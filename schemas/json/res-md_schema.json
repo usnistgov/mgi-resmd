@@ -1,0 +1,310 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "$extensionSchemas": ["http://mgi.nist.gov/json-schema/v0.1"],
+  "id": "http://mgi.nist.gov/json/res-md/v0.1",
+  "title": "Resource metadata schema",
+  "description": "a library of schemas for describing resources in a data federation",
+  "notes": [
+      "This schema is equivalent to the MGI res-md.xsd",
+      "This is based on VOResource v1.0"
+  ]
+  definitions: {
+    "Curation": {
+      "description": "Information regarding the general curation of a resource",
+      "type": "object",
+      "properties": {
+          "publisher": {
+              "$ref": "#/definitons/NameID",
+              "description": "the Entity (e.g. person or organisation) responsible for making the resource available.",
+          },
+          "creator": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/NameID" },
+              "description": "The entity (e.g. person or organization) primarily responsible for creating the content or constitution of the resource.",
+          },
+          "contributor": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/NameID" },
+              "description": "Entity responsible for contributions to the content of the resource"
+          },
+          "date": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/ReleventDate" },
+              "description": "Date associated with an event in the life cycle of the resource.",
+              "notes": [ "This will typically be associated with the creation or availability (i.e., most recent release or version) of the resource.  Use the role attribute to clarify." ]
+          }
+          "contact": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/Contact" },
+              "description": "Information that can be used for contacting someone with regard to this resource."
+          }
+      },
+      "equivalentTo": "http://mgi.nist.gov/xml/res-md/v0.1#Curation"
+    },
+
+    "NameID": {
+      "description": "a reference to something having a name and/or an identifier",
+      "notes": [ "This schema allows one to either provide just a human-readable name (as a string) or a name plus an identifier (as an array)."],
+      "oneOf": [
+          {
+              "type": "string",
+              "description": "A human-readable name or title for the entity being referenced"
+          },
+          {
+              "type": "array",
+              "items": [
+                  {
+                      "type": "string",
+                      "description": "A human-readable name or title for the entity being referenced"
+                  },
+                  {
+                      "$ref": "#/definitions/identifierInfo"
+                  }
+              ]
+              "additionalItems": { "$ref": "#/definitions/IdentifierInfo" }
+              
+          }
+      ]
+    },
+
+    "IdentifierInfo": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "string",
+                "format": "uri",
+                "description": "an identifier for the entity being referneced",
+            },
+            "scheme": {
+                "type": "string",
+                "description": "a label or identifier for the identifier system that the identifier complies with",
+                "notes": ["Use of this property is recommended when the identifier scheme is not obvious from the format of the identifier itself", "The value should be ignored if the id property is not given."],
+            }
+        },
+        "dependencies": {
+            "scheme": [ "id" ]
+        }
+        "comments": ["This definition was inspired on the bioCADDIE identifier_info_schema"]
+    },
+
+    "Contact": {
+      "description": "Information that can be used for contacting someone",
+      "type": "object",
+      "properties": {
+          "name": {
+              "$ref": "name-id_schema.json",
+              "description": "the name of the contact person or group",
+              "notes": [ "This can be a person's name, e.g. 'John P. Jones' or a group, 'Archinve Support Team'" ]
+          },
+          "postalAddress": {
+              "description": "the contact mailing address",
+              "notes": [ "All components of the mailing address are given in one string, e.g. '3700 San Martin Drive, Baltimore, MD 21218 USA'." ]
+              "type" : "string",
+              "comments": ["split this out?"]
+          },
+          "emailAddress": {
+              "description": "the contact email address",
+              "type" : "string",
+              "format": "email",
+              "recommended": true,
+              "comment": ["replace with more structure?"]
+          },
+          "phoneNumber": {
+              "description": "the contact telephone number",
+              "notes": [ "Complete international dialing codes should be given, e.g. '+1-410-338-1234'" ]
+              "type" : "string",
+          },
+          "timeZone": {
+              "description": "the time zone where the contact typically operates",
+              "type" : "string",
+              "pattern": "^[-+][0-9]{4}$"
+          }
+      },
+      "required": [ "name" ],
+      "equivalentTo": "http://mgi.nist.gov/xml/res-md/v0.1#Contact"
+    },
+
+    "Identity": {
+        "description": "a collection of metadata describing the identity of a resource",
+        "type": "object",
+        "properties": {
+            "title": {
+                "type": "string",
+                "description": "the full name given to the resource"
+            },
+            "shortName": {
+                "type": "string",
+                "description": "a short name or abbriviation given to the resource",
+                "notes": [
+                    "This name will be used where brief annotations for the resource name are required.  Applications may use to refer to this resource in a compact display.  This is NOT expected to be globally unique; thus, it should not be used as an identifier.",
+                    "One word or a few letters is recommended."
+                ]
+            },
+            "version": {
+                "type": "string",
+                "description": "Label a particular release or variation of the resource.",
+                "notes": [
+                    "Different versions of a resource typically share the same title."
+                ]
+            },
+            "identifier": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/IdentifierInfo" }
+                "description": "Unambiguous reference to the resource using a recognized identifier system.",
+                "notes": [
+                    "Multiple identifiers can be given if the resource is identified in multiple identifier systems."
+                ]
+            },
+            "logo": {
+                "type": "string",
+                "format": "uri",
+                "description": "URL pointing to a graphical logo, which may be used to help identify the information source"
+            }
+        },
+        "required": [ "title" ]
+    },
+
+    "Content": {
+        "description": "Information regarding the general content of a resource",
+        "type": "object",
+        "properties": {
+            "type": {
+                "$ref": "#/definitions/NameID",
+                "description": "An account of the nature of the resource",
+                "notes": [
+                    "The description may include but is not limited to an abstract, table of contents, reference to a graphical representation of content or a free-text account of the content."
+                ]
+            },
+            "subject": {
+                "type": "array",
+                "items": [
+                    "type": "string"
+                ]
+                "description": "An account of the nature of the resource",
+                "notes": [
+                    "The description may include but is not limited to an abstract, table of contents, reference to a graphical representation of content or a free-text account of the content."
+                ]
+            },
+            "referenceURL": {
+                "description": "URL pointing to a human-readable document describing this resource.",
+                "type": "string",
+                "format": "uri"
+            },
+            "referenceCitation": {
+                "description": "a bibliographic reference to a literature article that discusses this resource.",
+                "type": "array",
+                "items": { "$ref": "#/definitions/NameID" },
+                "notes": [
+                    "The value is a human-consumable version of the reference, such as a formatted bibliographic representation (e.g. used in an article bibliography).  The id component gives a persistant is prefered."
+                ]
+            },
+            "primaryAudience": {
+                "description": "The primary audience this resource is intended for.",
+                "type": "string",
+                "enum": [ "research", "education", "public outreach" ]
+                "valueDocumentation": {
+                    "research": {
+                        "description": "intended for academic and commercial researchers"
+                    },
+                    "education": {
+                        "description": "intended for formal and informal educational settings"
+                    },
+                    "public outreach": {
+                        "description": "intended for broad public consumption for purposes of news and awareness"
+                    }
+                }
+            }
+        }
+    },
+
+    "Applicability": {
+        "type": "object",
+        "description": "metadata describing a resource's applicability to a particular domain",
+        "notes":[
+            "It is expected that an instance of this type will comply with a an extension of this type marked with the '$type' annotation." 
+        ]
+    },
+
+    "Access": {
+        "type": "object",
+        "description": "metadata describing how one can access a resource and its features and capabilities.",
+        "properties": {
+            "policy": {
+                "description": "a description of the policy for accessing a resource",
+                "$ref": "#/definitions/Policy"
+            },
+            "portal": {
+                "description": "A description of the access to a resource through a web site, accessible through a web site."
+                "type": "array",
+                "items": { "$ref": "#/definitions/Portal" }
+            }
+        }
+    },
+
+    "Policy": {
+        "description": "metadata describing the policies accessing the resource",
+        "type": "object",
+        "properties": {
+            "rights": {
+                "description": "information about the held in and over the resource.",
+                "notes": [
+                    "Mulitple values should be provided if different kinds of access have different applicable rights"
+                ],
+                "type": "array",
+                "items": { "$ref": "#/definitions/Rights" },
+                "uniqueItems": true
+            },
+            "terms": {
+                "description": "A public URL to a document describing the terms of access for the resource.",
+                "type": "string",
+                "format": "uri"
+            }
+        }
+    },
+
+    "Rights": {
+        "type": "string",
+        "enum": [ "public", "open-login", "proprietary", "fee-required" ],
+        "valueDocumentation": {
+            "public": {
+                "description": "unrestricted, anonymous access is allowed without authentication.",
+            },
+            "open-login": {
+                "description": "unrestricted access requires a login (or other authentication mechanism)."
+            },
+            "proprietary": {
+                "description": "requires authentication and users only have access to datasets they have been given rights to.  Generally, there is no charge to use this resource."
+            },
+            "fee-required": {
+                "description": "requires user to pay a one-time or subscription fee in order to access the resource.  On-line resources typically will require authentication."
+            }
+        }
+    },
+
+    "Portal": {
+        "description": "metadata describing how one can access a resource",
+        "type": "object",
+        "properties": {
+            "description": {
+                "description": "a summary of how this portal provides access to the resource",
+                "notes": [
+                    "Providing a description is recommended if more than one portal is available."
+                ]
+                "type": "string",
+            },
+            "title": {
+                "description": "a title for the portal",
+                "notes": [
+                    "Providing a title is recommended if the portal is not specific to this resource and/or if the portal is described separately as a resource and has an identifier"
+                ]
+                "type": "string"
+            },
+            "homeURL": {
+                "description": "URL for accessing (via a browser) the home or entrance page to the portal",
+                "type": "string",
+                "format": "uri"
+            }
+        }
+    }
+  }
+}
