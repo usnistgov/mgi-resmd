@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="urn:nist.gov/schema/mat-sci_res-md/1.0wd" 
+           xmlns="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:rsm="urn:nist.gov/schema/res-md/1.0wd" 
+           xmlns:ms="urn:nist.gov/schema/mat-sci_res-md/1.0wd" 
+           xmlns:am="urn:nist.gov/schema/mgi.schema.annot" 
+           elementFormDefault="unqualified" 
+           attributeFormDefault="unqualified" version="0.1">
+
+   <xs:annotation>
+      <xs:documentation>
+        An extension of the MGI resource metadata for describing
+        resources with applicability to materials science.
+      </xs:documentation>
+      <xs:documentation>
+        This schema is based on VOResource v1.0 
+        (http://www.ivoa.net/xml/VOResource/v1.0) by Plante et al. 2008,
+        VOResource: an XML Encoding Schema for Resource Metadata, v. 1.03
+        (http://www.ivoa.net/documents/latest/VOResource.html).
+      </xs:documentation>
+   </xs:annotation>
+
+   <xs:import namespace="urn:nist.gov/schema/res-md/1.0wd"/>
+
+   <xs:complexType name="MaterialsScience">
+     <xs:annotation>
+       <xs:documentation>
+         Information describing a resource's applicability to Materials Science
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:Applicability">
+         <xs:sequence>
+           <xs:element name="materialType" type="ms:MaterialType" 
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:documentation>
+                 the category of material studied in the data contained in 
+                 this resource.
+               </xs:documentation>
+               <xs:documentation>
+                 one or more of: metal, semiconductor, ceramic, polymer, 
+                 biomaterial, organic, inorganic, oxide, composite,
+                 nanomaterials, superconductor, other, non-specific
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="structuralMorphology" 
+                       type="ms:StructuralMorphology" 
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:documentation>
+                 the primary or prevalent characteristic of the structure of 
+                 the material of interest to this resource
+               </xs:documentation>
+               <xs:documentation>
+                 one or more of: crystalline, amorphous, fluid, 
+                 quasi-periodic, bulk, 2D, 1D, film, nanotube, fiber, 
+                 composite, interfacial, interphase, line defect, 
+                 point defect, non-specific, other
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="propertyClass" type="ms:PropertyClass"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:documentation>
+                 a category of property that is sampled by the contained data
+               </xs:documentation>
+               <xs:documentation>
+                 one or more of: optical, mechanical, thermodynamic, structural,
+                 simulated, transport, defect, other, non-specific
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="acquisitionMethod" type="xs:token"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:documentation>
+                  the experimental or computational technique used to 
+                  acquire the data within this resource 
+               </xs:documentation>
+               <xs:documentation>
+                 one or more of recommended values:
+                  electron microscopy, scattering-diffraction, calorimetry, 
+                  load frame testing, atom probe microscopy, spectroscopy, 
+                  optical microscopy, impact testing, indentation, dilatometry,
+                  density functional theory calculation, 
+                  molecular dynamics simulation, numerical simulations, 
+                  multiscale simulations, finite element analysis, 
+                  computational thermodynamics, statistical mechanics, 
+                  dislocation dynamics, phase field calculation, 
+                  crystal plasticity calculation, Monte-Carlo simulation, 
+                  boundary tracking/level set, non-specific
+                 Other values are allowed.
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="sampleProcessing" type="xs:token"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:documentation>
+                 the physical processing or preparation technique applied 
+                 to the material being studied.
+               </xs:documentation>
+               <xs:documentation>
+                 one or more of recommended values:
+                  casting, annealing, vapor deposition, milling, extrusion, 
+                  pressing, exfoliation, melt blending, polymerization, 
+                  curing, evaporation, focused ion beam, non-specific.
+                 Other values are allowed.
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="MaterialType">
+     <xs:annotation>
+       <xs:documentation>
+         allowed values representing categories of materials.
+       </xs:documentation>
+     </xs:annotation>
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="metal">
+         <xs:annotation>
+           <xs:documentation>
+             an electropositive element or an alloy based on these elements; 
+             a material characterized by a partially filled energy band.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="semiconductor">
+         <xs:annotation>
+           <xs:documentation>
+             a material characterized by slightly filled or slightly empty 
+             energy band; a material with a relatively narrow band gap between 
+             0 and ~2 eV.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="polymer">
+         <xs:annotation>
+           <xs:documentation>
+             material composed of large molecules built up by repetition of 
+             small, simple chemical units.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="biomaterial">
+         <xs:annotation>
+           <xs:documentation>
+             material derived from living organisms or otherwise produced via 
+             biological processes.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="organic">
+         <xs:annotation>
+           <xs:documentation>
+             material comprised of Carbon-based compounds.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="inorganic">
+         <xs:annotation>
+           <xs:documentation>
+             material comprised of compounds exclusive of Carbon 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="oxide">
+         <xs:annotation>
+           <xs:documentation>
+             material comprised of Oxygen-based compounds 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="composite">
+         <xs:annotation>
+           <xs:documentation>
+             material comprised of multiple categories of materials 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="nanomaterials">
+         <xs:annotation>
+           <xs:documentation>
+             material comprised of structural units between 1 and 1000 nm in 
+             size.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="superconductor">
+         <xs:annotation>
+           <xs:documentation>
+             material capable of being an electrical conductor with zero 
+             resistance.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="non-specific">
+         <xs:annotation>
+           <xs:documentation>
+             materials related to (or studied in) this resource are not 
+             specific to any category 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="StructuralMorphology">
+     <xs:annotation>
+       <xs:documentation>
+         allowed values representing categories of structural morphologies.
+       </xs:documentation>
+     </xs:annotation>
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="crystalline">
+         <xs:annotation>
+           <xs:documentation>
+             having a certain crystal structure, i.e., characterized by both 
+             the short-range and long-range periodic order in the atomic 
+             structure; having a structure of identical units (consisting of 
+             one or more atoms) which are regularly arranged with respect to 
+             each other in space.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="amorphous">
+         <xs:annotation>
+           <xs:documentation>
+             a structure without regular or periodic order; having a structure 
+             characterized by only a short-range order but without a long-range 
+             order in atomic structure.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="fluid">
+         <xs:annotation>
+           <xs:documentation>
+             a material in a liquid or gaseous state.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="quasi-periodic">
+         <xs:annotation>
+           <xs:documentation>
+             a structure that is ordered but not periodic in its units; a 
+             structure characterized by rotational symmetry but not 
+             translational symmetry 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="bulk">
+         <xs:annotation>
+           <xs:documentation>
+             referring to structure representative of a material away from 
+             surfaces and large enough to be volume invariant 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="2D">
+         <xs:annotation>
+           <xs:documentation>
+             having the structure of a sheet, usually being one structural unit 
+             in size in one spatial dimension.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="1D">
+         <xs:annotation>
+           <xs:documentation>
+             having a linear structure, usually being one structural unit in 
+             size in two spatial dimensions.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="film">
+         <xs:annotation>
+           <xs:documentation>
+             structured into a thin layer.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="nanotube">
+         <xs:annotation>
+           <xs:documentation>
+             having the structure of a tube on the nanomaterial scale.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="fiber">
+         <xs:annotation>
+           <xs:documentation>
+             having a filament shape, i.e. one that is long in relation to its 
+             thickness
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="composite">
+         <xs:annotation>
+           <xs:documentation>
+             being comprised of pieces of different structural types.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="interfacial">
+         <xs:annotation>
+           <xs:documentation>
+             featuring two different materials or structures segregated along 
+             a well-defined surface.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="interphase">
+         <xs:annotation>
+           <xs:documentation>
+             the region between two distinct phases.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="line defect">
+         <xs:annotation>
+           <xs:documentation>
+             dislocations; having lattice imperfections in a crystal structure; 
+             having a crystal structure in which lattice components are 
+             displaced from the nominally periodic positions. 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="point defect">
+         <xs:annotation>
+           <xs:documentation>
+             vacancies; having a crystal structure with unoccupied lattice sites.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="non-specific">
+         <xs:annotation>
+           <xs:documentation>
+             materials related to (or studied in) this resource are not 
+             restricted to a specific category of structure or morphology.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="PropertyClass">
+     <xs:annotation>
+       <xs:documentation>
+         allowed values representing categories of material physical properties
+       </xs:documentation>
+     </xs:annotation>
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="optical">
+         <xs:annotation>
+           <xs:documentation>
+             property describes out a material interacts with electromagnetic 
+             radiation.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="mechanical">
+         <xs:annotation>
+           <xs:documentation>
+             property describes a sample material's response to an external 
+             influence causing plastic deformation or destruction.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="thermodynamic">
+         <xs:annotation>
+           <xs:documentation>
+             property describing a materials response to heat, including the 
+             transfer of heat through the material and thermophysical properties
+             (those that vary with temperature without changing the material's 
+             identity. 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="structural">
+         <xs:annotation>
+           <xs:documentation>
+             properties describing the relative locations of a material's 
+             constituent atoms or molecules. 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="simulated">
+         <xs:annotation>
+           <xs:documentation>
+             a property or parameter describing a material's state as calculated
+             in a computational simulation.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="transport">
+         <xs:annotation>
+           <xs:documentation>
+             a property describing the transport of mass through a material.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="defect">
+         <xs:annotation>
+           <xs:documentation>
+             a property describing an imperfection in the lattice structure of 
+             a crystal, including dislocations, vacancies, and impurities (i.e. 
+             interstitial atoms); a property describing structural disorder in 
+             a material (i.e. departures from the regular ordered structure of 
+             a crystal).
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="non-specific">
+         <xs:annotation>
+           <xs:documentation>
+             resource may address any number of different properties.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+
+</xs:schema>
+
