@@ -1,26 +1,61 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema",
   "$extensionSchemas": ["http://mgi.nist.gov/json-schema/v0.1"],
-  "id": "http://mgi.nist.gov/json/res-md/v0.1",
-  "title": "Resource metadata schema",
+  "id": "http://mgi.nist.gov/json/res-md/v1.0wd",
+  "title": "Resource metadata type library",
   "description": "a library of schemas for describing resources in a data federation",
   "notes": [
       "This schema is equivalent to the MGI res-md.xsd",
       "This is based on VOResource v1.0"
-  ]
-  definitions: {
+  ],
+  "definitions": {
+    "Resource": {
+        "description": "an identified, described, and discoverable component of the distributed data environment.",
+        "type": "object",
+        "properties": {
+            "identity": {
+                "description": "a collection of metadata that help identify the resource in various contexts.  It includes its title and unique identifiers.",
+                "notes": [ 
+                    "Note that the ensemble of metadata contained here do not define the identity uniquely and unambiguously; rather, any of the given identifier element values (and only those values) can do that for the context of that identifier." 
+                ],
+                "$ref": "#/definitions/Identity"
+            },
+            "curation": {
+                "description": "Information regarding the general curation of the resource",
+                "$ref": "#/definitions/Curation"
+            },
+            "curation": {
+                "description": "Information regarding the general content of the resource",
+                "$ref": "#/definitions/Content"
+            },
+            "applicability": {
+                "description": "Information describing the resource's applicability to a particular domain",
+                "notes": [ 
+                    "Domain specific metadata gets captured here." 
+                ],
+                "type": "array",
+                "items": {
+                    "$ref": "#/definitions/Applicability"
+                }
+            },
+            "access": {
+                "description": "Information describing how to access the resource and its features and capabilities",
+                "$ref": "#/definitions/Access"
+            }
+        }
+    },
     "Curation": {
       "description": "Information regarding the general curation of a resource",
       "type": "object",
       "properties": {
           "publisher": {
               "$ref": "#/definitons/NameID",
-              "description": "the Entity (e.g. person or organisation) responsible for making the resource available.",
+              "description": "the Entity (e.g. person or organisation) responsible for making the resource available."
           },
           "creator": {
               "type": "array",
               "items": { "$ref": "#/definitions/NameID" },
-              "description": "The entity (e.g. person or organization) primarily responsible for creating the content or constitution of the resource.",
+              "description": "The entity (e.g. person or organization) primarily responsible for creating the content or constitution of the resource."
           },
           "contributor": {
               "type": "array",
@@ -32,7 +67,7 @@
               "items": { "$ref": "#/definitions/ReleventDate" },
               "description": "Date associated with an event in the life cycle of the resource.",
               "notes": [ "This will typically be associated with the creation or availability (i.e., most recent release or version) of the resource.  Use the role attribute to clarify." ]
-          }
+          },
           "contact": {
               "type": "array",
               "items": { "$ref": "#/definitions/Contact" },
@@ -60,7 +95,7 @@
                   {
                       "$ref": "#/definitions/identifierInfo"
                   }
-              ]
+              ],
               "additionalItems": { "$ref": "#/definitions/IdentifierInfo" }
               
           }
@@ -73,17 +108,17 @@
             "id": {
                 "type": "string",
                 "format": "uri",
-                "description": "an identifier for the entity being referneced",
+                "description": "an identifier for the entity being referneced"
             },
             "scheme": {
                 "type": "string",
                 "description": "a label or identifier for the identifier system that the identifier complies with",
-                "notes": ["Use of this property is recommended when the identifier scheme is not obvious from the format of the identifier itself", "The value should be ignored if the id property is not given."],
+                "notes": ["Use of this property is recommended when the identifier scheme is not obvious from the format of the identifier itself", "The value should be ignored if the id property is not given."]
             }
         },
         "dependencies": {
             "scheme": [ "id" ]
-        }
+        },
         "comments": ["This definition was inspired on the bioCADDIE identifier_info_schema"]
     },
 
@@ -98,7 +133,7 @@
           },
           "postalAddress": {
               "description": "the contact mailing address",
-              "notes": [ "All components of the mailing address are given in one string, e.g. '3700 San Martin Drive, Baltimore, MD 21218 USA'." ]
+              "notes": [ "All components of the mailing address are given in one string, e.g. '3700 San Martin Drive, Baltimore, MD 21218 USA'." ],
               "type" : "string",
               "comments": ["split this out?"]
           },
@@ -111,8 +146,8 @@
           },
           "phoneNumber": {
               "description": "the contact telephone number",
-              "notes": [ "Complete international dialing codes should be given, e.g. '+1-410-338-1234'" ]
-              "type" : "string",
+              "notes": [ "Complete international dialing codes should be given, e.g. '+1-410-338-1234'" ],
+              "type" : "string"
           },
           "timeZone": {
               "description": "the time zone where the contact typically operates",
@@ -149,7 +184,7 @@
             },
             "identifier": {
                 "type": "array",
-                "items": { "$ref": "#/definitions/IdentifierInfo" }
+                "items": { "$ref": "#/definitions/IdentifierInfo" },
                 "description": "Unambiguous reference to the resource using a recognized identifier system.",
                 "notes": [
                     "Multiple identifiers can be given if the resource is identified in multiple identifier systems."
@@ -177,9 +212,9 @@
             },
             "subject": {
                 "type": "array",
-                "items": [
+                "items": {
                     "type": "string"
-                ]
+                },
                 "description": "An account of the nature of the resource",
                 "notes": [
                     "The description may include but is not limited to an abstract, table of contents, reference to a graphical representation of content or a free-text account of the content."
@@ -201,7 +236,7 @@
             "primaryAudience": {
                 "description": "The primary audience this resource is intended for.",
                 "type": "string",
-                "enum": [ "research", "education", "public outreach" ]
+                "enum": [ "research", "education", "public outreach" ],
                 "valueDocumentation": {
                     "research": {
                         "description": "intended for academic and commercial researchers"
@@ -234,7 +269,7 @@
                 "$ref": "#/definitions/Policy"
             },
             "portal": {
-                "description": "A description of the access to a resource through a web site, accessible through a web site."
+                "description": "A description of the access to a resource through a web site, accessible through a web site.",
                 "type": "array",
                 "items": { "$ref": "#/definitions/Portal" }
             }
@@ -267,7 +302,7 @@
         "enum": [ "public", "open-login", "proprietary", "fee-required" ],
         "valueDocumentation": {
             "public": {
-                "description": "unrestricted, anonymous access is allowed without authentication.",
+                "description": "unrestricted, anonymous access is allowed without authentication."
             },
             "open-login": {
                 "description": "unrestricted access requires a login (or other authentication mechanism)."
@@ -289,14 +324,14 @@
                 "description": "a summary of how this portal provides access to the resource",
                 "notes": [
                     "Providing a description is recommended if more than one portal is available."
-                ]
-                "type": "string",
+                ],
+                "type": "string"
             },
             "title": {
                 "description": "a title for the portal",
                 "notes": [
                     "Providing a title is recommended if the portal is not specific to this resource and/or if the portal is described separately as a resource and has an identifier"
-                ]
+                ],
                 "type": "string"
             },
             "homeURL": {
