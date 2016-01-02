@@ -11,17 +11,17 @@
                 "This is intended for use whereever the descriptions property is allowed",
                 "The convention of this extension of json-schema is that the description property contains the definitive semantic definition of the property.",
                 "Each note item captures a separate idea (like a paragraph)"
-            ]
+            ],
             "items": { "type": "string" }
         },
 
         "Documentation": {
-            "type": "object"
+            "type": "object",
             "properties": {
                 "description": {
                     "type": "string",
                     "description": "the definition of the item being documented"
-                }
+                },
                 "notes": {
                     "$ref": "#definitions/Notes",
                     "description": "additional advice on the use of the thing being defined"
@@ -29,14 +29,14 @@
                 "comments": {
                     "$ref": "defintions/Notes",
                     "description": "editorial comments not intended for user consumption"
-                }
+                },
                 "equivalentTo": {
                     "type": "string",
                     "format": "uri",
                     "description": "An identifier for a metadata definition that this property is semantically equivalent"
                 }
             }
-        }
+        },
 
         "EnhancedSchema": {
             "type": "object",
@@ -82,7 +82,7 @@
                                 "items": {
                                     "type": "string",
                                     "format": "uri"
-                                }
+                                },
                                 "description": "an array of identifiers that should be considered extensions of the schema given in the $schema property that instances of this schema are also compliant with.",
                                 "notes": [
                                     "If an application recognizes any of the identifiers given, it can optionally choose to validate the instance against that schema and interpret and additional properties it defines accordingly.",
@@ -90,11 +90,11 @@
                                 ]
                             },
                             "notes": {
-                                "$ref": "#definitions/Notes"
+                                "$ref": "#definitions/Notes",
                                 "description": "additional advice on the use of the schema being defined"
                             },
                             "comments": {
-                                "$ref": "#definitions/Notes"
+                                "$ref": "#definitions/Notes",
                                 "description": "editorial comments not intended for user consumption"
                             },
                             "equivalentTo": {
