@@ -13,27 +13,27 @@ schemadir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
                          'schemas','json')
 schemafile = os.path.join(schemadir, 'mgi-json-schema.json')
 
-class TestAltLocationSchemaLoader(object):
+class TestSchemaLoader(object):
 
     def test_ctor(self):
-        ldr = validate.AltLocationSchemaLoader()
+        ldr = validate.SchemaLoader()
         assert len(set(ldr.iterURIs())) == 0
 
-        ldr = validate.AltLocationSchemaLoader(locs)
+        ldr = validate.SchemaLoader(locs)
         uris = set(ldr.iterURIs())
         assert len(uris) == 2
         assert "uri:nist.gov/goober" in uris
         assert "http://mgi.nist.gov/goof" in uris
 
     def test_locate(self):
-        ldr = validate.AltLocationSchemaLoader(locs)
+        ldr = validate.SchemaLoader(locs)
         assert ldr.locate("uri:nist.gov/goober") == \
             "http://www.ivoa.net/xml/goober"
         assert ldr.locate("http://mgi.nist.gov/goof") == "goof.xml"
         assert ldr.locate("ivo://ivoa.net/rofr") is None
 
     def test_add(self):
-        ldr = validate.AltLocationSchemaLoader()
+        ldr = validate.SchemaLoader()
         assert len(set(ldr.iterURIs())) == 0
 
         ldr.add_locations(locs)
@@ -43,7 +43,7 @@ class TestAltLocationSchemaLoader(object):
             "http://www.ivoa.net/xml/goober"
         assert ldr.locate("http://mgi.nist.gov/goof") == "goof.xml"
 
-        ldr = validate.AltLocationSchemaLoader()
+        ldr = validate.SchemaLoader()
         ldr.add_location("uri:nist.gov/goober", "goober.json")
         assert len(set(ldr.iterURIs())) == 1
         assert ldr.locate("uri:nist.gov/goober") == "goober.json"
@@ -54,7 +54,7 @@ class TestAltLocationSchemaLoader(object):
             "http://www.ivoa.net/xml/goober"
 
     def test_load_schema(self):
-        ldr = validate.AltLocationSchemaLoader()
+        ldr = validate.SchemaLoader()
         ldr.add_location("uri:nist.gov/goober", schemafile)
 
         schema = ldr.load_schema("uri:nist.gov/goober")
@@ -63,7 +63,7 @@ class TestAltLocationSchemaLoader(object):
         assert "id" in schema
 
     def test_call(self):
-        ldr = validate.AltLocationSchemaLoader()
+        ldr = validate.SchemaLoader()
         ldr.add_location("uri:nist.gov/goober", schemafile)
 
         schema = ldr("uri:nist.gov/goober")
@@ -71,60 +71,49 @@ class TestAltLocationSchemaLoader(object):
         assert "$schema" in schema
         assert "id" in schema
 
-class TestAltLocationSchemaHandler(object):
+class TestSchemaHandler(object):
 
     def test_ctor(self):
-        ldr = validate.AltLocationSchemaHandler()
-        assert len(set(ldr.iterURIs())) == 0
-
-        ldr = validate.AltLocationSchemaHandler(locs)
-        uris = set(ldr.iterURIs())
-        assert len(uris) == 2
-        assert "uri:nist.gov/goober" in uris
-        assert "http://mgi.nist.gov/goof" in uris
-
-        ldr = validate.AltLocationSchemaHandler(locs, True)
-        assert len(set(ldr.iterURIs())) == 2
-        assert ldr._strict
-
-        ldr = validate.AltLocationSchemaHandler(locs, strict=False)
-        assert len(set(ldr.iterURIs())) == 2
+        ldr = validate.SchemaHandler(validate.SchemaLoader())
         assert not ldr._strict
 
-    def test_call(self):
-        ldr = validate.AltLocationSchemaHandler()
-        ldr.add_location("uri:nist.gov/goober", schemafile)
+        ldr = validate.SchemaHandler(validate.SchemaLoader(locs))
+        assert not ldr._strict
 
-        schema = ldr("uri:nist.gov/goober")
-        assert schema
-        assert "$schema" in schema
-        assert "id" in schema
+        ldr = validate.SchemaHandler(locs, True)
+        assert ldr._strict
+
+        ldr = validate.SchemaHandler(validate.SchemaLoader(locs), strict=False)
+        assert not ldr._strict
 
     def test_compat(self):
-        ldr = validate.AltLocationSchemaHandler(locs)
-        ldr.add_location("http://mgi.nist.gov/mgi-json-schema/v0.1", schemafile)
+        ldr = validate.SchemaLoader(locs)
+        ldr.add_location("http://mgi.nist.gov/mgi-json-schema/v0.1", 
+                         schemafile)
+        hdlr = validate.SchemaHandler(ldr)
 
-        assert "uri" in ldr
-        assert "http" in ldr
-        assert len(ldr) == 2
+        assert "uri" in hdlr
+        assert "http" in hdlr
+        assert len(hdlr) == 2
 
-        assert ldr["uri"] is ldr
-        assert ldr["http"] is ldr
-        assert ldr["https"] is ldr  # not strict
+        assert hdlr["uri"] is ldr
+        assert hdlr["http"] is ldr
+        assert hdlr["https"] is ldr  # not strict
 
-        schema = ldr["http"]("http://mgi.nist.gov/mgi-json-schema/v0.1")
+        schema = hdlr["http"]("http://mgi.nist.gov/mgi-json-schema/v0.1")
         assert isinstance(schema, dict)
-        assert "$schema" in ldr
-        assert "id" in ldr
+        assert "$schema" in schema
+        assert "id" in schema
         assert schema["id"] == "http://mgi.nist.gov/mgi-json-schema/v0.1"
 
     def test_strict(self):
-        ldr = validate.AltLocationSchemaHandler(locs, strict=True)
-        assert ldr["uri"] is ldr
-        assert ldr["http"] is ldr
+        ldr = validate.SchemaLoader(locs)
+        hdlr = validate.SchemaHandler(ldr, strict=True)
+        assert hdlr["uri"] is ldr
+        assert hdlr["http"] is ldr
 
         with pytest.raises(KeyError):
-            assert ldr["https"] is ldr 
+            assert hdlr["https"] is ldr 
 
 
         
