@@ -3,11 +3,12 @@ a module that provides support for loading schemas, particularly those
 cached on local disk.  
 """
 from __future__ import with_statement
-import sys, os, json
+import sys, os, json, errno
 
 from urlparse import urlparse
 from urllib2 import urlopen
 from collections import Mapping
+import jsonschema as jsch
 
 from .location import read_loc_file
 
@@ -152,3 +153,115 @@ class SchemaHandler(Mapping):
         return self._loader._schemes.__iter__()
 
 
+class DirectorySchemaCache(object):
+    """
+    a front end for a cache of schemas stored in files within a single 
+    directory.  This class can either pre-load all schemas into memory or 
+    simply create a mapping of URIs to file locations.  
+
+    A schema is recognized as a JSON file containing a "$schema" property set 
+    to a recognized JSON-Schema URI.  It should also contain an "id" property 
+    that contains the schema's URI; if it doesn't, a file-scheme URI will be 
+    given to it based on its location on disk.  
+    """
+
+    class NotASchemaError(Exception):
+
+        def __init__(self, why=None, filepath=None):
+            self.filename = None
+            self.path = filepath
+            self.why = why
+
+        @property
+        def path(self):
+            """
+            the file path to file containing the non-schema
+            """
+            return self._path
+        @path.setter
+        def path(self, val):
+            self._path = val
+            if filepath:
+                self.filename = os.path.basename(filepath)
+        @path.deleter
+        def path(self):
+            del self._path
+
+        def __str__(self):
+            out = ""
+            if self.filename:
+                out += self.filename + ": "
+            out += "Not a JSON Schema document"
+            if why:
+                out += ": " + why
+            return out
+
+    def __init__(self, dirpath):
+        self._dir = dirpath
+
+    def _checkdir(self):
+        if not os.path.exists(self._dir):
+            raise IOError((errno.ENOENT, "directory not found", self._dir)) 
+        if not os.path.isdir(self._dir):
+            raise RuntimeError(self._dir + ": not a directory")
+
+    def _read_id(self, fd):
+        schema = json.load(fd)
+        if not has_attr(schema, "get"):
+            raise self.NotASchemaError("Does not contain a JSON object")
+        try:
+            sid = schema["$schema"]
+            if sid not in jsch.validators.meta_schemas:
+                raise self.NotASchemaError("Unrecognized JSON-Schema $schema")
+        except KeyError:
+            raise self.NotASchemaError("JSON object does not contain a $schema property")
+
+        return (schema.get("id"), schema)
+
+    def _open_file(self, filename):
+        with open(filename) as fd:
+            try:
+                (id, schema) = self._read_id(fd)
+            except self.NotASchemaError, ex:
+                ex.path = filename
+                raise
+
+            if not id:
+                id = "file://" + os.path.abspath(filename)
+
+            return (id, schema)
+
+    def _iterfiles(self):
+        for file in filter(lambda f: f.endswith(".json"), 
+                           os.listdir(self._dir)):
+            try:
+                (id, schema) = self._open_file(os.path.join(self._dir, file))
+                yield file, id, schema
+            except self.NotASchemaError, ex:
+                continue
+
+    def locations(self, absolute=False):
+        """
+        return a dictionary that maps schema URIs to their file paths.  
+
+        :argument bool absolute:  if True, the paths returned will be absolute;
+                                  by default (False), paths relative to the 
+                                  directory are returned. 
+        """
+        out = {}
+        for file, id, schema in self._iterfiles():
+            if absolute:
+                file = os.path.join(self._dir, file)
+            out[id] = file
+
+        return out
+
+    def schemas(self):
+        """
+        return a dictionary of mappings of URIs to parsed schemas
+        """
+        out = {}
+        for file, id, schema in self._iterfiles():
+            out[id] = schema
+
+        return out
