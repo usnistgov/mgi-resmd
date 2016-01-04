@@ -181,8 +181,8 @@ class DirectorySchemaCache(object):
         @path.setter
         def path(self, val):
             self._path = val
-            if filepath:
-                self.filename = os.path.basename(filepath)
+            if val:
+                self.filename = os.path.basename(val)
         @path.deleter
         def path(self):
             del self._path
@@ -207,7 +207,7 @@ class DirectorySchemaCache(object):
 
     def _read_id(self, fd):
         schema = json.load(fd)
-        if not has_attr(schema, "get"):
+        if not hasattr(schema, "get") or not hasattr(schema,"__getitem__"):
             raise self.NotASchemaError("Does not contain a JSON object")
         try:
             sid = schema["$schema"]
@@ -218,8 +218,13 @@ class DirectorySchemaCache(object):
 
         return (schema.get("id"), schema)
 
-    def _open_file(self, filename):
-        with open(filename) as fd:
+    def open_file(self, filename):
+        """
+        read the file in the cache directory with the given filename and 
+        return 2-tuple of the schema's id and the parsed schema
+        """
+        filepath = os.path.join(self._dir, filename)
+        with open(filepath) as fd:
             try:
                 (id, schema) = self._read_id(fd)
             except self.NotASchemaError, ex:
@@ -227,7 +232,7 @@ class DirectorySchemaCache(object):
                 raise
 
             if not id:
-                id = "file://" + os.path.abspath(filename)
+                id = "file://" + filepath
 
             return (id, schema)
 
@@ -235,7 +240,7 @@ class DirectorySchemaCache(object):
         for file in filter(lambda f: f.endswith(".json"), 
                            os.listdir(self._dir)):
             try:
-                (id, schema) = self._open_file(os.path.join(self._dir, file))
+                (id, schema) = self.open_file(file)
                 yield file, id, schema
             except self.NotASchemaError, ex:
                 continue
@@ -265,3 +270,24 @@ class DirectorySchemaCache(object):
             out[id] = schema
 
         return out
+
+    def save_locations(self, outfile="schemaLocation.json", absolute=False):
+        """
+        write the id-location map to a file (in JSON format).  
+
+        :argument str outfile:  the name of the output file.  If not provided,
+                     it will be written to a file called "schemaLocation.json"
+                     in the cache directory.  A relative path will be 
+                     interpreted as relative to the cache directory.  To write
+                     to an arbitrary location, one must provide an absolute
+                     path.
+        :argument bool absolute:  if True, the paths returned will be absolute;
+                                  by default (False), paths relative to the 
+                                  directory are returned. 
+        """
+        outfile = os.path.join(self._dir, outfile)
+
+        locs = self.locations(absolute)
+
+        with open(outfile, "w") as fd:
+            json.dump(locs, fd, separators=(",", ": "), indent=4)

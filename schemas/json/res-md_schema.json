@@ -85,7 +85,7 @@
           "maxProperties": 1,
           "patternProperties": { "^.*$": { "type": "string", "format": "date" }}
       }
-    }
+    },
 
     "NameID": {
       "description": "a reference to something having a name and/or an identifier",

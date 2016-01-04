@@ -1,7 +1,9 @@
 # import pytest
 from __future__ import with_statement
-import json, os, pytest
+import json, os, pytest, shutil
 from cStringIO import StringIO
+
+from . import Tempfiles
 import xjs.schemaloader as loader
 
 locs = {
@@ -12,6 +14,7 @@ schemadir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
                             os.path.dirname(os.path.dirname(__file__))))), 
                          'schemas','json')
 schemafile = os.path.join(schemadir, 'mgi-json-schema.json')
+datadir = os.path.join(os.path.dirname(__file__), "data")
 
 class TestSchemaLoader(object):
 
@@ -115,5 +118,104 @@ class TestSchemaHandler(object):
         with pytest.raises(KeyError):
             assert hdlr["https"] is ldr 
 
+@pytest.fixture(scope="module")
+def schemafiles(request):
+    tf = Tempfiles()
+    schdir = tf.mkdir("schemas")
+    shutil.copy(os.path.join(schemadir,"registry-resource_schema.json"), schdir)
+    shutil.copy(os.path.join(schemadir,"extern","json-schema.json"), schdir)
+    def fin():
+        tf.clean()
+    request.addfinalizer(fin)
+    return tf
 
+class TestDirectorySchemaCache(object):
+
+    def test_openfile(self, schemafiles):
+        sfile = os.path.join(schemafiles.parent, "schemas", "json-schema.json")
+        assert os.path.exists(sfile)
+
+        cache = loader.DirectorySchemaCache(schemafiles.parent)
+        id, schema = cache.open_file(sfile)
+
+        assert id == 'http://json-schema.org/draft-04/schema#'
+        assert schema['id'] == id
+
+    def test_locations(self, schemafiles):
+        sdir = os.path.join(schemafiles.parent, "schemas")
+        cache = loader.DirectorySchemaCache(sdir)
+        loc = cache.locations()
+        assert loc['http://json-schema.org/draft-04/schema#'] == \
+            "json-schema.json"
+        assert loc['http://mgi.nist.gov/json/registry-resource/v0.1'] == \
+            "registry-resource_schema.json"
+
+    def test_locations_abs(self, schemafiles):
+        sdir = os.path.join(schemafiles.parent, "schemas")
+        cache = loader.DirectorySchemaCache(sdir)
+        loc = cache.locations(True)
+        assert loc['http://json-schema.org/draft-04/schema#'] == \
+            os.path.join(sdir, "json-schema.json")
+        assert loc['http://mgi.nist.gov/json/registry-resource/v0.1'] == \
+            os.path.join(sdir, "registry-resource_schema.json")
+        assert len(loc) == 2
+
+    def test_schemas(self, schemafiles):
+        sdir = os.path.join(schemafiles.parent, "schemas")
+        cache = loader.DirectorySchemaCache(sdir)
+        loc = cache.schemas()
+        assert loc['http://json-schema.org/draft-04/schema#']['id'] == \
+            "http://json-schema.org/draft-04/schema#"
+        assert loc['http://mgi.nist.gov/json/registry-resource/v0.1']['id'] == \
+            "http://mgi.nist.gov/json/registry-resource/v0.1"
+
+    def test_openfile_fileid(self):
+        cache = loader.DirectorySchemaCache(datadir)
+        (id, schema) = cache.open_file("noid_schema.json")
+        assert id == "file://" + os.path.join(datadir, "noid_schema.json")
+
+    def test_notaschema(self):
+        cache = loader.DirectorySchemaCache(datadir)
+        with pytest.raises(loader.DirectorySchemaCache.NotASchemaError):
+            cache.open_file("loc.json")
+
+    def test_locs_nota(self):
+        cache = loader.DirectorySchemaCache(datadir)
+        loc = cache.locations()
+        assert "file://" + os.path.join(datadir, "noid_schema.json") in loc
+        assert len(loc) == 1
+
+    def test_save(self, schemafiles):
+        sdir = os.path.join(schemafiles.parent, "schemas")
+        slfile = os.path.join(sdir,"schemaLocation.json")
+        if os.path.exists(slfile):
+            os.remove(slfile)
+        assert not os.path.exists(slfile)
+
+        cache = loader.DirectorySchemaCache(sdir)
+        cache.save_locations()
+
+        assert os.path.exists(slfile)
+        with open(slfile) as fd:
+            loc = json.load(fd)
+        assert loc['http://json-schema.org/draft-04/schema#'] == \
+            "json-schema.json"
+        assert loc['http://mgi.nist.gov/json/registry-resource/v0.1'] == \
+            "registry-resource_schema.json"
+
+    def test_save_abs(self, schemafiles):
+        slfile = os.path.join(schemafiles.parent, "locations.json")
+        if os.path.exists(slfile):
+            os.remove(slfile)
+        assert not os.path.exists(slfile)
+
+        cache = loader.DirectorySchemaCache(datadir)
+        cache.save_locations(slfile, True)
+
+        assert os.path.exists(slfile)
+        with open(slfile) as fd:
+            loc = json.load(fd)
+        assert loc['file://'+os.path.join(datadir,"noid_schema.json")] == \
+            os.path.join(datadir, "noid_schema.json")
+        assert len(loc) == 1
         
