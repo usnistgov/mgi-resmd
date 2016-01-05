@@ -1,12 +1,12 @@
 {
     "id": "urn:nist.gov/nmrr/ipr",
     "$schema": "http://mgi.nist.gov/json/registry-resource/v0.1",
-    "$ns": { "ms": "urn:nist.gov/schema/mat-sci_res-md/1.0wd#/definitions/" }
+    "$ns": { "ms": "urn:nist.gov/schema/mat-sci_res-md/1.0wd#/definitions/" },
     "$extendedSchemas": [ "ms:Database" ],
     "identity": {
         "title": "The Interatomic Potentials Repository Project",
         "shortName": "IPR",
-        "version" = "2.0"
+        "version": "2.0"
     },
     "curation": {
         "publisher": "NIST/MSED Center for Theoretical and Computational Materials Science (CTCMS)",
@@ -16,8 +16,8 @@
             { "creation":  "2008-04-01" }
         ],
         "contact": {
-            "name": "Zachary Trautt"
-            "emailAddress": "zachary.trautt@nist.gov"
+            "name": "Zachary Trautt",
+            "emailAddress": "zachary.trautt@nist.gov",
             "timeZone":  "-0500"
         }
     },
@@ -31,20 +31,22 @@
             "molecular dynamics",
             "metals",
             "force fields",
-            "atomistic simulations",
+            "atomistic simulations"
         ],
         "referenceURL": "http://www.ctcms.nist.gov/potentials/",
         "referenceCitation":  [ 
             [ "Becker, C.A. et al., 'Considerations for choosing and using force fields and interatomic potentials in materials science and engineering,' Current Opinion in Solid State and Materials Science, 17, 277-283 (2013).",
               "doi:10.1016/j.cossms.2013.10.001" ]
-        ]
+        ],
         "primaryAudience": [ "research" ]
     },
-    "applicability": {
-        "$extendedSchema": [ "ms:MaterialScience" ]
-        "materialType": [ "non-specific" ],
-        "propertyClass": [ "simulated", "structural" ]
-    },
+    "applicability": [
+        {
+            "$extendedSchemas": [ "ms:MaterialScience" ],
+            "materialType": [ "non-specific" ],
+            "propertyClass": [ "simulated", "structural" ]
+        }
+    ],
     "access": {
         "policy": {
             "rights": [ "public" ]
