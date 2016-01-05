@@ -236,42 +236,52 @@ class DirectorySchemaCache(object):
 
             return (id, schema)
 
-    def _iterfiles(self):
-        for file in filter(lambda f: f.endswith(".json"), 
-                           os.listdir(self._dir)):
-            try:
-                (id, schema) = self.open_file(file)
-                yield file, id, schema
-            except self.NotASchemaError, ex:
-                continue
+    def _iterfiles(self, recurse=True):
+        for dir, dirnames, filenames in os.walk(self._dir):
+            dir = dir[len(self._dir)+1:]
+            for file in map(lambda p: os.path.join(dir, p), 
+                            filter(lambda f: f.endswith(".json"), filenames)):
+                try:
+                    (id, schema) = self.open_file(file)
+                    yield file, id, schema
+                except self.NotASchemaError, ex:
+                    continue
+            if not recurse:
+                break
 
-    def locations(self, absolute=False):
+    def locations(self, absolute=False, recursive=True):
         """
         return a dictionary that maps schema URIs to their file paths.  
 
         :argument bool absolute:  if True, the paths returned will be absolute;
                                   by default (False), paths relative to the 
                                   directory are returned. 
+        :argument bool recursive: if True (default), this list will include
+                                  schemas from subdirectories
         """
         out = {}
-        for file, id, schema in self._iterfiles():
+        for file, id, schema in self._iterfiles(recursive):
             if absolute:
                 file = os.path.join(self._dir, file)
             out[id] = file
 
         return out
 
-    def schemas(self):
+    def schemas(self, recursive=True):
         """
         return a dictionary of mappings of URIs to parsed schemas
+
+        :argument bool recursive: if True (default), this list will include
+                                  schemas from subdirectories
         """
         out = {}
-        for file, id, schema in self._iterfiles():
+        for file, id, schema in self._iterfiles(recursive):
             out[id] = schema
 
         return out
 
-    def save_locations(self, outfile="schemaLocation.json", absolute=False):
+    def save_locations(self, outfile="schemaLocation.json", 
+                       absolute=False, recursive=True):
         """
         write the id-location map to a file (in JSON format).  
 
@@ -284,10 +294,12 @@ class DirectorySchemaCache(object):
         :argument bool absolute:  if True, the paths returned will be absolute;
                                   by default (False), paths relative to the 
                                   directory are returned. 
+        :argument bool recursive: if True (default), this list will include
+                                  schemas from subdirectories
         """
         outfile = os.path.join(self._dir, outfile)
 
-        locs = self.locations(absolute)
+        locs = self.locations(absolute, recursive)
 
         with open(outfile, "w") as fd:
             json.dump(locs, fd, separators=(",", ": "), indent=4)

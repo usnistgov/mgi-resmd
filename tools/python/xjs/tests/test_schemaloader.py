@@ -219,3 +219,11 @@ class TestDirectorySchemaCache(object):
             os.path.join(datadir, "noid_schema.json")
         assert len(loc) == 1
         
+    def test_recursive(self):
+        cache = loader.DirectorySchemaCache(schemadir)
+
+        locs = cache.locations()
+        assert len(locs) == 4
+
+        locs = cache.locations(recursive=False)
+        assert len(locs) == 3
