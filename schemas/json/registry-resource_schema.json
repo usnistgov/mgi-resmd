@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "$extensionSchemas": ["http://mgi.nist.gov/json-schema/v0.1"],
   "id": "http://mgi.nist.gov/json/registry-resource/v0.1",
   "patch": "0",
