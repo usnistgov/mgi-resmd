@@ -74,6 +74,60 @@ class TestSchemaLoader(object):
         assert "$schema" in schema
         assert "id" in schema
 
+    def test_from_locationfile(self):
+        ldr = loader.SchemaLoader.from_location_file(
+            os.path.join(schemadir, "schemaLocation.json"))
+        assert len(ldr) >= 4
+        assert ldr.locate("http://json-schema.org/draft-04/schema#").endswith("/extern/json-schema.json")
+
+    def test_from_directory(self, schemafiles):
+        sdir = os.path.join(schemafiles.parent, "schemas")
+        locfile = os.path.join(sdir, loader.SCHEMA_LOCATION_FILE)
+        if os.path.exists(locfile):
+            os.remove(locfile)
+
+        try:
+            ldr = loader.SchemaLoader.from_directory(sdir)
+            assert len(ldr) == 2
+            assert ldr.locate("http://json-schema.org/draft-04/schema#") == \
+                "json-schema.json"
+            assert not os.path.exists(locfile)
+
+            ldr = loader.SchemaLoader.from_directory(sdir, True)
+            assert len(ldr) == 2
+            assert ldr.locate("http://json-schema.org/draft-04/schema#") == \
+                "json-schema.json"
+            assert os.path.exists(locfile)
+            os.remove(locfile)
+
+            ldr = loader.SchemaLoader.from_directory(sdir, True, 
+                                                     locfile="locations.json")
+            assert len(ldr) == 2
+            assert ldr.locate("http://json-schema.org/draft-04/schema#") == \
+                "json-schema.json"
+            assert not os.path.exists(locfile)
+            assert os.path.exists(os.path.join(sdir, "locations.json"))
+
+            with open(os.path.join(sdir,"one.json"), "w") as fd:
+                json.dump({ "http://json-schema.org/draft-04/schema#": 
+                            "extern/json-schema.json" }, fd)
+            ldr = loader.SchemaLoader.from_directory(sdir, locfile="one.json")
+            assert len(ldr) == 1
+            assert ldr.locate("http://json-schema.org/draft-04/schema#") == \
+                "json-schema.json"
+            assert not os.path.exists(os.path.join(sdir,"one.json"))
+
+        finally:
+            if os.path.exists(locfile):
+                os.remove(locfile)
+            locfile = os.path.join(sdir, "locations.json")
+            if os.path.exists(locfile):
+                os.remove(locfile)
+            locfile = os.path.join(sdir, "one.json")
+            if os.path.exists(locfile):
+                os.remove(locfile)
+                
+
 class TestSchemaHandler(object):
 
     def test_ctor(self):
@@ -209,15 +263,19 @@ class TestDirectorySchemaCache(object):
             os.remove(slfile)
         assert not os.path.exists(slfile)
 
-        cache = loader.DirectorySchemaCache(datadir)
-        cache.save_locations(slfile, True)
+        try:
+            cache = loader.DirectorySchemaCache(datadir)
+            cache.save_locations(slfile, True)
 
-        assert os.path.exists(slfile)
-        with open(slfile) as fd:
-            loc = json.load(fd)
-        assert loc['file://'+os.path.join(datadir,"noid_schema.json")] == \
-            os.path.join(datadir, "noid_schema.json")
-        assert len(loc) == 1
+            assert os.path.exists(slfile)
+            with open(slfile) as fd:
+                loc = json.load(fd)
+            assert loc['file://'+os.path.join(datadir,"noid_schema.json")] == \
+                os.path.join(datadir, "noid_schema.json")
+            assert len(loc) == 1
+        finally:
+            if os.path.exists(slfile):
+                os.remove(slfile)
         
     def test_recursive(self):
         cache = loader.DirectorySchemaCache(schemadir)

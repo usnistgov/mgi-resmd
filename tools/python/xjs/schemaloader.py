@@ -17,7 +17,30 @@ try:
 except ImportError:
     requests = None
 
-class SchemaLoader(object):
+SCHEMA_LOCATION_FILE = "schemaLocation.json"
+
+class BaseSchemaLoad(object):
+
+    def load_schema(self, uri):
+        """
+        return the parsed json schema document for a given URI.
+
+        :exc `KeyError` if the location of the schema has not been set
+        :exc `IOError` if an error occurs while trying to read from the 
+                       registered location.  This includes if the file is
+                       not found or reading causes a syntax error.  
+        """
+        raise NotImplementedError("Programmer error: load_schema() "+
+                                  "not implemented")
+
+    def __call__(self, uri):
+        """
+        return the parsed json schema document for a given URI.  Calling an
+        instance as a function is equivalent to calling load_schema().
+        """
+        return self.load_schema(uri)
+
+class SchemaLoader(BaseSchemaLoad):
     """
     A class that can be configured to load schemas from particular locations.
     For example, it can be used as a schema handler that loads schemas from
@@ -42,6 +65,49 @@ class SchemaLoader(object):
         self._schemes = set()
         self._addschemes(urilocs)
 
+    @classmethod
+    def from_directory(cls, dirpath, ensure_locfile=False, 
+                       locfile=SCHEMA_LOCATION_FILE):
+        """
+        create a schemaLoader for schemas stored as files under a given 
+        directory.  This factory method will attempt to load schema file 
+        names from a file called locfile (defaults to "schemaLocation.json").
+        If the file is not found, all the JSON files under that directory
+        (including subdirectories) will be examined and those recognized as 
+        JSON schemas will be loaded.  
+        """
+        if not os.path.exists(dirpath):
+            raise IOError((errno.ENOENT, "directory not found", dirpath)) 
+        if not os.path.isdir(dirpath):
+            raise RuntimeError(dirpath + ": not a directory")
+
+        out = SchemaLoader()
+
+        locpath = os.path.join(dirpath, locfile)
+        if os.path.exists(locpath):
+            out.load_locations(locpath, dirpath)
+        else:
+            dc = DirectorySchemaCache(dirpath)
+            out.add_locations(dc.locations())
+            if ensure_locfile:
+                dc.save_locations(locfile)
+
+        return out
+
+    @classmethod
+    def from_location_file(cls, locpath, basedir=None):
+        """
+        create a schemaLoader for schemas listed in a schema location file.
+
+        :argument str basedir:  the base directory that document paths are 
+                                assumed to be relative to.  If not given, any
+                                relative paths will be assumed to be relative
+                                to the directory containing the location file. 
+        """
+        out = SchemaLoader()
+        out.load_locations(locpath, basedir)
+        return out
+
     def _addschemes(self, map):
         # used to support SchemaHandler
         for loc in self._map:
@@ -59,6 +125,9 @@ class SchemaLoader(object):
         return an iterator for the uris mapped in this instance
         """
         return self._map.iterkeys()
+
+    def __len__(self):
+        return len(self._map)
 
     def add_location(self, uri, path):
         """
@@ -108,22 +177,16 @@ class SchemaLoader(object):
 
         return result
 
-    def load_locations(self, filename):
+    def load_locations(self, filename, basedir=None):
         """
-        load in a mapping of URIs to file paths from a file.
+        load in a mapping of URIs to file paths from a file.  This uses the
+        location module to read the mappings file.  
 
         :argument str filename:  a file path to the mappings file.  The format 
                                  should be any of the formats supported by this 
                                  class.
         """
-        self.add_locations(location.read_loc_file(file))
-
-    def __call__(self, uri):
-        """
-        return the parsed json schema document for a given URI.  Calling an
-        instance as a function is equivalent to calling load_schema().
-        """
-        return self.load_schema(uri)
+        self.add_locations(read_loc_file(filename, basedir=basedir))
 
 class SchemaHandler(Mapping):
     """
@@ -198,6 +261,7 @@ class DirectorySchemaCache(object):
 
     def __init__(self, dirpath):
         self._dir = dirpath
+        self._checkdir()
 
     def _checkdir(self):
         if not os.path.exists(self._dir):
@@ -280,7 +344,7 @@ class DirectorySchemaCache(object):
 
         return out
 
-    def save_locations(self, outfile="schemaLocation.json", 
+    def save_locations(self, outfile=SCHEMA_LOCATION_FILE, 
                        absolute=False, recursive=True):
         """
         write the id-location map to a file (in JSON format).  
