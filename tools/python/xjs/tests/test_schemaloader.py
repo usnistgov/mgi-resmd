@@ -33,7 +33,8 @@ class TestSchemaLoader(object):
         assert ldr.locate("uri:nist.gov/goober") == \
             "http://www.ivoa.net/xml/goober"
         assert ldr.locate("http://mgi.nist.gov/goof") == "goof.xml"
-        assert ldr.locate("ivo://ivoa.net/rofr") is None
+        with pytest.raises(KeyError):
+            ldr.locate("ivo://ivoa.net/rofr")
 
     def test_add(self):
         ldr = loader.SchemaLoader()
@@ -239,7 +240,7 @@ class TestDirectorySchemaCache(object):
         cache = loader.DirectorySchemaCache(datadir)
         loc = cache.locations()
         assert "file://" + os.path.join(datadir, "noid_schema.json") in loc
-        assert len(loc) == 1
+        assert len(loc) == 2
 
     def test_save(self, schemafiles):
         sdir = os.path.join(schemafiles.parent, "schemas")
@@ -274,7 +275,7 @@ class TestDirectorySchemaCache(object):
                 loc = json.load(fd)
             assert loc['file://'+os.path.join(datadir,"noid_schema.json")] == \
                 os.path.join(datadir, "noid_schema.json")
-            assert len(loc) == 1
+            assert len(loc) == 2
         finally:
             if os.path.exists(slfile):
                 os.remove(slfile)

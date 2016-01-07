@@ -5,9 +5,14 @@ extended json-schema tags.
 from __future__ import with_statement
 import sys, os, json
 import jsonschema
-import jsonschema as jsch
+import jsonschema.validators as jsch
 from jsonschema.exceptions import ValidationError, SchemaError
-from collections import Mapping
+
+from . import schemaloader as loader
+from .instance import Instance, EXTSCHEMAS
+
+# These are URIs that identify versions of the JSON Enhanced Schema schem
+EXTSCHEMA_URIS = [ "http://mgi.nist.gov/mgi-json-schema/v0.1" ]
 
 class ExtValidator(object):
     """
@@ -18,8 +23,10 @@ class ExtValidator(object):
         """
         initialize the validator for a set of expected schemas
         """
+        if not schemaLoader:
+            schemaLoader = loader.SchemaLoader()
         self._loader = schemaLoader
-        self._handler = SchemaHandler(schemaLoader)
+        self._handler = loader.SchemaHandler(schemaLoader)
         self._schemaStore = {}
         self._validators = {}
 
@@ -40,7 +47,7 @@ class ExtValidator(object):
         files.  See schemaloader.SchemaLoader for more information about 
         creating loaders for schema files on disk.  
         """
-        loader.SchemaLoader.from_directory(dirpath)
+        return ExtValidator(loader.SchemaLoader.from_directory(dirpath))
 
     def validate(self, instance, minimally=False, strict=False):
         """
@@ -55,10 +62,17 @@ class ExtValidator(object):
         self.validate_against(instance, baseSchema, True)
 
         if not minimally:
-            inst = Instance(instance)
-            extensions = dict(inst.find_extend_objs())
-            for uri in extensions:
-                self.validate_against(instance, extensions[uri], strict)
+            if self.is_extschema_schema(instance):
+                # since EXTSCHEMA_URIS defines the EXTSCHEMAS property,
+                # we need to handle it a little differently
+                extensions = { "/": instance }
+            else: 
+                inst = Instance(instance)
+                extensions = dict(inst.find_extended_objs())
+
+            for ptr in extensions:
+                self.validate_against(extensions[ptr], 
+                                      extensions[ptr][EXTSCHEMAS], strict)
             
 
     def validate_against(self, instance, schemauris=[], strict=False):
@@ -76,14 +90,14 @@ class ExtValidator(object):
                                 ignored and validation against that schema will
                                 be skipped.  
         """
-        if isinstance(schemauris, str):
+        if isinstance(schemauris, str) or isinstance(schemauris, unicode):
             schemauris = [ schemauris ]
         schema = None
         out = True
         for uri in schemauris:
             val = self._validators.get(uri)
             if not val:
-                schema = self._schemaStore[uri]
+                schema = self._schemaStore.get(uri)
                 if not schema:
                     try:
                         schema = self._loader(uri)
@@ -93,7 +107,7 @@ class ExtValidator(object):
                                               uri)
                         continue
                 resolver = jsch.RefResolver(uri, schema, self._schemaStore,
-                                            self._handler)
+                                            handlers=self._handler)
 
                 cls = jsch.validator_for(schema)
                 cls.check_schema(schema)
@@ -102,5 +116,24 @@ class ExtValidator(object):
             try:
                 val.validate(instance)
             finally:
+                self._validators[uri] = val
                 self._schemaStore.update(val.resolver.store)
 
+    def validate_file(self, filepath, minimally=False, strict=False):
+        """
+        open the specified file and validated its contents.  This is 
+        equivalent to loading the JSON in the file and passing it to 
+        validate().
+        """
+        with open(filepath) as fd:
+            instance = json.load(fd)
+        self.validate(instance, minimally, strict)
+
+    def is_extschema_schema(self, instance):
+        """
+        return true if the given JSON instance has both an "id" property
+        set to one of the recognized URIs for a version of the JSON Enhanced 
+        Schema (Supporting Extensions) _and_ an "$extensionSchema" property.
+        """
+        return instance.get('id') in EXTSCHEMA_URIS and \
+               instance.has_key(EXTSCHEMAS)

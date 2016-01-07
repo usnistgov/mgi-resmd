@@ -1,7 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "$extendedSchema": "http://mgi.nist.gov/mgi-json-schema/v0.1",
+    "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-schema/v0.1" ],
     "id": "http://mgi.nist.gov/mgi-json-schema/v0.1",
+    "title": "JSON Enhanced Schema Supporting Extensions",
     "description": "An extension of json-schema that defines additional non-validating properties that support richer annotation of a schema and interpretation of instances",
     "definitions": {
         "Notes": {
@@ -23,11 +24,11 @@
                     "description": "the definition of the item being documented"
                 },
                 "notes": {
-                    "$ref": "#definitions/Notes",
+                    "$ref": "#/definitions/Notes",
                     "description": "additional advice on the use of the thing being defined"
                 },
                 "comments": {
-                    "$ref": "defintions/Notes",
+                    "$ref": "#/defintions/Notes",
                     "description": "editorial comments not intended for user consumption"
                 },
                 "equivalentTo": {
@@ -90,11 +91,11 @@
                                 ]
                             },
                             "notes": {
-                                "$ref": "#definitions/Notes",
+                                "$ref": "#/definitions/Notes",
                                 "description": "additional advice on the use of the schema being defined"
                             },
                             "comments": {
-                                "$ref": "#definitions/Notes",
+                                "$ref": "#/definitions/Notes",
                                 "description": "editorial comments not intended for user consumption"
                             },
                             "equivalentTo": {
@@ -105,7 +106,7 @@
                             "valueDocumentation": {
                                 "type": "object",
                                 "additionalProperties": {
-                                    "$ref": "#defintions/Documentation"
+                                    "$ref": "#/defintions/Documentation"
                                 },
                                 "description": "definitions of recognized string values for the property being defined",
                                 "notes": [
@@ -115,12 +116,27 @@
                             }
                         }}
                     ]
+                },
+
+                "notes": {
+                    "$ref": "#/definitions/Notes",
+                    "description": "additional advice on the use of the thing being defined"
+                },
+                "comments": {
+                    "$ref": "#/defintions/Notes",
+                    "description": "editorial comments not intended for user consumption"
+                },
+                "equivalentTo": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "An identifier for a metadata definition that this property is semantically equivalent"
                 }
+
             }
         }
     },
-    "oneOf": [
+    "allOf": [
         { "$ref": "http://json-schema.org/draft-04/schema#" },
-        { "$ref": "#definitions/EnhancedSchema" }
+        { "$ref": "#/definitions/EnhancedSchema" }
     ]
 }

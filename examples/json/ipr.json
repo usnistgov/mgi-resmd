@@ -2,7 +2,7 @@
     "id": "urn:nist.gov/nmrr/ipr",
     "$schema": "http://mgi.nist.gov/json/registry-resource/v0.1",
     "$ns": { "ms": "urn:nist.gov/schema/mat-sci_res-md/1.0wd#/definitions/" },
-    "$extendedSchemas": [ "ms:Database" ],
+    "$extensionSchemas": [ "ms:Database" ],
     "identity": {
         "title": "The Interatomic Potentials Repository Project",
         "shortName": "IPR",
@@ -42,7 +42,7 @@
     },
     "applicability": [
         {
-            "$extendedSchemas": [ "ms:MaterialScience" ],
+            "$extensionSchemas": [ "ms:MaterialScience" ],
             "materialType": [ "non-specific" ],
             "propertyClass": [ "simulated", "structural" ]
         }
@@ -51,8 +51,8 @@
         "policy": {
             "rights": [ "public" ]
         },
-        "portal": {
-            "homeURL": "http://www.ctcms.nist.gov/potentials/"
-        }
+        "portal": [
+            { "homeURL": "http://www.ctcms.nist.gov/potentials/" }
+        ]
     }
 }

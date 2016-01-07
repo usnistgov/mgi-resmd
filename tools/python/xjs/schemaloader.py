@@ -117,8 +117,10 @@ class SchemaLoader(BaseSchemaLoad):
         """
         return the file path location of the schema for the given URI or None
         if the schema is not known to be available locally.
+
+        :exc `KeyError` if the location of the schema has not been set
         """
-        return self._map.get(uri)
+        return self._map[uri]
 
     def iterURIs(self):
         """

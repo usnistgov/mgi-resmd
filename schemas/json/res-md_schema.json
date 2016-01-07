@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "$extensionSchemas": ["http://mgi.nist.gov/json-schema/v0.1"],
+  "$extensionSchemas": ["http://mgi.nist.gov/mgi-json-schema/v0.1"],
   "id": "http://mgi.nist.gov/json/res-md/v1.0wd",
   "title": "Resource metadata type library",
   "description": "a library of schemas for describing resources in a data federation",
@@ -80,11 +80,9 @@
     "RelevantDate": {
       "description": "A date that played a particular role in the subject's lifecycle",
       "type": "object",
-      "properties": {
-          "minProperties": 1,
-          "maxProperties": 1,
-          "patternProperties": { "^.*$": { "type": "string", "format": "date" }}
-      }
+      "minProperties": 1,
+      "maxProperties": 1,
+      "patternProperties": { "^.*$": { "type": "string", "format": "date" }}
     },
 
     "NameID": {
@@ -228,7 +226,7 @@
                     "Each element in the array should be considered a separate logical paragraph." 
                 ],
                 "type": "array",
-                "items": "string"
+                "items": { "type": "string" }
             },
             "subject": {
                 "type": "array",

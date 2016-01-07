@@ -8,7 +8,7 @@ import os, json, jsonspec.pointer
 from urlparse import urlparse
 from urllib2 import urlopen
 
-EXTSCHEMAS = "$extendedSchemas"
+EXTSCHEMAS = "$extensionSchemas"
 
 class Instance(object):
     """
