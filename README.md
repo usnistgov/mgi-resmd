@@ -13,6 +13,17 @@ has the following dependencies:
    * jsonspec 0.9.16 or later
    * requests
 
+In addition, the testing framework uses py.test. 
+
+## Running Tests
+
+The included tests apply unit-tests to the tool code and scripts.
+Tests also check the correctness of the schemas and examples.  
+
+Currently, tests only exist for the JSON schemas, examples, and
+tools.  py.test is used to execute these tests.   To run, change into
+the root directory of this distribution and type "py.test".  
+
 ## Disclaimer
 
 This repository serves as a platform for open community collaboration
