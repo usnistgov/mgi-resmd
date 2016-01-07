@@ -1,7 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "$extensionSchemas": ["http://mgi.nist.gov/mgi-json-schema/v0.1"],
-  "id": "http://mgi.nist.gov/json/registry-resource/v0.1",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "$extensionSchemas": ["http://mgi.nist.gov/json-schema/v0.1"],
   "patch": "0",
   "title": "Registry Resource record schema",
   "description": "a resource record format for use in a registry",

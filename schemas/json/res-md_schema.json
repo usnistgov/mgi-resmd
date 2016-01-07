@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema",
-  "$extensionSchemas": ["http://mgi.nist.gov/json-schema/v0.1"],
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$extensionSchemas": ["http://mgi.nist.gov/mgi-json-schema/v0.1"],
   "id": "http://mgi.nist.gov/json/res-md/v1.0wd",
   "title": "Resource metadata type library",
   "description": "a library of schemas for describing resources in a data federation",
@@ -64,7 +64,7 @@
           },
           "date": {
               "type": "array",
-              "items": { "$ref": "#/definitions/ReleventDate" },
+              "items": { "$ref": "#/definitions/RelevantDate" }, 
               "description": "Date associated with an event in the life cycle of the resource.",
               "notes": [ "This will typically be associated with the creation or availability (i.e., most recent release or version) of the resource.  Use the role attribute to clarify." ]
           },
@@ -75,6 +75,14 @@
           }
       },
       "equivalentTo": "http://mgi.nist.gov/xml/res-md/v0.1#Curation"
+    },
+
+    "RelevantDate": {
+      "description": "A date that played a particular role in the subject's lifecycle",
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "patternProperties": { "^.*$": { "type": "string", "format": "date" }}
     },
 
     "NameID": {
@@ -209,6 +217,16 @@
                 "notes": [
                     "The description may include but is not limited to an abstract, table of contents, reference to a graphical representation of content or a free-text account of the content."
                 ]
+            },
+
+            "description": {
+                "description": "An account of the nature of the resource",
+                "notes": [ 
+                    "The description may include but is not limited to an abstract, table of contents, reference to a graphical representation of content or a free-text account of the content.",
+                    "Each element in the array should be considered a separate logical paragraph." 
+                ],
+                "type": "array",
+                "items": { "type": "string" }
             },
             "subject": {
                 "type": "array",

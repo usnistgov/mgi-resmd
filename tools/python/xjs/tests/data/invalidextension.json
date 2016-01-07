@@ -1,0 +1,8 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$extensionSchemas": ["http://mgi.nist.gov/mgi-json-schema/v0.1"],
+  "id": "http://mgi.nist.gov/json/res-md/v1.0wd",
+  "title": "Resource metadata type library",
+  "description": "a library of schemas for describing resources in a data federation",
+  "notes": 3
+}

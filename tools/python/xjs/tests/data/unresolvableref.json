@@ -1,0 +1,11 @@
+{
+    "$schema": "http://mgi.nist.gov/json/registry-resource/v0.1",
+    "identity": {
+        "title": "Goofy"
+    },
+    "accessiblity": [
+        {
+            "$extensionSchemas": [ "urn:unresolvable.json" ]
+        }
+    ]
+}

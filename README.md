@@ -3,6 +3,16 @@
 a repository for the development of resource metadata schemas and
 related tools in support for the Materials Genome Initiative at NIST.
 
+## Dependencies
+
+The tools component of this package, including the xjs python library,
+has the following dependencies:
+
+   * python 2.7.x  (python 3.x not yet supported)
+   * jsonschema 2.5.x or later
+   * jsonspec 0.9.16 or later
+   * requests
+
 ## Disclaimer
 
 This repository serves as a platform for open community collaboration

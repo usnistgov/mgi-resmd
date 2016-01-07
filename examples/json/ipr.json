@@ -1,0 +1,58 @@
+{
+    "id": "urn:nist.gov/nmrr/ipr",
+    "$schema": "http://mgi.nist.gov/json/registry-resource/v0.1",
+    "$ns": { "ms": "urn:nist.gov/schema/mat-sci_res-md/1.0wd#/definitions/" },
+    "$extensionSchemas": [ "ms:Database" ],
+    "identity": {
+        "title": "The Interatomic Potentials Repository Project",
+        "shortName": "IPR",
+        "version": "2.0"
+    },
+    "curation": {
+        "publisher": "NIST/MSED Center for Theoretical and Computational Materials Science (CTCMS)",
+        "creator": ["Chandler Becker"],
+        "contributor": ["Zachary Trautt"],
+        "date": [
+            { "creation":  "2008-04-01" }
+        ],
+        "contact": {
+            "name": "Zachary Trautt",
+            "emailAddress": "zachary.trautt@nist.gov",
+            "timeZone":  "-0500"
+        }
+    },
+    "content": {
+        "type": "Repository",
+        "description": [
+            "This repository provides a source for interatomic potentials (force fields), related files, and evaluation tools to help researchers obtain interatomic models and judge their quality and applicability. Users are encouraged to download and use interatomic potentials, with proper acknowledgement, and developers are welcome to contribute potentials for inclusion. The files provided have been submitted or vetted by their developers and appropriate references are provided. All classes of potentials (e.g., MEAM, ADP, COMB, Reax, EAM, etc.) and materials are welcome. Interatomic potentials and/or related files are currently available for various metals, semiconductors, oxides, and carbon-containing systems." 
+        ],
+        "subject": [
+            "interatomic potentials",
+            "molecular dynamics",
+            "metals",
+            "force fields",
+            "atomistic simulations"
+        ],
+        "referenceURL": "http://www.ctcms.nist.gov/potentials/",
+        "referenceCitation":  [ 
+            [ "Becker, C.A. et al., 'Considerations for choosing and using force fields and interatomic potentials in materials science and engineering,' Current Opinion in Solid State and Materials Science, 17, 277-283 (2013).",
+              "doi:10.1016/j.cossms.2013.10.001" ]
+        ],
+        "primaryAudience": [ "research" ]
+    },
+    "applicability": [
+        {
+            "$extensionSchemas": [ "ms:MaterialScience" ],
+            "materialType": [ "non-specific" ],
+            "propertyClass": [ "simulated", "structural" ]
+        }
+    ],
+    "access": {
+        "policy": {
+            "rights": [ "public" ]
+        },
+        "portal": [
+            { "homeURL": "http://www.ctcms.nist.gov/potentials/" }
+        ]
+    }
+}

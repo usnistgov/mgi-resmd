@@ -1,0 +1,6 @@
+{
+    "http://json-schema.org/draft-04/schema#": "extern/json-schema.json",
+    "http://mgi.nist.gov/json/registry-resource/v0.1": "registry-resource_schema.json",
+    "http://mgi.nist.gov/mgi-json-schema/v0.1": "mgi-json-schema.json",
+    "http://mgi.nist.gov/json/res-md/v1.0wd": "res-md_schema.json"
+}
