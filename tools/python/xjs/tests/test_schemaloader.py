@@ -100,6 +100,7 @@ class TestSchemaLoader(object):
             assert os.path.exists(locfile)
             os.remove(locfile)
 
+            # pytest.set_trace()
             ldr = loader.SchemaLoader.from_directory(sdir, True, 
                                                      locfile="locations.json")
             assert len(ldr) == 2
@@ -111,11 +112,12 @@ class TestSchemaLoader(object):
             with open(os.path.join(sdir,"one.json"), "w") as fd:
                 json.dump({ "http://json-schema.org/draft-04/schema#": 
                             "extern/json-schema.json" }, fd)
+            assert os.path.exists(os.path.join(sdir,"one.json"))
             ldr = loader.SchemaLoader.from_directory(sdir, locfile="one.json")
             assert len(ldr) == 1
             assert ldr.locate("http://json-schema.org/draft-04/schema#") == \
-                "json-schema.json"
-            assert not os.path.exists(os.path.join(sdir,"one.json"))
+                os.path.join(sdir, "extern/json-schema.json")
+            assert not os.path.exists(os.path.join(sdir,"schemaLocation.json"))
 
         finally:
             if os.path.exists(locfile):
