@@ -23,6 +23,25 @@ class ExtValidator(object):
         self._schemaStore = {}
         self._validators = {}
 
+    @classmethod
+    def with_schema_dir(self, dirpath):
+        """
+        Create an ExtValidator that leverages schema cached as files in a 
+        directory.  
+
+        Before creating the ExtValidator, this factory will establish use
+        of the cache: first, it will look for a file in that directory called 
+        schemaLocation.json to identify the available schemas.  If that file
+        does not exist, all JSON files in that directory will examined to find
+        JSON schemas.  From this list of schemas, a SchemaLoader instance will 
+        be passed into the ExtValidator constructor.
+
+        See the location module for more information about schema location 
+        files.  See schemaloader.SchemaLoader for more information about 
+        creating loaders for schema files on disk.  
+        """
+        loader.SchemaLoader.from_directory(dirpath)
+
     def validate(self, instance, minimally=False, strict=False):
         """
         validate the instance document against its schema and its extensions
@@ -32,12 +51,15 @@ class ExtValidator(object):
         if not baseSchema:
             raise ValidationError("Base schema ($schema) not specified; " +
                                   "unable to validate")
-        schemauris = [ baseSchema ] 
+
+        self.validate_against(instance, baseSchema, True)
 
         if not minimally:
-            schemauris.extend(instance.get("$extendedSchemas", []))
-
-        return self.validate_against(instance, schemauris, strict)
+            inst = Instance(instance)
+            extensions = dict(inst.find_extend_objs())
+            for uri in extensions:
+                self.validate_against(instance, extensions[uri], strict)
+            
 
     def validate_against(self, instance, schemauris=[], strict=False):
         """
@@ -54,6 +76,8 @@ class ExtValidator(object):
                                 ignored and validation against that schema will
                                 be skipped.  
         """
+        if isinstance(schemauris, str):
+            schemauris = [ schemauris ]
         schema = None
         out = True
         for uri in schemauris:
@@ -71,7 +95,7 @@ class ExtValidator(object):
                 resolver = jsch.RefResolver(uri, schema, self._schemaStore,
                                             self._handler)
 
-                cls = validator_for(schema)
+                cls = jsch.validator_for(schema)
                 cls.check_schema(schema)
                 val = cls(schema, resolver=resolver)
 
@@ -80,4 +104,3 @@ class ExtValidator(object):
             finally:
                 self._schemaStore.update(val.resolver.store)
 
-            return True
