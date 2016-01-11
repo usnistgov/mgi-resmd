@@ -49,12 +49,14 @@ class ExtValidator(object):
         """
         return ExtValidator(loader.SchemaLoader.from_directory(dirpath))
 
-    def validate(self, instance, minimally=False, strict=False):
+    def validate(self, instance, minimally=False, strict=False, schemauri=None):
         """
         validate the instance document against its schema and its extensions
         as directed.  
         """
-        baseSchema = instance.get("$schema")
+        baseSchema = schemauri
+        if not baseSchema:
+            baseSchema = instance.get("$schema")
         if not baseSchema:
             raise ValidationError("Base schema ($schema) not specified; " +
                                   "unable to validate")
@@ -79,7 +81,8 @@ class ExtValidator(object):
         """
         validate the instance against each of the schemas identified by the 
         list of schemauris.  For the instance to be considered valid, it 
-        must validate against each of the named schemas.
+        must validate against each of the named schemas.  $extensionSchema
+        properties within the instance are ignored.  
 
         :argument instance:  a parsed JSON document to be validated.
         :argument list schemauris:  a list of URIs of the schemas to validate
