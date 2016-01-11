@@ -1,0 +1,12 @@
+#! /usr/bin/env python
+#
+import os, sys
+from xjs.cli import validate
+
+prog = os.path.basename(sys.argv[0])
+if not prog or prog == 'python':
+    prog = "Validate"
+
+runner = validate.Validate(prog)
+
+sys.exit(runner.execute())
