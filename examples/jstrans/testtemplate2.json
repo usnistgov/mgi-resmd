@@ -1,0 +1,7 @@
+{
+    "roottemplate": {
+        "type": "stringtemplate",
+        "content": "Contact {contact/name} via <{contact/email}>"
+    }
+
+}

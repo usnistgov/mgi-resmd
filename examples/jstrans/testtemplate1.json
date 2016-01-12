@@ -1,0 +1,7 @@
+{
+    "roottemplate": {
+        "type": "stringtemplate",
+        "content": "a substitution token looks like this: {$lb}texpr{$rb}"
+    }
+
+}
