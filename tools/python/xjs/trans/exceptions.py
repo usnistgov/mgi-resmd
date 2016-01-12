@@ -46,7 +46,7 @@ class TransformConfigException(JSONTransformException):
         self.transform = name
 
     @classmethod
-    def make_message_from_name(cls, name, why):
+    def make_message(cls, name, why):
         """
         build an exception message based on an underlying exception cause.
 
@@ -83,7 +83,7 @@ class TransformConfigParamError(TransformConfigException):
 
     def __init__(self, param, name=None, message=None):
         if not message:
-            message = TransformConfigException.make_message_from_name(name, 
+            message = TransformConfigException.make_message(name, 
                                          "problem with "+ param + " parameter")
         super(TransformConfigParamError, self).__init__(message, name)
         self.param = param
@@ -108,7 +108,7 @@ class MissingTransformData(TransformConfigParamError):
                             provided, one is generated based on param, name.
         """
         if not message:
-            message = TransformConfigException.make_message_from_name(
+            message = TransformConfigException.make_message(
                 name, "missing parameter: " + param)
         super(MissingTransformData, self).__init__(param, name, message)
 
@@ -183,7 +183,7 @@ class TransformApplicationException(JSONTransformException):
         self.context = context
 
     @classmethod
-    def make_message_from_name(cls, name, why, basemsg=None):
+    def make_message(cls, name, why, basemsg=None):
         """
         build an exception message based on an underlying exception cause.
 
@@ -220,7 +220,7 @@ class TransformApplicationException(JSONTransformException):
                                 from the underlying cause.  If None, a generic
                                 default is used. 
         """
-        return cls.make_message_from_name(name, repr(cause), basemsg)
+        return cls.make_message(name, repr(cause), basemsg)
 
     @classmethod
     def due_to(cls, cause, input=None, context=None, name=None, basemsg=None):
@@ -276,7 +276,7 @@ class TransformInputTypeError(TransformApplicationException):
                 if need and got:  msg += ", "
                 if got:  msg += "got %s." % got
             message = \
-                TransformApplicationException.make_message_from_name(name, msg)
+                TransformApplicationException.make_message(name, msg)
 
         super(TransformInputTypeError, self).__init__(message, input, context, 
                                                       name)

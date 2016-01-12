@@ -2,61 +2,16 @@
 a module providing the transformation engine and utility functions
 """
 import os, json
-from collections import MutableMapping
+
+import jsonspec.pointer as jsonptr
 
 from .exceptions import *
+from .base import *
 from .transforms import std
 
 defaultContext = {
     "$secure": True,
 }
-
-class ScopedDict(MutableMapping):
-
-    def __init__(self, defaults=None):
-        MutableMapping.__init__(self)
-        self._data = {}
-        if defaults is None:
-            defaults == {}
-        self._defaults = defaults
-
-    def __getitem__(self, key):
-        try:
-            return self._data.__getitem__(key)
-        except KeyError:
-            return self.__missing__(key)
-
-    def __missing__(self, key):
-        return self._defaults[key]
-
-    def __setitem__(self, key, val):
-        self._data[key] = val
-
-    def __delitem__(self, key):
-        del self._data[key]
-
-    def __keys(self):
-        return list(set(self._data.keys()).union(self._defaults))
-
-    def __iter__(self):
-        for key in self.__keys():
-            yield key
-
-    def __len__(self):
-        return len(self.__keys())
-
-    def default_to(self):
-        """
-        create and return a new dictionary that uses this one as its defaults
-        """
-        return self.__class__(self)
-
-    @property
-    def defaults(self):
-        """
-        the default dictionary
-        """
-        return self._defaults
 
 class Context(ScopedDict):
     """
@@ -109,7 +64,7 @@ class DataPointer(object):
             if len(parts[0]) == 0:
                 raise ValueError("Format error (empty string)")
             parts = [ None, parts[0] ]
-        return (parts)
+        return tuple(parts)
 
     def __init__(self, strrep=None):
         """
@@ -126,45 +81,18 @@ class DataPointer(object):
             out += self.target + ':'
         return out + self.path
 
+    def __repr__(self):
+        return "DataPointer(target={0}, path={1})".format(repr(self.target),
+                                                          repr(self.path))
+
     def copy(self):
+        """
+        create a copy of this pointer
+        """
         out = DataPointer()
         out.target = self.target
         out.path = self.path
         return out
-
-    def normalize(self, engine):
-        if not self.target:
-            self.target = "$in"
-            return
-
-        out = self.copy()
-        try:
-            while out.target != "$in" and out.target != "$context":
-                prefix = engine.resolve_prefix(out.target)
-                if not prefix:
-                    break
-                out = DataPointer.parse(prefix+out.path)
-        except ValueError, ex:
-            raise StylesheetContentError("Prefix definition for '" + out.target
-                                       +"' resulting in invalid data pointer: "
-                                       + prefix, ex)
-        return out
-
-    def extract_from(input, context, engine):
-        use = self.normalize(engine)
-
-        try:
-            if use.target == "$in":
-                return jsonspec.extract(input, "/"+use.path)
-            elif use.target == "$context":
-                return jsonspec.extract(context, "/"+use.path)
-        except Exception, ex:
-            raise StylesheetContentError("Data pointer (" + str(self) + 
-                                         "does not normalize to useable JSON " +
-                                         "pointer: /" + use.path)
-
-        raise StylesheetContentError("Unresolvable prefix: " + use.target)
-
 
 class Engine(object):
 
@@ -220,8 +148,7 @@ class Engine(object):
     def _load_transform_types(self):
         if self.transtypes is None:
             self.transtypes = {}
-        for type in std.types:
-            self.transtypes[type] = getattr(std, type)
+        self.transtypes.update(std.types)
 
     @property
     def stylesheet(self):
@@ -252,8 +179,56 @@ class Engine(object):
         Use a given data pointer to extract data from either the input data
         or the context.
         """
-        select = DataPointer(select).normalize(self)
+        use = self.normalize_datapointer(select, context)
+
+        try:
+            if use.target == "$in":
+                return jsonptr.extract(input, "/"+use.path)
+            elif use.target == "$context":
+                return jsonptr.extract(context, "/"+use.path)
+        except jsonptr.ExtractError, ex:
+            raise DataExtractionError.due_to(ex, input, context)
+        except Exception, ex:
+            raise StylesheetContentError("Data pointer (" + str(self) + 
+                                        " does not normalize to useable JSON " +
+                                         "pointer: /" + use.path)
+
+        raise StylesheetContentError("Unresolvable prefix: " + use.target)
+
         return select.extract_from(input, context, self)
+
+    def normalize_datapointer(self, dptr, context=None):
+        """
+        return a new data pointer in which the target prefix has been
+        as fully resolve as enabled by the current engine and context
+
+        :argument DataPointer dptr:  the data pointer to normalize, either as
+                                     a DataPointer instance or its string 
+                                     representation.
+        :argument Context context:   the template-specific context to use; if 
+                                     None, the engine's default context will 
+                                     be used.
+        """
+        if isinstance(dptr, DataPointer):
+            out = dptr.copy()
+        else:
+            out = DataPointer(dptr)
+
+        if not out.target:
+            out.target = "$in"
+            return out
+
+        try:
+            while out.target != "$in" and out.target != "$context":
+                prefix = self.resolve_prefix(out.target)
+                if not prefix:
+                    break
+                (out.target, out.path) = DataPointer.parse(prefix+out.path)
+        except ValueError, ex:
+            raise StylesheetContentError("Prefix definition for '" + out.target
+                                       +"' resulted in invalid data pointer: "
+                                       + prefix, ex)
+        return out
 
     def resolve_prefix(self, prefix):
         """
@@ -266,12 +241,7 @@ class Engine(object):
         if config is None:
             raise TransformNotFound(name)
 
-        typefunc = self.function_for_type(config['type'])
-        if typefunc is None:
-            raise TransformConfigError("type", name, 
-                                       "unknown template type: " + config.type)
-        return typefunc(self, config)
-
+        return self.make_transform(config, name)
 
     def resolve_transform(self, name, *args):
         """
@@ -281,15 +251,20 @@ class Engine(object):
         if config is None:
             raise TransformNotFound(name)
 
-        typefunc = self.function_for_type(config['type'])
-        if typefunc is None:
-            raise TransformConfigError("type", name, 
-                                       "unknown transform type: " + config.type)
-        return typefunc(self, config)
-        
+        return self.make_transform(config, name)
 
-    def function_for_type(self, type):
-        return self.transtypes.get(type)
+    def make_transform(self, config, name=None, type=None):
+        if not type:
+            type = config.get('type', '')
+        try:
+            tcls = self.transtypes[type]
+        except KeyError:
+            msg = ""
+            if name: msg += name + ": "
+            msg += "Unrecognized transform type: " + type
+            raise TransformNotFound(name, msg)
+
+        return tcls(config, self, name, type)
 
 
     
