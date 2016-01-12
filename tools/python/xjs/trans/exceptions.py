@@ -2,89 +2,69 @@
 Exceptions that can occur while using trans transformations
 """
 
-class TransformException(Exception):
+class JSONTransformException(Exception):
     """
-    An error that can occur while transforming JSON data
+    An error that can occur while transforming JSON data.  This is the 
+    base exception for all exceptions resulting from the transforms module.
     """
 
-    def __init__(self, message, name=None, input=None, context=None):
+    def __init__(self, message, cause=None):
+        """
+        construct the exception, providing a message
+
+        :argument str message:      an explantation of the error condition.
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  If None, there 
+                                      was no such underlying cause.
+        """
+        super(Exception, self).__init__(message)
+        self.cause = cause
+
+class TransformConfigException(JSONTransformException):
+    """
+    An exception resulting while processing the transform configuration 
+    (i.e. the stylesheet) in preparation for its application to the 
+    input data.
+    """
+
+    def __init__(self, message, name=None, cause=None):
         """
         construct the exception, providing a message
 
         :argument str message: an explanation of what went wrong
-        :argument str name:  the name of the transform were the exception
-                             occured.  If None, the transform name is unknown
-                             or not applicable.
+        :argument str name:  the name of the transform where the exception
+                             occured.  If None, the exception is not known
+                             or not specific to a particular transform.
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  If None, there 
+                                      was no such underlying cause.
+
         :argument input:    the JSON data that was being transformed
         :argument context:  the context at the point of the exception
         """
-        super(TransformException, self).__init__(message)
+        super(TransformConfigException, self).__init__(message, cause)
         self.transform = name
-        self.input = input
-        self.context = context
 
-class TransformStateException(TransformException):
-    """
-    an exception indicating that an unexpected state occurred that prevented
-    the application of a transformation.  This exception typically wraps 
-    another exception that was the underlying cause
-    """
-
-    def __init__(self, cause=None, message=None, name=None,
-                 input=None, context=None):
+    @classmethod
+    def make_message_from_name(cls, name, why):
         """
-        construct the exception to wrap another one
+        build an exception message based on an underlying exception cause.
 
-        :argument exc cause: the underlying exception that halted the 
-                             transformation
-        :argument str message: an explanation of what went wrong
-        :argument str name:  the name of the transform were the exception
-                             occured.  If None, the transform name is unknown
-                             or not applicable.
-        :argument input:    the JSON data that was being transformed
-        :argument context:  the context at the point of the exception
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  
+        :argument str name:  the name of the transform being applied when
+                             the exception occured.  This is incorporated into
+                             the message only when the basemsg is not provided
+        :argument str why:  a base explanation to combine with the message
+                                from the underlying cause.  
         """
-        if not message:
-            if name:
-                message = "Internal failure in the %s transform: %s" % \
-                          (name, repr(cause))
-            elif cause:
-                message = "Internal transform failure: " + repr(cause)
-            else:
-                message = "Unknown internal failure"
+        msg = ""
+        if name: msg += name + " "
+        msg += "transform config error"
+        if why: msg += ": " + why
+        return msg
 
-        super(TransformStateException, self).__init__(message, name,
-                                                       input, context)
-        self.cause = cause
-
-class TransformConfigError(TransformException):
-    """
-    an exception indicating an invalid transform configuration.
-    """
-
-    def __init__(self, param=None, name=None, message=None, 
-                 basemsg="transform invalid: invalid configuration"):
-        """
-        create the exception
-
-        :argument str name:  the name of the transform were the exception
-                             occured.  If None, the transform name is unknown
-                             or not applicable.
-        :argument str message: an explanation of what went wrong; if not 
-                            provided, one is generated based on param, name.
-        """
-        if not message:
-            message = ''
-            if name: 
-                message = name + " "
-            message += basemsg
-            if param:
-                message += ": " + param
-
-        super(TransformConfigError, self).__init__(message, name)
-        self.param = param
-
-class TransformNotFound(TransformConfigError):
+class TransformNotFound(TransformConfigException):
     """
     an exception indicating that a template could not be resolved
     """
@@ -93,48 +73,46 @@ class TransformNotFound(TransformConfigError):
             message = "Named transform could not be found"
             if name:
                 message += ': ' + name
-        super(TransformNotFound, self).__init__(name=name, message=message)
+        super(TransformNotFound, self).__init__(message, name)
 
-class MissingTransformData(TransformConfigError):
+class TransformConfigParamError(TransformConfigException):
+    """
+    a transform configuration exception due to an error in a particular 
+    parameter.
+    """
+
+    def __init__(self, param, name=None, message=None):
+        if not message:
+            message = TransformConfigException.make_message_from_name(name, 
+                                         "problem with "+ param + " parameter")
+        super(TransformConfigParamError, self).__init__(message, name)
+        self.param = param
+
+class MissingTransformData(TransformConfigParamError):
     """
     an exception indicating that an invalid transform request because
     it was missing critical configuration or input data.  
     """
 
-    def __init__(self, param=None, name=None, message=None, 
-                 basemsg="transform invalid: missing parameter"):
+    def __init__(self, param=None, name=None, message=None):
         """
-        create the exception, noting the parameter that was missing
+        create the exception, noting the parameter that was missing.  This 
+        may be either be transform configuration property or an argument
+        to the function-form of the transform.
 
+        :argument str param: the name of the missing configuration parameter
         :argument str name:  the name of the transform were the exception
                              occured.  If None, the transform name is unknown
                              or not applicable.
-        :argument input:    the JSON data that was being transformed
-        :argument context:  the context at the point of the exception
         :argument str message: an explanation of what went wrong; if not 
                             provided, one is generated based on param, name.
         """
-        super(MissingTransformData, self).__init__(param, name, message,basemsg)
+        if not message:
+            message = TransformConfigException.make_message_from_name(
+                name, "missing parameter: " + param)
+        super(MissingTransformData, self).__init__(param, name, message)
 
-class StringTemplateSyntaxError(TransformConfigError):
-    """
-    an exception indicating that an invalid transform request because
-    it was missing critical configuration or input data.  
-    """
-
-    def __init__(self, message=None, template=None, param=None, name=None):
-        msg = "String template syntax error"
-        if message:
-            message = msg + ": " + message
-        else:
-            message = msg
-        if template:
-            if not isinstance(template, str):
-                template = str(template)
-            message += ": " + template
-        super(StringTemplateSyntaxError, self).__init__(param, name, message)
-
-class TransformConfigTypeError(TransformConfigError):
+class TransformConfigTypeError(TransformConfigParamError):
     """
     the type of a provided configuration property has the wrong type for the
     type of transform being generated.
@@ -149,46 +127,139 @@ class TransformConfigTypeError(TransformConfigError):
             message += "parameter"
             if need or got:
                 message += ": "
-                if need: message += "need %s " % need
+                if need: message += "need %s" % need
                 if need and got:  message += ", "
                 if got:  message += "got %s." % got
 
-        super(TransformConfigTypeError, self).__init__(param, name, 
-                                                       message=message)
+        super(TransformConfigTypeError, self).__init__(param, name, message)
         self.typeneeded = need
         self.typegot = got
 
-class StylesheetContentError(TransformStateException):
+class StringTemplateSyntaxError(TransformConfigException):
+    """
+    an exception indicating an error in the tranform token syntax within
+    a string template.
+    """
 
-    def __init__(self, message=None, cause=None, input=None, context=None):
+    def __init__(self, message=None, template=None, name=None):
+        msg = "Syntax error in string template"
+        if name: msg += " ({0})".format(name)
+        if message:
+            message = msg + ": " + message
+        else:
+            message = msg
+        if template:
+            message += ": " + repr(template)
+        super(StringTemplateSyntaxError, self).__init__(message, name)
+        self.template = template
+
+class TransformApplicationException(JSONTransformException):
+    """
+    an exception that occurs while trying to apply a transform to the input
+    data.
+
+    If the due_to() constructor is helpful for constructing a message that 
+    relates to an underlying cause represented by another Exception.
+    """
+
+    def __init__(self, message, input=None,context=None, name=None,cause=None):
         """
-        construct the exception to wrap another one
+        construct the exception, providing an explanation.
 
-        :argument exc cause: the underlying exception that halted the 
-                             transformation
         :argument str message: an explanation of what went wrong
-        :argument str name:  the name of the transform were the exception
-                             occured.  If None, the transform name is unknown
-                             or not applicable.
         :argument input:    the JSON data that was being transformed
         :argument context:  the context at the point of the exception
+        :argument str name:  the name of the transform being applied when
+                             the exception occured.  If None, the exception 
+                             is not known or not specific to a particular 
+                             transform.
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  If None, there 
+                                      was no such underlying cause.
         """
-        if not message:
-            message = "Problem while parsing/using stylesheet: " + repr(cause)
-        super(StylesheetContentError, self).__init__(message=message, 
-                                                     cause=cause,
-                                                     name=None, input=input,
-                                                     context=context)
+        super(TransformApplicationException, self).__init__(message, cause)
+        self.transform = name
+        self.input = input
+        self.context = context
 
-class TransformInputError(TransformException):
-    """
-    an exception indicating a transform could not be applied due to an 
-    invalid condition in the input data.
-    """
-    def __init__(self, message, name=None, input=None, context=None):
-        super(TransformInputError, self).__init__(message, name, input, context)
+    @classmethod
+    def make_message_from_name(cls, name, why, basemsg=None):
+        """
+        build an exception message based on an underlying exception cause.
 
-class TransformInputTypeError(TransformInputError):
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  
+        :argument str name:  the name of the transform being applied when
+                             the exception occured.  This is incorporated into
+                             the message only when the basemsg is not provided
+        :argument str why:  a base explanation to combine with the message
+                                from the underlying cause.  
+        :argument str basemsg:  a base explanation to combine with the message
+                                from the underlying cause.  If None, a generic
+                                default based on the name is used. 
+        """
+        if not basemsg:
+            basemsg = "Failed to apply "
+            if name: basemsg += name + " "
+            basemsg += "transform"
+        msg = basemsg
+        if why: msg += ": " + why
+        return msg
+
+    @classmethod
+    def make_message_from_cause(cls, cause, name=None, basemsg=None):
+        """
+        build an exception message based on an underlying exception cause.
+
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  
+        :argument str name:  the name of the transform being applied when
+                             the exception occured.  This is incorporated into
+                             the message only when the basemsg is not provided
+        :argument str basemsg:  a base explanation to combine with the message
+                                from the underlying cause.  If None, a generic
+                                default is used. 
+        """
+        return cls.make_message_from_name(name, repr(cause), basemsg)
+
+    @classmethod
+    def due_to(cls, cause, input=None, context=None, name=None, basemsg=None):
+        """
+        construct an exception that is mainly due to an underlying problem.
+
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  
+        :argument str basemsg:  a base explanation to combine with the message
+                                from the underlying cause.  If None, a generic
+                                default is used. 
+        """
+        msg = cls.make_message_from_cause(cause, name, basemsg)
+        return TransformApplicationException(msg, input, context, name, cause)
+
+class DataExtractionError(TransformApplicationException):
+    """
+    an exception indication an error while attempting to extract data 
+    from the transform input.
+    """
+
+    @classmethod
+    def due_to(cls, cause, input=None, context=None, name=None):
+        """
+        construct an exception that is mainly due to an underlying problem.
+
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  
+        :argument str basemsg:  a base explanation to combine with the message
+                                from the underlying cause.  If None, a generic
+                                default is used. 
+        """
+        basemsg = ""
+        if name: basemsg += name + ' transform: '
+        basemsg += "problem extracting data"
+        msg = cls.make_message_from_cause(cause, basemsg=basemsg)
+        return DataExtractionError(msg, input, context, name, cause)
+
+class TransformInputTypeError(TransformApplicationException):
     """
     an exception indicating a transform could not be applied because the 
     input data has the wrong (JSON data structure) type.
@@ -196,16 +267,19 @@ class TransformInputTypeError(TransformInputError):
     def __init__(self, need=None, got=None, name=None, 
                  input=None, context=None, message=None):
         if not message:
-            message = ""
-            if name: message += name + " "
-            message += "Transform failed due to wrong input data type"
+            msg = ""
+            if name: msg += name + " "
+            msg += "wrong input data type"
             if need or got:
-                message += ": "
-                if need: message += "need %s " % need
-                if need and got:  message += ", "
-                if got:  message += "got %s." % got
+                msg += ": "
+                if need: msg += "need %s " % need
+                if need and got:  msg += ", "
+                if got:  msg += "got %s." % got
+            message = \
+                TransformApplicationException.make_message_from_name(name, msg)
 
-        super(TransformInputError, self).__init__(message, name, input, context)
+        super(TransformInputTypeError, self).__init__(message, input, context, 
+                                                      name)
         self.typeneeded = need
         self.typegot = got
 
