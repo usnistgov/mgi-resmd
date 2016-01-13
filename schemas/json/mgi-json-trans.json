@@ -1,0 +1,83 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id":  "http://mgi.nist.gov/mgi-json-trans/v0.1",
+    "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-schema/v0.1" ],
+    "title": "JSON Transformations",
+    "description": "This is the schema for JSON Transformation stylesheets",
+    "definitions": {
+        "Prefixes": {
+            "description": "a mapping of prefixes to data-pointer values",
+            "type": "object",
+            "patternProperties": {
+                "^[a-zA-Z0-9_!@#$]+$": { "$ref": "#/definitions/DataPointer" }
+            }
+        },
+        "DataPointer": {
+            "description": "a pointer into JSON data comprised of an optional data target ($in or $context) or prefix, a colon, and a path (a JSON pointer excluding the leading slash)",
+            "type": "string",
+            "pattern": "^([a-zA-Z0-9_!@#$]:)?[a-zA-Z0-9_!@#$]+$"
+        },
+        "Transform": {
+            "description": "a configuration of a transform that can be applied to JSON data structures",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "the name of the type of template this is.  This determines the other properties used to configure the transform.",
+                    "type": "string",
+                    "pattern": "^([a-zA-Z0-9_!@#$])+$"
+                },
+                "context": {
+                    "description": "an arbitrary set of named properties that can be accessed while applying a transform",
+                    "notes": [
+                        "The properties will be merged with the current context so that new properities will override existing ones with the same name",
+                        "A transform can be alternatively applied to the context data via a data pointer that begins with '$context:'"
+                    ],
+                    "type": "object"
+                },
+                "expects": { 
+                    "description":  "a list of JSON types that this transform expects",
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/JSONType" },
+                    "uniqueItems": true
+                },
+                "returns": {
+                    "description": "the JSON type that this transform will return after being applied to the input (of an acceptable type)",
+                    "$ref": "#/definitions/JSONType"
+                },
+                "transforms": {
+                    "description": "a named list of additional transforms available to the current transform",
+                    "notes": [
+                        "These transforms will be merged in with the current set of available transforms, overriding existing ones with the same name"
+                    ],
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/Transform" }
+                },
+                "templates": {
+                    "description": "a named list of additional templates available to the current transform",
+                    "notes": [
+                        "A template is a transform that returns a string type result",
+                        "These transforms will be merged in with the current set of available transforms, overriding existing ones with the same name"
+                    ],
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/Transform" }
+                },
+                "joins": {
+                    "description": "a named list of additional join templates available to the current transform",
+                    "notes": [
+                        "A join template is a template that requires an array of strings as its input",
+                        "These transforms will be merged in with the current set of available transforms, overriding existing ones with the same name"
+                    ],
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/Transform" }
+                }
+            }
+        },
+        "JSONType": {
+            "description": "a name for a JSON primitive type",
+            "type": "string",
+            "enum": [ "string", "int", "real", "object", "array", "bool", "any" ]
+        }
+    },
+
+    "$ref": "#/definitions/Transform" 
+}

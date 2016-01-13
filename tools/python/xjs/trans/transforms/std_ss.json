@@ -1,0 +1,86 @@
+{
+    "templates": {
+        "$lb": {
+            "type": "literal",
+            "value": "{",
+            "input_expected": "any",
+            "returns": "string"
+        },
+        "$rb": {
+            "type": "literal",
+            "value": "}",
+            "input_expected": "any",
+            "returns": "string"
+        }
+    },
+    "transforms": {
+        "applytransform": {
+            "type": "function",
+            "name": "$std.applytransform",
+            "argdesc": [ 
+                "str: transform name", 
+                "str: pointer to data to use as new input",
+                "...: args to pass to transform" 
+            ],
+            "input_expected": "any",
+            "returns": "any"
+        },
+        "extract": {
+            "type": "function",
+            "name": "$std.extract",
+            "argdesc": [ "str: pointer to data to extract" ],
+            "input_expected": "any",
+            "returns": "any"
+        },
+        "wrap": {
+            "type": "function",
+            "name": "$std.wrap",
+            "description": "break text into an array of lines of limited length",
+            "argdesc": [ "int: maximum length of each line" ],
+            "input_expected": "string",
+            "returns": "array"
+        },
+        "fill": {
+            "type": "sequence",
+            "status": "disabled",
+            "transforms": [
+                "wrap({0})", "newline"
+            ],
+            "argdesc": [ "int: maximum length of each line" ],
+            "input_expected": "string",
+            "returns": "string"
+        }
+    }, 
+    "joins": {
+        "concat": {
+            "type": "function",
+            "name": "$std.delim",
+            "args": [""],
+            "input_expected": "array",
+            "returns": "string"
+        },
+        "delim": {
+            "type": "function",
+            "name": "$std.delim",
+            "argdesc": ["str: delimiting string"],
+            "input_expected": "array",
+            "returns": "string"
+        },
+        "newline": {
+            "type": "function",
+            "name": "$std.delimit",
+            "description": "places each item on a different line",
+            "args": [ "\n" ],
+            "input_expected": "array",
+            "returns": "string"
+        },
+        "doubleNewline": {
+            "type": "function",
+            "name": "$std.delimit",
+            "description": "places a blank line between each item",
+            "args": [ "\n\n" ],
+            "input_expected": "array",
+            "returns": "string"
+        }
+    }
+}
