@@ -1,7 +1,7 @@
 {
-    "roottemplate": {
-        "type": "stringtemplate",
-        "content": "a substitution token looks like this: {$lb}texpr{$rb}"
-    }
+    "$schema":  "http://mgi.nist.gov/mgi-json-trans/v0.1",
 
+    "type": "stringtemplate",
+    "content": "a substitution token looks like this: {$lb}texpr{$rb}",
+    "returns": "string"
 }

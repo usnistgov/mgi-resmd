@@ -96,7 +96,7 @@ class TestExamples(object):
 
         engine = njn.Engine(ss)
 
-        tfunc = engine.resolve_template('roottemplate')
+        tfunc = engine.resolve_template('')
         result = tfunc({}, {})
         
         assert result == "a substitution token looks like this: {texpr}"
@@ -109,7 +109,7 @@ class TestExamples(object):
 
         engine = njn.Engine(ss)
 
-        tfunc = engine.resolve_template('roottemplate')
+        tfunc = engine.resolve_template('')
         result = tfunc(input, {})
         
         assert result == "Contact Bob via <bob@gmail.com>"

@@ -110,10 +110,9 @@ class Engine(object):
         self.translu = None
         self._templates = None
         self._load_transforms()
-        rt = self._stylesheet.get("roottemplate")
-        if rt:
-            self.translu["roottemplate"] = rt
-            self._templates["roottemplate"] = rt
+        self.translu[""] = self._stylesheet
+        if self._stylesheet.get("returns") == "string":
+            self._templates[""] = self._stylesheet
 
         self.transtypes = None
         self._load_transform_types()
