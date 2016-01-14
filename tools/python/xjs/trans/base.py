@@ -9,7 +9,7 @@ class ScopedDict(MutableMapping):
         MutableMapping.__init__(self)
         self._data = {}
         if defaults is None:
-            defaults == {}
+            defaults = {}
         self._defaults = defaults
 
     def __getitem__(self, key):
