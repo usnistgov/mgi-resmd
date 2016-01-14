@@ -84,7 +84,7 @@ class TestExamples(object):
 
     def test_simple(self):
         ss = { "type": "literal", "value": "@" }
-        engine = njn.Engine()
+        engine = njn.StdEngine()
         tfunc = engine.make_transform(ss, "$at")
         result = tfunc({}, {})
         assert result == "@"
@@ -94,7 +94,7 @@ class TestExamples(object):
         with open(os.path.join(exdir,"testtemplate1.json")) as fd:
             ss = json.load(fd)
 
-        engine = njn.Engine(ss)
+        engine = njn.DocEngine(ss)
 
         tfunc = engine.resolve_template('')
         result = tfunc({}, {})
@@ -107,7 +107,7 @@ class TestExamples(object):
         with open(os.path.join(exdir,"testtemplate2.json")) as fd:
             ss = json.load(fd)
 
-        engine = njn.Engine(ss)
+        engine = njn.DocEngine(ss)
 
         tfunc = engine.resolve_template('')
         result = tfunc(input, {})

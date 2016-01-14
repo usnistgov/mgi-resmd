@@ -1,7 +1,7 @@
 """
 a module providing the transformation engine and utility functions
 """
-import os, json
+import os, json, copy
 
 import jsonspec.pointer as jsonptr
 
@@ -112,7 +112,7 @@ class Engine(object):
 
     def __init__(self, currtrans=None, base=None):
         """
-        wrap around another library and then load the transforms and prefixes
+        wrap around another engine and then load the transforms and prefixes
         included there.  
 
         :argument object currtrans: the current transform where sub-transforms
@@ -139,15 +139,16 @@ class Engine(object):
 
 
         # load any new prefixes
-        self._loadprefixes(ct.get('prefixes'))
+        self._loadprefixes(currtrans.get('prefixes'))
 
         # load any new transforms, templates, and joins
-        self._loadtransforms(ct.get('transforms'))
-        self._loadtemplates(ct.get('templates'))
-        self._loadjoins(ct.get('joins'))
+        self._loadtransforms(currtrans.get('transforms'))
+        self._loadtemplates(currtrans.get('templates'))
+        self._loadjoins(currtrans.get('joins'))
 
         # wrap default transform classes for the different types
-        self._transCls = ScopedDict(getattr(base, "_transCls"))
+        if base:
+            self._transCls = ScopedDict(base._transCls)
 
     def _loadprefixes(self, defs):
         if not defs:
@@ -167,6 +168,26 @@ class Engine(object):
         for name in defs:
             self.add_transform(name, defs[name])
 
+    def _loadtemplates(self, defs):
+        if not defs:
+            return
+        if not isinstance(defs, dict):
+            raise TransformConfigException("'transforms' node not a dict: " + 
+                                           str(type(defs)))
+
+        for name in defs:
+            self.add_template(name, defs[name])
+
+    def _loadjoins(self, defs):
+        if not defs:
+            return
+        if not isinstance(defs, dict):
+            raise TransformConfigException("'transforms' node not a dict: " + 
+                                           str(type(defs)))
+
+        for name in defs:
+            self.add_join(name, defs[name])
+
     def add_transform(self, name, config):
         """
         register a named transform.
@@ -182,10 +203,10 @@ class Engine(object):
         register a named template.  A Template is a Transform that returns
         a string.
         """
-        self._transforms[name] config:
+        self._transforms[name] = copy.deepcopy(config)
 
         if config.get('returns', 'string') != 'string':
-            throw new TransformConfigParamError('returns', name, 
+            raise TransformConfigParamError('returns', name, 
     name + " template: 'returns' not set to 'string': " + config.get('returns'))
         self._templates.add(name)
 
@@ -194,10 +215,10 @@ class Engine(object):
         register a named template.  A Template is a Transform that returns
         a string.
         """
-        self._transforms[name] config:
+        self.add_transform(name, config)
 
         if config.get('returns', 'string') != 'string':
-            throw new TransformConfigParamError('returns', name, 
+            raise TransformConfigParamError('returns', name, 
     name + " template: 'returns' not set to 'string': " + config.get('returns'))
         self._templates.add(name)
 
@@ -387,7 +408,7 @@ class StdEngine(Engine):
         super(StdEngine, self).__init__()
         self._load_std_defs()
 
-    def _load_std_defs():
+    def _load_std_defs(self):
         # load the std Transform types
         self.load_transform_types(std)
 
@@ -404,6 +425,16 @@ class StdEngine(Engine):
         self._loadtemplates(stddefs.get('templates'))
         self._loadjoins(stddefs.get('joins'))
 
+class DocEngine(Engine):
+
+    def __init__(self, doctrans=None):
+        """
+        create an Engine from an initial transform.  
+
+        :argument object doctrans: the initial transform sheet
+        """
+        super(DocEngine, self).__init__(doctrans, StdEngine())
+        self.add_transform('', doctrans)
 
 
 class NEngine(object):

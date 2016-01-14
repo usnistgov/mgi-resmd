@@ -57,3 +57,15 @@ class TestScopedDict(object):
         assert 'hank' in ctx
         assert len(ctx) == 3
 
+    def test_nodefs(self):
+        ctx = base.ScopedDict()
+        assert ctx._defaults is not None
+        assert 'foo' not in ctx.keys()
+        assert 'foo' not in ctx
+        assert len(ctx) == 0
+        assert ctx.get('foo') is None
+
+        ctx['foo'] = 'blah'
+        assert ctx.get('foo') == 'blah'
+        assert 'foo' in ctx
+        assert len(ctx) == 1
