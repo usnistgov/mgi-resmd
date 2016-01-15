@@ -3,7 +3,8 @@ The implementation for the script that provides the command-line interface (CLI)
 """
 import os, sys, errno, json
 from argparse import ArgumentParser
-from ..validate import ExtValidator, ValidationError, SchemaError
+from ..validate import ExtValidator
+from ..validate import ValidationError, SchemaError, RefResolutionError
 from ..schemaloader import SchemaLoader
 
 description = \
@@ -75,7 +76,7 @@ class Runner(object):
         try:
             return self.run()
         except Exception, ex:
-            return self.fail(UNEXPECTED, "Unexpected exception: " + str(ex))
+            return self.fail(UNEXPECTED, "Unexpected exception: " + repr(ex))
 
     def run(self):
         return 0
@@ -158,10 +159,14 @@ class Validate(Runner):
 
                 if not self.opts.silent:
                     self.tell("{0}: valid!".format(os.path.basename(filename)))
-            except (ValidationError, SchemaError), ex:
+            except (ValidationError, SchemaError, RefResolutionError), ex:
                 f = os.path.basename(filename)
                 self.advise("{0}:".format(f))
-                self.advise(str(ex))
+                if isinstance(ex, RefResolutionError):
+                    self.advise("Unable to resolve reference in schema: "+
+                                str(ex))
+                else:
+                    self.advise(str(ex))
                 self.tell("{0}: not valid.".format(f))
                 anyinvalid = True
                 if isinstance(ex, SchemaError):

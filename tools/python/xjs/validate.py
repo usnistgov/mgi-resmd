@@ -3,10 +3,11 @@ a module that provides support for validating schemas that support
 extended json-schema tags.
 """
 from __future__ import with_statement
-import sys, os, json
+import sys, os, json, urlparse
 import jsonschema
 import jsonschema.validators as jsch
-from jsonschema.exceptions import ValidationError, SchemaError
+from jsonschema.exceptions import (ValidationError, SchemaError, 
+                                   RefResolutionError)
 
 from . import schemaloader as loader
 from .instance import Instance, EXTSCHEMAS
@@ -100,17 +101,25 @@ class ExtValidator(object):
         for uri in schemauris:
             val = self._validators.get(uri)
             if not val:
-                schema = self._schemaStore.get(uri)
+                (urib,frag) = self._spliturifrag(uri)
+                schema = self._schemaStore.get(urib)
                 if not schema:
                     try:
-                        schema = self._loader(uri)
+                        schema = self._loader(urib)
                     except KeyError, e:
                         if strict:
                             raise SchemaError("Unable to resolve schema for " + 
-                                              uri)
+                                              urib)
                         continue
                 resolver = jsch.RefResolver(uri, schema, self._schemaStore,
                                             handlers=self._handler)
+
+                if frag:
+                    try:
+                        schema = resolver.resolve_fragment(schema, frag)
+                    except RefResolutionError, ex:
+                        raise SchemaError("Unable to resolve fragment, ",frag,
+                                          "from schema, ", urib)
 
                 cls = jsch.validator_for(schema)
                 cls.check_schema(schema)
@@ -121,6 +130,12 @@ class ExtValidator(object):
             finally:
                 self._validators[uri] = val
                 self._schemaStore.update(val.resolver.store)
+
+    def _spliturifrag(self, uri):
+        parts = urlparse.urldefrag(uri)
+        if not parts[1] and uri.endswith('#'):
+            return (uri, '')
+        return parts
 
     def validate_file(self, filepath, minimally=False, strict=False):
         """
