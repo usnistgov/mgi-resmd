@@ -94,9 +94,10 @@
                         },
                         "value": {
                             "description": "The literal value that the transform should return",
-                            "$ref": "AnyType" 
+                            "$ref": "#/definitions/AnyType" 
                         }
-                    }
+                    },
+                    "required": [ "value" ]
                 }
             ]
         },
