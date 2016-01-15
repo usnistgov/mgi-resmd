@@ -333,6 +333,15 @@ class Engine(object):
 
         return tcls(config, self, name, type)
 
+    def resolve_all_transforms(self):
+        """
+        ensure that all loaded template configurations have been resolved
+        into Template instances.  This effectively validates the templates
+        configurations.
+        """
+        for name in self._transforms:
+            self.resolve_transform(name)
+
     def load_transform_types(self, module):
         """
         load the Transform classes defined in the given module.  The module

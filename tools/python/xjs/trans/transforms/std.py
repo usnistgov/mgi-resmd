@@ -1,7 +1,7 @@
 """
 transformers from the standard module
 """
-import json, copy, re
+import json, copy, re, importlib
 import types as tps
 import json as jsp
 
@@ -223,7 +223,7 @@ class Function(Transform):
             return fimpl(self.engine, input, context, *use, **keys)
         return impl
 
-    def _load_function(fname):
+    def _load_function(self, fname):
         try: 
             (mod, fname) = fname.rsplit('.', 1)
             mod = importlib.import_module(mod)

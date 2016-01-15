@@ -74,7 +74,31 @@ class TestContext(object):
 
 class TestDataPointer(object):
 
+    #TODO
     pass
+
+class TestStdEngine(object):
+
+    def test_loading(self):
+        engine = njn.StdEngine()
+
+        assert "literal" in engine._transCls
+        assert "$lb" in engine._transforms
+        assert "$lb" in engine._templates
+
+    def test_transform_lb(self):
+        engine = njn.StdEngine()
+        t = engine.resolve_transform("$lb")
+        assert isinstance(t, njn.Transform)
+        assert t(engine, {}, {}) == '{'
+
+    def no_test_validate(self):
+        engine = njn.StdEngine()
+        engine.resolve_all_transforms()
+
+        assert "$lb" in engine._transforms
+        assert isinstance(engine._transforms["$lb"], njn.Transform)
+        
 
 exdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "examples",
