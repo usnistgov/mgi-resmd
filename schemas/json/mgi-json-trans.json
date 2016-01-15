@@ -9,13 +9,13 @@
             "description": "a mapping of prefixes to data-pointer values",
             "type": "object",
             "patternProperties": {
-                "^[a-zA-Z0-9_!@#$]+$": { "$ref": "#/definitions/DataPointer" }
+                "^[a-zA-Z0-9_!@#$.]+$": { "$ref": "#/definitions/DataPointer" }
             }
         },
         "DataPointer": {
             "description": "a pointer into JSON data comprised of an optional data target ($in or $context) or prefix, a colon, and a path (a JSON pointer excluding the leading slash)",
             "type": "string",
-            "pattern": "^([a-zA-Z0-9_!@#$]:)?[a-zA-Z0-9_!@#$]+$"
+            "pattern": "^([a-zA-Z0-9_!@#$.]:)?[a-zA-Z0-9_!@#$.]+$"
         },
         "Transform": {
             "description": "a configuration of a transform that can be applied to JSON data structures",
@@ -24,7 +24,7 @@
                 "type": {
                     "description": "the name of the type of template this is.  This determines the other properties used to configure the transform.",
                     "type": "string",
-                    "pattern": "^([a-zA-Z0-9_!@#$])+$"
+                    "pattern": "^([a-zA-Z0-9_!@#$.])+$"
                 },
                 "context": {
                     "description": "an arbitrary set of named properties that can be accessed while applying a transform",
@@ -49,8 +49,10 @@
                     "notes": [
                         "These transforms will be merged in with the current set of available transforms, overriding existing ones with the same name"
                     ],
-                    "type": "array",
-                    "items": { "$ref": "#/definitions/Transform" }
+                    "type": "object",
+                    "patternProperties": {
+                        "^[a-zA-Z0-9_!@#$.]+$": { "$ref": "#/definitions/Transform" }
+                    }
                 },
                 "templates": {
                     "description": "a named list of additional templates available to the current transform",
@@ -58,8 +60,10 @@
                         "A template is a transform that returns a string type result",
                         "These transforms will be merged in with the current set of available transforms, overriding existing ones with the same name"
                     ],
-                    "type": "array",
-                    "items": { "$ref": "#/definitions/Transform" }
+                    "type": "object",
+                    "patternProperties": {
+                        "^[a-zA-Z0-9_!@#$.]+$": { "$ref": "#/definitions/Transform" }
+                    }
                 },
                 "joins": {
                     "description": "a named list of additional join templates available to the current transform",
@@ -67,15 +71,39 @@
                         "A join template is a template that requires an array of strings as its input",
                         "These transforms will be merged in with the current set of available transforms, overriding existing ones with the same name"
                     ],
-                    "type": "array",
-                    "items": { "$ref": "#/definitions/Transform" }
+                    "type": "object",
+                    "patternProperties": {
+                        "^[a-zA-Z0-9_!@#$.]+$": { "$ref": "#/definitions/Transform" }
+                    }
                 }
             }
         },
         "JSONType": {
             "description": "a name for a JSON primitive type",
             "type": "string",
-            "enum": [ "string", "int", "real", "object", "array", "bool", "any" ]
+            "enum": [ "string", "integer", "number", "object", "array", "boolean", "any" ]
+        },
+        "LiteralTransform": {
+            "description": "a type of transform that emits a constant value, regardless of the input",
+            "allOf": [
+                { "$ref": "#/definitions/Transform" },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": [ "literal" ] 
+                        },
+                        "value": {
+                            "description": "The literal value that the transform should return",
+                            "$ref": "AnyType" 
+                        }
+                    }
+                }
+            ]
+        },
+        "AnyType": {
+            "description": "a type representing a union of all primitive types",
+            "type": [ "array", "boolean", "integer", "number", 
+                      "null", "object", "string" ]
         }
     },
 

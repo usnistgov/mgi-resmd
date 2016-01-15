@@ -1,20 +1,23 @@
 {
+    "$schema": "http://mgi.nist.gov/mgi-json-trans/v0.1",
     "templates": {
         "$lb": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/LiteralTransform" ],
             "type": "literal",
             "value": "{",
-            "input_expected": "any",
+            "expects": ["any"],
             "returns": "string"
         },
         "$rb": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/LiteralTransform" ],
             "type": "literal",
             "value": "}",
-            "input_expected": "any",
+            "expects": ["any"],
             "returns": "string"
         }
     },
     "transforms": {
-        "applytransform": {
+        "apply": {
             "type": "function",
             "name": "$std.applytransform",
             "argdesc": [ 
@@ -22,14 +25,14 @@
                 "str: pointer to data to use as new input",
                 "...: args to pass to transform" 
             ],
-            "input_expected": "any",
+            "expects": ["any"],
             "returns": "any"
         },
         "extract": {
             "type": "function",
             "name": "$std.extract",
             "argdesc": [ "str: pointer to data to extract" ],
-            "input_expected": "any",
+            "expects": ["any"],
             "returns": "any"
         },
         "wrap": {
@@ -37,17 +40,17 @@
             "name": "$std.wrap",
             "description": "break text into an array of lines of limited length",
             "argdesc": [ "int: maximum length of each line" ],
-            "input_expected": "string",
+            "expects": ["string"],
             "returns": "array"
         },
         "fill": {
-            "type": "sequence",
+            "type": "chain",
             "status": "disabled",
-            "transforms": [
+            "steps": [
                 "wrap({0})", "newline"
             ],
             "argdesc": [ "int: maximum length of each line" ],
-            "input_expected": "string",
+            "expects": ["string"],
             "returns": "string"
         }
     }, 
@@ -56,14 +59,14 @@
             "type": "function",
             "name": "$std.delim",
             "args": [""],
-            "input_expected": "array",
+            "expects": ["array"],
             "returns": "string"
         },
         "delim": {
             "type": "function",
             "name": "$std.delim",
             "argdesc": ["str: delimiting string"],
-            "input_expected": "array",
+            "expects": ["array"],
             "returns": "string"
         },
         "newline": {
@@ -71,7 +74,7 @@
             "name": "$std.delimit",
             "description": "places each item on a different line",
             "args": [ "\n" ],
-            "input_expected": "array",
+            "expects": ["array"],
             "returns": "string"
         },
         "doubleNewline": {
@@ -79,7 +82,7 @@
             "name": "$std.delimit",
             "description": "places a blank line between each item",
             "args": [ "\n\n" ],
-            "input_expected": "array",
+            "expects": ["array"],
             "returns": "string"
         }
     }
