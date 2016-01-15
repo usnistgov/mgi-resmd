@@ -246,7 +246,8 @@ types = { "literal": Literal,
           "stringtemplate": StringTemplate, 
           "function": Function,
           "mapjoin": MapJoin,
-          "json": JSON
+          "json": JSON,
+          "pointer": Pointer
           }
 
 # function type implementations
