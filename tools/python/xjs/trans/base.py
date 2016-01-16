@@ -2,6 +2,7 @@
 a module providing the base utility functions and classes
 """
 from collections import MutableMapping
+from .exceptions import TransformConfigException
 
 class ScopedDict(MutableMapping):
 
@@ -62,10 +63,18 @@ class Transform(object):
         self.type = type
         self.config = config
         self.engine = engine
+        self._check_status(config, engine)
         self._func = self.mkfn(config, engine)
 
     def __call__(self, input, context, *args):
         return self._func(input, context, *args)
+
+    def _check_status(self, config, engine):
+        if config.get("status") == "disabled":
+            msg = "Can't use "
+            msg += self.name or "anonymous" 
+            msg += " transform: status is marked as 'disabled'"
+            raise TransformConfigException(msg, self.name)
 
     def mkfn(self, config, engine):
         def impl(input, context, *args):

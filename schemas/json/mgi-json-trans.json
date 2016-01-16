@@ -44,6 +44,20 @@
                     "description": "the JSON type that this transform will return after being applied to the input (of an acceptable type)",
                     "$ref": "#/definitions/JSONType"
                 },
+                "status": {
+                    "description": "a switch that control whether or how this transform can be applied",
+                    "type": "string",
+                    "enum": [ "enabled", "disabled" ],
+                    "valueDocumenation": {
+                        "enabled": {
+                            "description": "the transform is available to be applied"
+                        },
+                        "disabled": {
+                            "description": "the transform is not available to be applied; attempting to do so will result in an error."
+                        }
+                    },
+                    "default": "enabled"
+                },
                 "transforms": {
                     "description": "a named list of additional transforms available to the current transform",
                     "notes": [
@@ -138,7 +152,7 @@
                 { 
                     "properties": {
                         "item": {
-                            "enum": "pointer"
+                            "enum": ["pointer"]
                         },
                         "select": {
                             "description": "a data pointer to the JSON data to extract from the input.",
@@ -155,30 +169,60 @@
             ]
         },
         "MapJoinTransform": {
-            "description": "",
+            "description": "a transform that applies a transform on each of elements of an input array and then combines them with a join transform",
             "allOf": [
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
                         "item": {
-                            "enum": "mapjoin"
+                            "enum": ["mapjoin"]
+                        },
+                        "itemmap": {
+                            "description": "the transform to apply to each element of the array",
+                            "oneOf": [
+                                { 
+                                    "description": "a text-based reference to a transform",
+                                    "type": "string" 
+                                },
+                                {
+                                    "description": "a transform description object",
+                                    "$ref": "#/definitions/Transform"
+                                }
+                            ]
+                        },
+                        "join": {
+                            "description": "the transform to apply to the array resulting from the map transform",
+                            "oneOf": [
+                                { 
+                                    "description": "a text-based reference to a transform",
+                                    "type": "string" 
+                                },
+                                {
+                                    "description": "a transform description object",
+                                    "$ref": "#/definitions/Transform"
+                                }
+                            ]
                         }
                     },
-                    "required": [ "type", "" ]
+                    "required": [ "type", "itemmap", "join" ]
                 }
             ]
         },
         "JSONTransform": {
-            "description": "",
+            "description": "converts input into a new JSON structure",
             "allOf": [
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
                         "item": {
-                            "enum": "mapjoin"
+                            "enum": ["json"]
+                        },
+                        "content": {
+                            "description": "the skeleton of the output JSON data structure containing transform token where input data should be inserted.",
+                            "$ref": "#/definitions/AnyType"
                         }
                     },
-                    "required": [ "type", "" ]
+                    "required": [ "type", "content" ]
                 }
             ]
         },
@@ -189,10 +233,14 @@
                 { 
                     "properties": {
                         "item": {
-                            "enum": "mapjoin"
+                            "enum": ["stringtemplate"]
+                        },
+                        "content": {
+                            "description": "a string containing template tokens where input data should be inserted",
+                            "type": "string"
                         }
                     },
-                    "required": [ "type", "" ]
+                    "required": [ "type", "content" ]
                 }
             ]
         },
