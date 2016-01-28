@@ -69,3 +69,50 @@ class TestScopedDict(object):
         assert ctx.get('foo') == 'blah'
         assert 'foo' in ctx
         assert len(ctx) == 1
+
+
+class TestTransform(object):
+
+    engine = "engine"
+
+    def test_ctor(self):
+        trfm = base.Transform({'type': 'fake'}, self.engine)
+        assert trfm.name is None
+        assert trfm.type == 'fake'
+        assert trfm.config['type'] == 'fake'
+        assert trfm.engine is self.engine
+        assert trfm._func is not None
+
+        trfm = base.Transform({'type': 'fake'}, self.engine, "identity")
+        assert trfm.name == "identity"
+        assert trfm.type == 'fake'
+        assert trfm.config['type'] == 'fake'
+        assert trfm.engine is self.engine
+        assert trfm._func is not None
+
+        trfm = base.Transform({'type': 'fake'}, self.engine, "identity", "goob")
+        assert trfm.name == "identity"
+        assert trfm.type == 'goob'
+        assert trfm.config['type'] == 'fake'
+        assert trfm.engine is self.engine
+        assert trfm._func is not None
+
+    def test_disabled(self):
+        with pytest.raises(base.TransformConfigException):
+            trfm = base.Transform({'type': 'fake', 'status': 'disabled'}, 
+                                  self.engine)
+
+        trfm = base.Transform({'type': 'fake', 'status': 'enabled'}, 
+                              self.engine)
+        assert trfm.name is None
+        assert trfm.type == 'fake'
+        assert trfm.config['type'] == 'fake'
+        assert trfm.engine is self.engine
+        assert trfm._func is not None
+
+    def test_callable(self):
+        trfm = base.Transform({'type': 'fake'}, self.engine, "identity")
+        assert trfm("value", {}) == "value"
+
+
+
