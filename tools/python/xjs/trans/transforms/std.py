@@ -1,14 +1,15 @@
 """
 transformers from the standard module
 """
-import json, copy, re
+import json, copy, re, importlib
 import types as tps
 import json as jsp
 
 from ..exceptions import *
 from ..base import Transform
+from .. import parse
 
-joins = [ "concat", "delim" ]
+joins = [ "delim" ]
 transforms = [ "identity_function", "applytransform", "extract", "wrap" ]
 templates = [ "tostr" ]
 
@@ -63,41 +64,42 @@ class StringTemplate(Transform):
 
     def parse_template_str(self, content):
 
-        # break up string at the braces
-        parts = self._braces_re.split(content)
-
-        # collapse template tokens with their surrounding braces
-        depth = 0
         parsed = []
-        for i in range(len(parts)):
-            item = parts[i]
-            parsed.append(item)
-            if item == '{':
-                depth += 1
-                if depth == 1:
-                    first = len(parsed)-1
-            elif item == '}':
-                depth -= 1
-                if depth < 0:
-                    raise StringTemplateSyntaxError("No matching { for }",
-                                                    ["".join(parsed), item, 
-                                                     "".join(parts)], content,
-                                                    self.name)
-                if depth == 0:
-                    parsed[first:] = [ "".join(parsed[first:]) ]
+        while len(content) > 0:
+            i = content.find('{')
+            if i < 0:
+                parsed.append(content)
+                content = ''
+                continue
+
+            if i > 0:
+                parsed.append(content[0:i])
+                content = content[i:]
+
+            try:
+                tok, content = parse.chomp_br_enclosure(content)
+                parsed.append(tok)
+            except parse.ConfigSyntaxError:
+                # no closing brace; treat like a normal string
+                if not parsed:
+                    parsed.append(content[0])
+                else:
+                    parsed[-1] += content[0]
+                content = content[1:]
+
 
         # resolve the tokens into transforms
-        if '{' in parts:
+        if len(filter(lambda p: p.startswith('{') and p.endswith('}'),parsed)) >0:
             for i in range(len(parsed)):
                 item = parsed[i]
-                if item.startswith('{'):
+                if item.startswith('{') and item.endswith('}'):
                     item = item[1:-1]
                     try:
                         # see if it matches a template or template-function
                         item = self.engine.resolve_template(item)
                     except TransformNotFound:
                         # it's a pointer
-                        item = Pointer({ "select": item }, self.engine, 
+                        item = Extract({ "select": item }, self.engine, 
                                        self.name+":(select)", "pointer")
                     parsed[i] = item
 
@@ -117,39 +119,47 @@ class JSON(Transform):
         skel = self._resolve_skeleton(copy.deepcopy(content))
         
         def impl(input, *args):
-            newdata = copy.deepcopy(skel)
-            self._transform_skeleton(newdata, engine, input, context)
-            return newdata
+            return self._transform_skeleton(skel, input, context)
 
         return impl
 
     def _resolve_skeleton(self, skel):
-        if isinstance(content, dict):
-            if content.has_key("$val"):
-                if isinstance(content["$val"], dict):
-                    return self.engine.make_transform(content["$val"], 
+        if isinstance(skel, dict):
+            if skel.has_key("$val"):
+                # $val means replace the object with the output from the
+                # Transform given as the value to $val
+                if isinstance(skel["$val"], dict):
+                    return self.engine.make_transform(skel["$val"], 
                                                       self.name+".(anon)")
                 else:
-                    return self.engine.resolve_transform(content["$val"])
+                    return self.engine.resolve_transform(skel["$val"])
             else:
-                _resolve_json_object(skel)
-        elif isinstance(content, str) and "{" in content and "}" in content:
-            content = _resolve_json_string(skel)
-        elif isinstance(content, list) or isinstance(content, tuple):
-            _resolve_json_array(skel)
+                self._resolve_json_object(skel)
+        elif (isinstance(skel, str) or isinstance(skel, unicode)) and \
+             "{" in skel and "}" in skel:
+            skel = self._resolve_json_string(skel)
+        elif isinstance(skel, list) or isinstance(skel, tuple):
+            self._resolve_json_array(skel)
 
         return skel
 
     def _resolve_json_object(self, content):
         # resolve the values
         for key in content:
-            _resolve_skeleton(content[key])
+            content[key] = self._resolve_skeleton(content[key])
 
         # transform keys
+        keytrans = {}
         for key in content.keys():
             if "{" in key and "}" in key:
-                newkey = _transform_json_string(key)
-                content[newkey] = content.pop(key)
+                keytrans[key] = self._resolve_json_string(key)
+                #newkey = _transform_json_string(key)
+                #content[newkey] = content.pop(key)
+
+        if keytrans:
+            # "\bkeytr" is a special key for holding Transforms that will 
+            # transform the keys.
+            content["\bkeytr"] = keytrans
 
         return content
 
@@ -166,6 +176,60 @@ class JSON(Transform):
         return StringTemplate({ "content": content, }, self.engine, self.name,
                               type="stringtemplate")
 
+    def _transform_skeleton(skel, input, context):
+        if isinstance(skel, Transform):
+            return skel(input, context)
+
+        if isinstance(skel, dict):
+            if skel.has_key("$val"):
+                # $val means replace the object with the output from the
+                # Transform given as the value to $val
+                if isinstance(skel['$val'], Transform):
+                    return skel['$val'](input, context)
+                else:
+                    return skel['$val']
+
+            return self._transform_json_object(skel, input, context)
+
+        if isinstance(skel, list) or isinstance(skel, tuple):
+            self._resolve_json_array(skel)
+
+        return skel
+
+    def _transform_json_object(self, skel, input, context):
+        out = {}
+
+        # transform the values
+        for key in skel:
+            if key == "\bkeytr":
+                continue
+            out[key] = self._transform_skeleton(skel)
+
+        # transform any keys needing transforming
+        if skel.has_key("\bkeytr"):
+            # "\bkeytr" is a special key for holding Transforms that will 
+            # transform the keys.
+            for key in skel["\bkeytr"]:
+                newkey = skel["\bkeytr"][key](input, context)
+                out[newkey] = out.pop(key)
+
+        return out
+
+    def _transform_json_array(self, skel, input, context):
+
+        out = []
+
+        # transform each item
+        for i in range(len(skel)):
+            if isinstance(skel[i], Transform):
+                out[i] = skel[i](input, context)
+            else:
+                out[i] = self._transform_skeleton(skel[i], input, context)
+
+        return out
+
+
+
 class MapJoin(Transform):
     """
     a transform that converts an array into a single string by applying the 
@@ -179,18 +243,15 @@ class MapJoin(Transform):
             itemmap = self.engine.resolve_template(itemmap)
         else:
             itemmap = tostr
-        join = config.get('join')
-        if join:
-            join = self.engine.resolve_template(join)
-        else:
-            join = concat
+        join = config.get('join', 'concat')
+        join = self.engine.resolve_template(join)
 
         def impl(input, context, *args, **keys):
             items = map(lambda i: itemmap(engine, i, context), input)
             return join(engine, items, context)
         return impl
 
-class Pointer(Transform):
+class Extract(Transform):
     """
     a transform that extracts data from the input via a data pointer
     """
@@ -201,31 +262,33 @@ class Pointer(Transform):
             return extract(engine, input, context, select)
         return impl
 
-class Function(Transform):
+class Native(Transform):
     """
     a transform that produces its output by calling a configured function
     """
 
     def mkfn(self, config, engine):
         try: 
-            fname = config['name']
+            fname = config['impl']
         except KeyError:
-            raise MissingTranformData("content", "json")
+            raise MissingTranformData("impl", self.name)
 
         if fname.startswith('$'):
            fname = ".".join([TRANSFORMS_MOD, fname[1:]])
-        fimpl = self._load_function(fname[1:]) #throws exc for unresolvable func
+        fimpl = self._load_function(fname) #throws exc for unresolvable func
 
-        confargs = config.get('args', [])
+        # configuration may provide a portion of the arguments supported by 
+        # the underlying implementation
+        conf_args = list(config.get('args',[]))
 
         def impl(input, context, *args, **keys):
-            use = confargs + args
+            use = conf_args + list(args)
             return fimpl(self.engine, input, context, *use, **keys)
         return impl
 
-    def _load_function(fname):
+    def _load_function(self, funcname):
         try: 
-            (mod, fname) = fname.rsplit('.', 1)
+            (mod, fname) = funcname.rsplit('.', 1)
             mod = importlib.import_module(mod)
             return getattr(mod, fname)
         except ValueError, ex:
@@ -235,18 +298,113 @@ class Function(Transform):
         except ImportError, ex:
             raise TransformConfigParamError("name", self.name, 
                   TransformConfigException.make_message(self.name, 
-                                         "function not found with this name"))
+                                         "function not found with this name: "+
+                                                        funcname))
         except AttributeError, ex:
             raise TransformConfigParamError("name", self.name, 
                   TransformConfigException.make_message(self.name, 
                "function {0} not found in the {1} module".format(fname, mod)))
-            
+
+class Function(Transform):
+    """
+    a transform that wraps another (Native, typically) Transform to handle 
+    an invocation in function form.  
+
+    String templates can contain transform directives that have the form of 
+    a function call--e.g. "delimit(',')".  This implies that there is a 
+    transform called "delimit" that can take at least one argument.  Arguments
+    themselves can be in the form of JSON data or string templates that can 
+    contain transform directives.  This transform will resolve all the argument
+    values and hold them until they can be applied to the input data and then
+    passed to the underlying implementation.
+    """
+
+    def __init__(self, engine, transform, args, name=None, type="function"):
+        self._wrapped = transform
+        self._args = args
+        super(Function, self).__init__({"args": tuple(args), 
+                                        "transform": transform}, 
+                                       engine, name, type)
+
+    def mkfn(self, config, engine):
+        if not config.has_key('args'):
+            raise MissingTranformData("arg", self.name)
+
+        if not isinstance(self._wrapped, Transform):
+            self._wrapped = engine.resolve_transform(self._wrapped)
+
+        for i in range(len(self._args)):
+            arg = self._args[i]
+            if isinstance(arg, str) or isinstance(arg, unicode):
+                try:
+                    # try assuming the argument is JSON data
+                    if arg[0] == "'" and arg[-1] == "'":
+                        arg = '"'+arg[1:-1]+'"'
+
+                    arg = json.loads(arg)
+                    if isinstance(arg, str) and "{" in arg:
+                        arg = StringTemplate({'content': arg}, engine, 
+                                             self.name+":(arg)", 
+                                             "stringtemplate")
+                    elif isinstance(arg, list) or isinstance(arg, dict):
+                        arg = JSON({'content': arg}, engine, self.name+":(arg)",
+                                   "json")
+                except ValueError:
+                    # It should be interpreted as a transform directive
+                    arg = engine.resolve_transform(arg)
+
+                self._args[i] = arg
+
+        def impl(input, context, *args, **keys):
+            use = []
+
+            # execute all transform references included in argument list
+            for i in range(len(self._args)):
+                item = self._args[i]
+                if isinstance(item, Transform):
+                    item = item(input, context)
+                use.append(item)
+
+            return self._wrapped(input, context, *use)
+
+        return impl
+
+    @classmethod
+    def matches(cls, invoc):
+        """
+        return True if the input string matches the function form of a transform
+        invocation.  If True, it can be turned into a Function Transform via
+        the factory method, parse().
+        """
+        return bool(parse.FUNC_PAT.search(invoc.strip()))
+
+    @classmethod
+    def parse(cls, engine, funcstr, name=None):
+        """
+        return a Function Transform by parsing the given function invocation 
+        string.
+        """
+        transf, args = parse.parse_function(funcstr.strip())
+        return cls(engine, transf, args, name=transf+"()")
+
+    def _resolve_argstr(self, argstr):
+        out = self.__class__._parse_argstr(argstr)
+
+class FunctionSyntaxError(TransformConfigException):
+    """
+    an exception indicating a syntax error was detected while the parsing a 
+    function invocation.  
+    """
+
+    def __init__(self, message):
+        super(FunctionSyntaxError, self).__init__(message)
 
 types = { "literal": Literal, 
           "stringtemplate": StringTemplate, 
-          "function": Function,
+          "native": Native,
           "mapjoin": MapJoin,
-          "json": JSON
+          "json": JSON,
+          "extract": Extract
           }
 
 # function type implementations
@@ -290,7 +448,7 @@ def extract(engine, input, context, select, *args, **keys):
     """
     return engine.extract(input, context, select)
 
-def wrap(engine, input, context, maxlen, *args, **keys):
+def wrap(engine, input, context, maxlen=75, *args, **keys):
     """
     convert a paragraph of text into an array of strings broken at word 
     boundarys that are less than a given maximum in length.  
@@ -319,6 +477,25 @@ def delimit(engine, input, context, delim=", ", *args, **keys):
     """
     join the input array with a delimiter
     """
-    use = _prep_array_for_join(input, name, input, context)
+    use = _prep_array_for_join(input)
     return delim.join(use)
 
+def _prep_array_for_join(data):
+    if isinstance(data, str) or isinstance(data, unicode):
+        return [data]
+
+    if isinstance(data, list):
+        out = []
+        for item in data:
+            if not isinstance(item, str) and not isinstance(item, unicode):
+                item = json.dumps(item)
+            out.append(item)
+
+        return out
+
+    if isinstance(data, dict):
+        return [json.dumps(data)]
+
+    return [str(data)]
+
+            

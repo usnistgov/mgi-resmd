@@ -36,6 +36,9 @@ def test_registry_resource_schema(validator):
 def test_resmd_schema(validator):
     validate(validator, "res-md_schema.json")
 
+def test_trans_schema(validator):
+    validate(validator, "mgi-json-trans.json")
+
 
 
 

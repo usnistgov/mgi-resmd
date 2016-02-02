@@ -74,7 +74,31 @@ class TestContext(object):
 
 class TestDataPointer(object):
 
+    #TODO
     pass
+
+class TestStdEngine(object):
+
+    def test_loading(self):
+        engine = njn.StdEngine()
+
+        assert "literal" in engine._transCls
+        assert "$lb" in engine._transforms
+        assert "$lb" in engine._templates
+
+    def test_transform_lb(self):
+        engine = njn.StdEngine()
+        t = engine.resolve_transform("$lb")
+        assert isinstance(t, njn.Transform)
+        assert t(engine, {}, {}) == '{'
+
+    def test_validate(self):
+        engine = njn.StdEngine()
+        engine.resolve_all_transforms()
+
+        assert "$lb" in engine._transforms
+        assert isinstance(engine._transforms["$lb"], njn.Transform)
+        
 
 exdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "examples",
@@ -84,7 +108,7 @@ class TestExamples(object):
 
     def test_simple(self):
         ss = { "type": "literal", "value": "@" }
-        engine = njn.Engine()
+        engine = njn.StdEngine()
         tfunc = engine.make_transform(ss, "$at")
         result = tfunc({}, {})
         assert result == "@"
@@ -94,7 +118,7 @@ class TestExamples(object):
         with open(os.path.join(exdir,"testtemplate1.json")) as fd:
             ss = json.load(fd)
 
-        engine = njn.Engine(ss)
+        engine = njn.DocEngine(ss)
 
         tfunc = engine.resolve_template('')
         result = tfunc({}, {})
@@ -107,7 +131,7 @@ class TestExamples(object):
         with open(os.path.join(exdir,"testtemplate2.json")) as fd:
             ss = json.load(fd)
 
-        engine = njn.Engine(ss)
+        engine = njn.DocEngine(ss)
 
         tfunc = engine.resolve_template('')
         result = tfunc(input, {})
