@@ -33,7 +33,6 @@ class StringTemplate(Transform):
     a template that will replace template tokens in a string
     with strings derived from the input data
     """
-    _braces_re = re.compile("([\{\}])")
 
     def mkfn(self, config, engine):
 
@@ -118,7 +117,7 @@ class JSON(Transform):
 
         skel = self._resolve_skeleton(copy.deepcopy(content))
         
-        def impl(input, *args):
+        def impl(input, context, *args):
             return self._transform_skeleton(skel, input, context)
 
         return impl
@@ -148,7 +147,7 @@ class JSON(Transform):
         for key in content:
             content[key] = self._resolve_skeleton(content[key])
 
-        # transform keys
+        # resolve keys
         keytrans = {}
         for key in content.keys():
             if "{" in key and "}" in key:
@@ -167,7 +166,7 @@ class JSON(Transform):
 
         # resolve each item
         for i in range(len(content)):
-            content[i] = _resolve_skeleton(content[i])
+            content[i] = self._resolve_skeleton(content[i])
 
         return content
 
@@ -176,7 +175,7 @@ class JSON(Transform):
         return StringTemplate({ "content": content, }, self.engine, self.name,
                               type="stringtemplate")
 
-    def _transform_skeleton(skel, input, context):
+    def _transform_skeleton(self, skel, input, context):
         if isinstance(skel, Transform):
             return skel(input, context)
 
@@ -192,7 +191,7 @@ class JSON(Transform):
             return self._transform_json_object(skel, input, context)
 
         if isinstance(skel, list) or isinstance(skel, tuple):
-            self._resolve_json_array(skel)
+            return self._transform_json_array(skel, input, context)
 
         return skel
 
@@ -203,7 +202,7 @@ class JSON(Transform):
         for key in skel:
             if key == "\bkeytr":
                 continue
-            out[key] = self._transform_skeleton(skel)
+            out[key] = self._transform_skeleton(skel[key], input, context)
 
         # transform any keys needing transforming
         if skel.has_key("\bkeytr"):
@@ -222,9 +221,9 @@ class JSON(Transform):
         # transform each item
         for i in range(len(skel)):
             if isinstance(skel[i], Transform):
-                out[i] = skel[i](input, context)
+                out.append(skel[i](input, context))
             else:
-                out[i] = self._transform_skeleton(skel[i], input, context)
+                out.append(self._transform_skeleton(skel[i], input, context))
 
         return out
 
