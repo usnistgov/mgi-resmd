@@ -18,7 +18,7 @@
     },
     "transforms": {
         "apply": {
-            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/FunctionTransform" ],
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "function",
             "name": "$std.applytransform",
             "argdesc": [ 
@@ -30,7 +30,7 @@
             "returns": "any"
         },
         "extract": {
-            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/FunctionTransform" ],
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "function",
             "name": "$std.extract",
             "argdesc": [ "str: pointer to data to extract" ],
@@ -38,7 +38,7 @@
             "returns": "any"
         },
         "wrap": {
-            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/FunctionTransform" ],
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "function",
             "name": "$std.wrap",
             "description": "break text into an array of lines of limited length",
@@ -59,7 +59,7 @@
     }, 
     "joins": {
         "concat": {
-            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/FunctionTransform" ],
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "function",
             "name": "$std.delim",
             "args": [""],
@@ -67,7 +67,7 @@
             "returns": "string"
         },
         "delim": {
-            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/FunctionTransform" ],
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "function",
             "name": "$std.delim",
             "argdesc": ["str: delimiting string"],
@@ -75,7 +75,7 @@
             "returns": "string"
         },
         "newline": {
-            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/FunctionTransform" ],
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "function",
             "name": "$std.delimit",
             "description": "places each item on a different line",
@@ -84,7 +84,7 @@
             "returns": "string"
         },
         "doubleNewline": {
-            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/FunctionTransform" ],
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "function",
             "name": "$std.delimit",
             "description": "places a blank line between each item",

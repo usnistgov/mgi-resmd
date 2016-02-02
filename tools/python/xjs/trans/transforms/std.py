@@ -123,6 +123,10 @@ class JSON(Transform):
 
         return impl
 
+    def _transform_skeleton(skel, engine, input, context):
+        if isinstance(skel, dict):
+            pass
+
     def _resolve_skeleton(self, skel):
         if isinstance(content, dict):
             if content.has_key("$val"):
@@ -146,10 +150,15 @@ class JSON(Transform):
             _resolve_skeleton(content[key])
 
         # transform keys
+        keytrans = {}
         for key in content.keys():
             if "{" in key and "}" in key:
-                newkey = _transform_json_string(key)
-                content[newkey] = content.pop(key)
+                keytrans[key] = self._resolve_json_string(key)
+                #newkey = _transform_json_string(key)
+                #content[newkey] = content.pop(key)
+
+        if keytrans:
+            content["\bkeytr"] = keytrans
 
         return content
 
@@ -238,7 +247,7 @@ class Native(Transform):
                   TransformConfigException.make_message(self.name, 
                "function {0} not found in the {1} module".format(fname, mod)))
 
-class FunctionTransform(Transform):
+class Function(Transform):
     """
     a transform that wraps another (Native, typically) Transform to handle 
     an invocation in function form.  
@@ -252,27 +261,48 @@ class FunctionTransform(Transform):
     passed to the underlying implementation.
     """
 
-    def __init__(self, transform, args, name=None, type="function"):
-        super(FunctionTransform, self).__init__({"args": tuple(args)}, 
-                                                transform.engine, name, type)
+    def __init__(self, engine, transform, args, name=None, type="function"):
+        super(Function, self).__init__({"args": tuple(args), 
+                                        "transform": transform}, 
+                                       engine, name, type)
         self._wrapped = transform
+        self._args = args
 
     def mkfn(self, config, engine):
-        if not config.has_key('argstr'):
-            raise MissingTranformData("argstr", self.name)
-        if not isinstance(config['argstr'], str) or \
-           not isinstance(config['argstr'], unicode):
-            raise TransformConfigTypeError("argstr", "str", 
-                                           type(config['argstr']), self.name)
+        if not config.has_key('args'):
+            raise MissingTranformData("arg", self.name)
 
-        args = self._resolve_argstr(config['argstr'])
+        if not isinstance(self._wrapped, Transform):
+            self._wrapped = engine.resolve_transform(self._wrapped)
+
+        for i in len(self._args):
+            arg = self._args[i]
+            if isinstance(arg, str) or isinstance(arg, unicode):
+                try:
+                    # try assuming the argument is JSON data
+                    if arg[0] == "'" and arg[-1] == "'":
+                        arg = '"'+arg[1:-1]+'"'
+
+                    arg = json.loads(arg)
+                    if isinstance(arg, str) and "{" in arg:
+                        arg = StringTemplate({'content': arg}, engine, 
+                                             self.name+":(arg)", 
+                                             "stringtemplate")
+                    elif isinstance(arg, list) or isinstance(arg, dict):
+                        arg = JSON({'content': arg}, engine, self.name+":(arg)",
+                                   "json")
+                except ValueError:
+                    # It should be interpreted as a transform directive
+                    arg = engine.resolve_transform(arg)
+
+                self._args[i] = arg
 
         def impl(input, context, *args, **keys):
             use = []
 
             # execute all transform references included in argument list
-            for i in range(len(args)):
-                item = args[i]
+            for i in range(len(self._args)):
+                item = self._args[i]
                 if isinstance(item, Transform):
                     item = item(input, context)
                 use.append(item)
@@ -281,7 +311,27 @@ class FunctionTransform(Transform):
 
         return impl
 
-    def _chomp_ensclosure(self, argstr):
+    @classmethod
+    def _chomp_arg(cls, argstr):
+        if argstr[0] in "{[":
+            tok, rest = cls._chomp_br_enclosure(argstr)
+        elif argstr[0] in "\"'":
+            tok, rest = cls._chomp_quote(argstr)
+        else:
+            parts = re.split(r'(,)', argstr, 1)
+            tok = parts[0].strip()
+            rest = ''
+            if len(parts) > 1:
+                rest = ''.join(parts[1:])
+
+        if len(rest) > 0 and rest[0] != ',':
+            raise FunctionSyntaxError("Expected argument delimiter (','): "+rest)
+        rest = rest.lstrip(', ')
+
+        return tok, rest
+
+    @classmethod
+    def _chomp_br_enclosure(cls, argstr):
         out = None
         start = argstr[0]
         end = start
@@ -291,6 +341,8 @@ class FunctionTransform(Transform):
             end = '}'
         elif start == '[':
             end = ']'
+        else:
+            return '', argstr
 
         i = 1;
         while lev > 0 and i < len(argstr):
@@ -298,23 +350,87 @@ class FunctionTransform(Transform):
                 lev += 1
             elif argstr[i] == end:
                 lev -= 1
+            elif argstr[i] in "\"'":
+                quote, rest = cls._chomp_quote(argstr[i:])
+                i += len(quote)-1
+            i += 1
+
         if lev > 0:
             raise FunctionSyntaxError("Not a legal argument token: missing '" +
                                       end + "': " + argstr)
-        rest = argstr[i].lstrip()
-        if len(rest) > 0 and rest[0] != ',':
-            raise FunctionSyntaxError("Expected argument delimiter (','): " + 
-                                      rest)
+        if i >= len(argstr):
+            return argstr, ''
 
-        return argstr[:i], rest
+        # rest = argstr[i].lstrip()
+        # if len(rest) > 0 and rest[0] != ',':
+        #     raise FunctionSyntaxError("Expected argument delimiter (','): " + 
+        #                               rest)
+
+        return argstr[:i], argstr[i:].lstrip()
+
+    @classmethod
+    def _chomp_quote(cls, instr):
+        qc = instr[0]
+        if qc not in "\"'":
+            return '', instr
+        bcc = 0
+        i = 1
+
+        while i < len(instr):
+            if instr[i] == qc:
+                if bcc % 2 == 0:
+                    break
+                bcc = 0
+            elif instr[i] == '\\':
+                bcc += 1
+            i += 1
+        
+        if i >= len(instr):
+            raise FunctionSyntaxError("Missing closing quote ("+qc+"): "+instr)
+        return instr[:i+1], instr[i+1:].lstrip()
+
+    @classmethod
+    def _parse_argstr(cls, argstr):
+        out = []
+        while len(argstr) > 0:
+            tok, argstr = cls._chomp_arg(argstr)
+            out.append(tok)
+
+        return out
+
+    _FUNC_PAT = re.compile(r'^(\w+)\((.*)\)$')
+
+    @classmethod
+    def _parse_function(cls, funcstr):
+        match = cls._FUNC_PAT(funcstr)
+        if not match:
+            raise FunctionSyntaxError("Does not match function syntax, f(...): "+
+                                      funcstr)
+
+        tf, argstr = match.group(1,2)
+        args = cls._parse_argstr(argstr)
+        return tf, args
+
+    @classmethod
+    def parse(cls, engine, funcstr, name=None):
+        """
+        return a Function Transform by parsing the given function invocation 
+        string.
+        """
+        transf, args = cls._parse_function(funcstr)
+        return cls(engine, transf, args, name)
 
     def _resolve_argstr(self, argstr):
-        out = []
-        argstr = argstr.strip()
-        while len(argstr) > 0:
-            if argstr[0] in "{['\"":
-                tok = self._chomp_enclosure(argstr)
+        out = self.__class__._parse_argstr(argstr)
 
+class FunctionSyntaxError(TransformConfigException):
+    """
+    an exception indicating a syntax error was detected while the parsing a 
+    function invocation.  
+    """
+
+    def __init__(self, message):
+        super(FunctionSyntaxError, self).__init__(message)
 
 types = { "literal": Literal, 
           "stringtemplate": StringTemplate, 
