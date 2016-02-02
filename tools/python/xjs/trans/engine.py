@@ -56,6 +56,10 @@ class DataPointer(object):
     def parse(cls, strrep):
         """
         parse the string representaton of a data pointer into a 2-tuple
+
+        data_pointer := target ':' json_pointer
+        target := prefix | resolved_target
+        resolved_target := '$' ( 'in' | 'context' | 'argv' )
         """
         parts = strrep.strip().rsplit(':')
         if len(parts) > 2:
@@ -375,6 +379,8 @@ class Engine(object):
                                      None, the engine's default context will 
                                      be used.
         """
+        resolved_targets = ("$in", "$context", "$argv")
+
         if isinstance(dptr, DataPointer):
             out = dptr.copy()
         else:
@@ -385,7 +391,7 @@ class Engine(object):
             return out
 
         try:
-            while out.target != "$in" and out.target != "$context":
+            while out.target not in resolved_targets:
                 prefix = self.resolve_prefix(out.target)
                 if not prefix:
                     break

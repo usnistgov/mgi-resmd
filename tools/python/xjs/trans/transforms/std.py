@@ -97,7 +97,7 @@ class StringTemplate(Transform):
                         item = self.engine.resolve_template(item)
                     except TransformNotFound:
                         # it's a pointer
-                        item = Pointer({ "select": item }, self.engine, 
+                        item = Extract({ "select": item }, self.engine, 
                                        self.name+":(select)", "pointer")
                     parsed[i] = item
 
@@ -190,7 +190,7 @@ class MapJoin(Transform):
             return join(engine, items, context)
         return impl
 
-class Pointer(Transform):
+class Extract(Transform):
     """
     a transform that extracts data from the input via a data pointer
     """
@@ -201,26 +201,23 @@ class Pointer(Transform):
             return extract(engine, input, context, select)
         return impl
 
-class Function(Transform):
+class Native(Transform):
     """
     a transform that produces its output by calling a configured function
     """
 
     def mkfn(self, config, engine):
         try: 
-            fname = config['name']
+            fname = config['impl']
         except KeyError:
-            raise MissingTranformData("content", "json")
+            raise MissingTranformData("impl", self.name)
 
         if fname.startswith('$'):
            fname = ".".join([TRANSFORMS_MOD, fname[1:]])
         fimpl = self._load_function(fname[1:]) #throws exc for unresolvable func
 
-        confargs = config.get('args', [])
-
         def impl(input, context, *args, **keys):
-            use = confargs + args
-            return fimpl(self.engine, input, context, *use, **keys)
+            return fimpl(self.engine, input, context, *args, **keys)
         return impl
 
     def _load_function(self, fname):
@@ -240,14 +237,91 @@ class Function(Transform):
             raise TransformConfigParamError("name", self.name, 
                   TransformConfigException.make_message(self.name, 
                "function {0} not found in the {1} module".format(fname, mod)))
-            
+
+class FunctionTransform(Transform):
+    """
+    a transform that wraps another (Native, typically) Transform to handle 
+    an invocation in function form.  
+
+    String templates can contain transform directives that have the form of 
+    a function call--e.g. "delimit(',')".  This implies that there is a 
+    transform called "delimit" that can take at least one argument.  Arguments
+    themselves can be in the form of JSON data or string templates that can 
+    contain transform directives.  This transform will resolve all the argument
+    values and hold them until they can be applied to the input data and then
+    passed to the underlying implementation.
+    """
+
+    def __init__(self, transform, args, name=None, type="function"):
+        super(FunctionTransform, self).__init__({"args": tuple(args)}, 
+                                                transform.engine, name, type)
+        self._wrapped = transform
+
+    def mkfn(self, config, engine):
+        if not config.has_key('argstr'):
+            raise MissingTranformData("argstr", self.name)
+        if not isinstance(config['argstr'], str) or \
+           not isinstance(config['argstr'], unicode):
+            raise TransformConfigTypeError("argstr", "str", 
+                                           type(config['argstr']), self.name)
+
+        args = self._resolve_argstr(config['argstr'])
+
+        def impl(input, context, *args, **keys):
+            use = []
+
+            # execute all transform references included in argument list
+            for i in range(len(args)):
+                item = args[i]
+                if isinstance(item, Transform):
+                    item = item(input, context)
+                use.append(item)
+
+            return self._wrapped(input, context, *use)
+
+        return impl
+
+    def _chomp_ensclosure(self, argstr):
+        out = None
+        start = argstr[0]
+        end = start
+        lev = 1
+
+        if start == '{':
+            end = '}'
+        elif start == '[':
+            end = ']'
+
+        i = 1;
+        while lev > 0 and i < len(argstr):
+            if argstr[i] == start:
+                lev += 1
+            elif argstr[i] == end:
+                lev -= 1
+        if lev > 0:
+            raise FunctionSyntaxError("Not a legal argument token: missing '" +
+                                      end + "': " + argstr)
+        rest = argstr[i].lstrip()
+        if len(rest) > 0 and rest[0] != ',':
+            raise FunctionSyntaxError("Expected argument delimiter (','): " + 
+                                      rest)
+
+        return argstr[:i], rest
+
+    def _resolve_argstr(self, argstr):
+        out = []
+        argstr = argstr.strip()
+        while len(argstr) > 0:
+            if argstr[0] in "{['\"":
+                tok = self._chomp_enclosure(argstr)
+
 
 types = { "literal": Literal, 
           "stringtemplate": StringTemplate, 
-          "function": Function,
+          "native": Native,
           "mapjoin": MapJoin,
           "json": JSON,
-          "pointer": Pointer
+          "extract": Extract
           }
 
 # function type implementations
