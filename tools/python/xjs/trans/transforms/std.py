@@ -7,6 +7,7 @@ import json as jsp
 
 from ..exceptions import *
 from ..base import Transform
+from .. import parse
 
 joins = [ "delim" ]
 transforms = [ "identity_function", "applytransform", "extract", "wrap" ]
@@ -368,114 +369,13 @@ class Function(Transform):
         return impl
 
     @classmethod
-    def _chomp_arg(cls, argstr):
-        if argstr[0] in "{[":
-            tok, rest = cls._chomp_br_enclosure(argstr)
-        elif argstr[0] in "\"'":
-            tok, rest = cls._chomp_quote(argstr)
-        else:
-            parts = re.split(r'(,)', argstr, 1)
-            tok = parts[0].strip()
-            rest = ''
-            if len(parts) > 1:
-                rest = ''.join(parts[1:])
-
-        if len(rest) > 0 and rest[0] != ',':
-            raise FunctionSyntaxError("Expected argument delimiter (','): "+rest)
-        rest = rest.lstrip(', ')
-
-        return tok, rest
-
-    @classmethod
-    def _chomp_br_enclosure(cls, argstr):
-        out = None
-        start = argstr[0]
-        end = start
-        lev = 1
-
-        if start == '{':
-            end = '}'
-        elif start == '[':
-            end = ']'
-        else:
-            return '', argstr
-
-        i = 1;
-        while lev > 0 and i < len(argstr):
-            if argstr[i] == start:
-                lev += 1
-            elif argstr[i] == end:
-                lev -= 1
-            elif argstr[i] in "\"'":
-                quote, rest = cls._chomp_quote(argstr[i:])
-                i += len(quote)-1
-            i += 1
-
-        if lev > 0:
-            raise FunctionSyntaxError("Not a legal argument token: missing '" +
-                                      end + "': " + argstr)
-        if i >= len(argstr):
-            return argstr, ''
-
-        # rest = argstr[i].lstrip()
-        # if len(rest) > 0 and rest[0] != ',':
-        #     raise FunctionSyntaxError("Expected argument delimiter (','): " + 
-        #                               rest)
-
-        return argstr[:i], argstr[i:].lstrip()
-
-    @classmethod
-    def _chomp_quote(cls, instr):
-        qc = instr[0]
-        if qc not in "\"'":
-            return '', instr
-        bcc = 0
-        i = 1
-
-        while i < len(instr):
-            if instr[i] == qc:
-                if bcc % 2 == 0:
-                    break
-                bcc = 0
-            elif instr[i] == '\\':
-                bcc += 1
-            i += 1
-        
-        if i >= len(instr):
-            raise FunctionSyntaxError("Missing closing quote ("+qc+"): "+instr)
-        return instr[:i+1], instr[i+1:].lstrip()
-
-    @classmethod
-    def _parse_argstr(cls, argstr):
-        out = []
-        while len(argstr) > 0:
-            tok, argstr = cls._chomp_arg(argstr)
-            out.append(tok)
-
-        return out
-
-    _FUNC_PAT = re.compile(r'^(\w+)\((.*)\)$')
-
-    @classmethod
-    def _parse_function(cls, funcstr):
-        match = cls._FUNC_PAT.search(funcstr)
-        if not match:
-            raise FunctionSyntaxError("Does not match function syntax, f(...): "+
-                                      funcstr)
-
-        tf, argstr = match.group(1,2)
-        args = cls._parse_argstr(argstr)
-        return tf, args
-
-    @classmethod
     def matches(cls, invoc):
         """
         return True if the input string matches the function form of a transform
         invocation.  If True, it can be turned into a Function Transform via
         the factory method, parse().
         """
-        return bool(cls._FUNC_PAT.search(invoc.strip()))
-        
+        return bool(parse.FUNC_PAT.search(invoc.strip()))
 
     @classmethod
     def parse(cls, engine, funcstr, name=None):
@@ -483,7 +383,7 @@ class Function(Transform):
         return a Function Transform by parsing the given function invocation 
         string.
         """
-        transf, args = cls._parse_function(funcstr.strip())
+        transf, args = parse.parse_function(funcstr.strip())
         return cls(engine, transf, args, name=transf+"()")
 
     def _resolve_argstr(self, argstr):
