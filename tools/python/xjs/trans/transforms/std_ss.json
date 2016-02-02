@@ -19,30 +19,54 @@
     "transforms": {
         "apply": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "function",
-            "name": "$std.applytransform",
-            "argdesc": [ 
-                "str: transform name", 
-                "str: pointer to data to use as new input",
-                "...: args to pass to transform" 
+            "type": "native",
+            "impl": "$std.applytransform",
+            "argv_supported": [
+                {
+                    "required": true,
+                    "name": "transform",
+                    "description": "the name of the transform to apply",
+                    "type": "string"
+                },
+                {
+                    "name": "select",
+                    "description": "pointer to data to use as new input",
+                    "type": "string"
+                },
+                {
+                    "description": "extra arguments to pass to the transform implementation",
+                    "type": "remaining"
+                }
             ],
             "expects": ["any"],
             "returns": "any"
         },
         "extract": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "function",
-            "name": "$std.extract",
-            "argdesc": [ "str: pointer to data to extract" ],
+            "type": "native",
+            "impl": "$std.extract",
+            "argv_supported": [
+                {
+                    "required": true,
+                    "name": "select",
+                    "type": "string"
+                }
+            ],
             "expects": ["any"],
             "returns": "any"
         },
         "wrap": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "function",
-            "name": "$std.wrap",
+            "type": "native",
+            "impl": "$std.wrap",
             "description": "break text into an array of lines of limited length",
-            "argdesc": [ "int: maximum length of each line" ],
+            "argv_supported": [
+                {
+                    "name": "maxlen",
+                    "description": "the maximum length of a line in number of characters",
+                    "type": "integer"
+                }
+            ],
             "expects": ["string"],
             "returns": "array"
         },
@@ -60,24 +84,30 @@
     "joins": {
         "concat": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "function",
-            "name": "$std.delim",
+            "type": "native",
+            "impl": "$std.delimit",
             "args": [""],
             "expects": ["array"],
             "returns": "string"
         },
-        "delim": {
+        "delimit": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "function",
-            "name": "$std.delim",
-            "argdesc": ["str: delimiting string"],
+            "type": "native",
+            "impl": "$std.delimit",
+            "argv_supported": [
+                {
+                    "name": "delim",
+                    "description": "the string to use as a delimiter",
+                    "type": "string"
+                }
+            ],
             "expects": ["array"],
             "returns": "string"
         },
         "newline": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "function",
-            "name": "$std.delimit",
+            "type": "native",
+            "impl": "$std.delimit",
             "description": "places each item on a different line",
             "args": [ "\n" ],
             "expects": ["array"],
@@ -85,8 +115,8 @@
         },
         "doubleNewline": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "function",
-            "name": "$std.delimit",
+            "type": "native",
+            "impl": "$std.delimit",
             "description": "places a blank line between each item",
             "args": [ "\n\n" ],
             "expects": ["array"],

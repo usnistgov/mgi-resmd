@@ -241,7 +241,7 @@
                             ],
                             "type": "string"
                         },
-                        "impl_args": {
+                        "args": {
                             "description": "an array that describes how to pass an arguments passed to this transform to the underlying implementation (using $argv directives",
                             "notes": [
                                 "string items are interpreted as string templates that may contain '{$argv}' directives; all others will be passed in as literal values."
@@ -261,39 +261,6 @@
                         }
                     },
                     "required": [ "type", "impl" ]
-                }
-            ]
-        },
-        "NativeTransform": {
-            "description": "a type of transform that calls an internal (implementation-specific) transform function to apply the transform",
-            "notes": [
-                "this tranform type differs from FunctionTransform in that the implementing function must accept the transform engine, the input data, and the context data as the first three arguments. (All others are passed after those.)"
-            ],
-            "allOf": [
-                { "$ref": "#/definitions/Transform" },
-                {
-                    "properties": {
-                        "type": {
-                            "enum": [ "function" ] 
-                        },
-                        "name": {
-                            "description": "the full name of function, including any namespaces, that is called when this transform is applied.",
-                            "notes": [ 
-                                "a $ at the start of the name is short-hand for the namespace or package that contains standard functions that come with the implementation of the transform engine implementation."
-                            ],
-                            "type": "string"
-                        },
-                        "argdesc": {
-                            "description": "a description of each of the arguments that can be passed to the function when it is invoked from a transform.",
-                            "type": "array",
-                            "items": { "type": "string" },
-                            "notes": [ 
-                                "The array should have one entry per argument and the order should correspond to the order they must be provided.",
-                                "This is primarily for documentation purposes; it is not used in the course of using the function."
-                            ]
-                        }
-                    },
-                    "required": [ "type", "name" ]
                 }
             ]
         },

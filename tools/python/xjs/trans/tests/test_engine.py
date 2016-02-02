@@ -92,7 +92,7 @@ class TestStdEngine(object):
         assert isinstance(t, njn.Transform)
         assert t(engine, {}, {}) == '{'
 
-    def no_test_validate(self):
+    def test_validate(self):
         engine = njn.StdEngine()
         engine.resolve_all_transforms()
 

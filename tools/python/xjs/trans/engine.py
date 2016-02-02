@@ -335,6 +335,9 @@ class Engine(object):
         try:
             tcls = self._transCls[type]
         except KeyError:
+            if config.get('status') == 'disabled':
+                raise TransformDisabled(name)
+
             msg = ""
             if name: msg += name + ": "
             msg += "Unrecognized transform type: " + type
@@ -346,10 +349,13 @@ class Engine(object):
         """
         ensure that all loaded template configurations have been resolved
         into Template instances.  This effectively validates the templates
-        configurations.
+        configurations.  This will skip over any disabled transforms.
         """
         for name in self._transforms:
-            self.resolve_transform(name)
+            try:
+                self.resolve_transform(name)
+            except TransformDisabled:
+                continue
 
     def load_transform_types(self, module):
         """
@@ -429,6 +435,13 @@ class Engine(object):
         raise StylesheetContentError("Unresolvable prefix: " + use.target)
 
         return select.extract_from(input, context, self)
+
+    def wrap(self, transconfig):
+        """
+        wrap this Engine by a new Engine with an overriding configuration.
+        """
+        return Engine(transconfig, self)
+
 
 class StdEngine(Engine):
     """

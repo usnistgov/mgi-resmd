@@ -75,6 +75,19 @@ class TransformNotFound(TransformConfigException):
                 message += ': ' + name
         super(TransformNotFound, self).__init__(message, name)
 
+
+class TransformDisabled(TransformConfigException):
+    """
+    an exception indicating that a template is currently (marked as) disabled
+    """
+    def __init__(self, name=None, message=None):
+        if not message:
+            message = "Transform is currently disabled"
+            if name:
+                message += ': ' + name
+        super(TransformDisabled, self).__init__(message, name)
+
+
 class TransformConfigParamError(TransformConfigException):
     """
     a transform configuration exception due to an error in a particular 

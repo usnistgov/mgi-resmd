@@ -8,7 +8,7 @@ import json as jsp
 from ..exceptions import *
 from ..base import Transform
 
-joins = [ "concat", "delim" ]
+joins = [ "delim" ]
 transforms = [ "identity_function", "applytransform", "extract", "wrap" ]
 templates = [ "tostr" ]
 
@@ -241,11 +241,8 @@ class MapJoin(Transform):
             itemmap = self.engine.resolve_template(itemmap)
         else:
             itemmap = tostr
-        join = config.get('join')
-        if join:
-            join = self.engine.resolve_template(join)
-        else:
-            join = concat
+        join = config.get('join', 'concat')
+        join = self.engine.resolve_template(join)
 
         def impl(input, context, *args, **keys):
             items = map(lambda i: itemmap(engine, i, context), input)
@@ -276,15 +273,20 @@ class Native(Transform):
 
         if fname.startswith('$'):
            fname = ".".join([TRANSFORMS_MOD, fname[1:]])
-        fimpl = self._load_function(fname[1:]) #throws exc for unresolvable func
+        fimpl = self._load_function(fname) #throws exc for unresolvable func
+
+        # configuration may provide a portion of the arguments supported by 
+        # the underlying implementation
+        conf_args = list(config.get('args',[]))
 
         def impl(input, context, *args, **keys):
+            use = conf_args + args
             return fimpl(self.engine, input, context, *args, **keys)
         return impl
 
-    def _load_function(self, fname):
+    def _load_function(self, funcname):
         try: 
-            (mod, fname) = fname.rsplit('.', 1)
+            (mod, fname) = funcname.rsplit('.', 1)
             mod = importlib.import_module(mod)
             return getattr(mod, fname)
         except ValueError, ex:
@@ -294,7 +296,8 @@ class Native(Transform):
         except ImportError, ex:
             raise TransformConfigParamError("name", self.name, 
                   TransformConfigException.make_message(self.name, 
-                                         "function not found with this name"))
+                                         "function not found with this name: "+
+                                                        funcname))
         except AttributeError, ex:
             raise TransformConfigParamError("name", self.name, 
                   TransformConfigException.make_message(self.name, 
@@ -455,7 +458,7 @@ class Function(Transform):
 
     @classmethod
     def _parse_function(cls, funcstr):
-        match = cls._FUNC_PAT(funcstr)
+        match = cls._FUNC_PAT.search(funcstr)
         if not match:
             raise FunctionSyntaxError("Does not match function syntax, f(...): "+
                                       funcstr)
@@ -465,12 +468,22 @@ class Function(Transform):
         return tf, args
 
     @classmethod
+    def matches(cls, invoc):
+        """
+        return True if the input string matches the function form of a transform
+        invocation.  If True, it can be turned into a Function Transform via
+        the factory method, parse().
+        """
+        return bool(cls._FUNC_PAT.search(invoc.strip()))
+        
+
+    @classmethod
     def parse(cls, engine, funcstr, name=None):
         """
         return a Function Transform by parsing the given function invocation 
         string.
         """
-        transf, args = cls._parse_function(funcstr)
+        transf, args = cls._parse_function(funcstr.strip())
         return cls(engine, transf, args, name=transf+"()")
 
     def _resolve_argstr(self, argstr):
@@ -534,7 +547,7 @@ def extract(engine, input, context, select, *args, **keys):
     """
     return engine.extract(input, context, select)
 
-def wrap(engine, input, context, maxlen, *args, **keys):
+def wrap(engine, input, context, maxlen=75, *args, **keys):
     """
     convert a paragraph of text into an array of strings broken at word 
     boundarys that are less than a given maximum in length.  
