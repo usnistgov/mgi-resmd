@@ -118,8 +118,8 @@ class ExtValidator(object):
                     try:
                         schema = resolver.resolve_fragment(schema, frag)
                     except RefResolutionError, ex:
-                        raise SchemaError("Unable to resolve fragment, ",frag,
-                                          "from schema, ", urib)
+                        raise SchemaError("Unable to resolve fragment, "+frag+
+                                          "from schema, "+ urib)
 
                 cls = jsch.validator_for(schema)
                 cls.check_schema(schema)
