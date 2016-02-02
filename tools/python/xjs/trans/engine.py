@@ -260,6 +260,11 @@ class Engine(object):
         :exc TransformConfigParamError: if the configuration is invalid for 
                                 the transform's type.
         """
+        # first see if the tranform invocation (i.e. the name) matches the 
+        # functional form
+        if std.Function.matches(name):
+            return std.Function.parse(self, name)
+
         try:
             transf = self._transforms[name]
         except KeyError, ex:

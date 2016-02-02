@@ -117,37 +117,34 @@ class JSON(Transform):
         skel = self._resolve_skeleton(copy.deepcopy(content))
         
         def impl(input, *args):
-            newdata = copy.deepcopy(skel)
-            self._transform_skeleton(newdata, engine, input, context)
-            return newdata
+            return self._transform_skeleton(skel, input, context)
 
         return impl
 
-    def _transform_skeleton(skel, engine, input, context):
-        if isinstance(skel, dict):
-            pass
-
     def _resolve_skeleton(self, skel):
-        if isinstance(content, dict):
-            if content.has_key("$val"):
-                if isinstance(content["$val"], dict):
-                    return self.engine.make_transform(content["$val"], 
+        if isinstance(skel, dict):
+            if skel.has_key("$val"):
+                # $val means replace the object with the output from the
+                # Transform given as the value to $val
+                if isinstance(skel["$val"], dict):
+                    return self.engine.make_transform(skel["$val"], 
                                                       self.name+".(anon)")
                 else:
-                    return self.engine.resolve_transform(content["$val"])
+                    return self.engine.resolve_transform(skel["$val"])
             else:
-                _resolve_json_object(skel)
-        elif isinstance(content, str) and "{" in content and "}" in content:
-            content = _resolve_json_string(skel)
-        elif isinstance(content, list) or isinstance(content, tuple):
-            _resolve_json_array(skel)
+                self._resolve_json_object(skel)
+        elif (isinstance(skel, str) or isinstance(skel, unicode)) and \
+             "{" in skel and "}" in skel:
+            skel = self._resolve_json_string(skel)
+        elif isinstance(skel, list) or isinstance(skel, tuple):
+            self._resolve_json_array(skel)
 
         return skel
 
     def _resolve_json_object(self, content):
         # resolve the values
         for key in content:
-            _resolve_skeleton(content[key])
+            content[key] = self._resolve_skeleton(content[key])
 
         # transform keys
         keytrans = {}
@@ -158,6 +155,8 @@ class JSON(Transform):
                 #content[newkey] = content.pop(key)
 
         if keytrans:
+            # "\bkeytr" is a special key for holding Transforms that will 
+            # transform the keys.
             content["\bkeytr"] = keytrans
 
         return content
@@ -174,6 +173,60 @@ class JSON(Transform):
 
         return StringTemplate({ "content": content, }, self.engine, self.name,
                               type="stringtemplate")
+
+    def _transform_skeleton(skel, input, context):
+        if isinstance(skel, Transform):
+            return skel(input, context)
+
+        if isinstance(skel, dict):
+            if skel.has_key("$val"):
+                # $val means replace the object with the output from the
+                # Transform given as the value to $val
+                if isinstance(skel['$val'], Transform):
+                    return skel['$val'](input, context)
+                else:
+                    return skel['$val']
+
+            return self._transform_json_object(skel, input, context)
+
+        if isinstance(skel, list) or isinstance(skel, tuple):
+            self._resolve_json_array(skel)
+
+        return skel
+
+    def _transform_json_object(self, skel, input, context):
+        out = {}
+
+        # transform the values
+        for key in skel:
+            if key == "\bkeytr":
+                continue
+            out[key] = self._transform_skeleton(skel)
+
+        # transform any keys needing transforming
+        if skel.has_key("\bkeytr"):
+            # "\bkeytr" is a special key for holding Transforms that will 
+            # transform the keys.
+            for key in skel["\bkeytr"]:
+                newkey = skel["\bkeytr"][key](input, context)
+                out[newkey] = out.pop(key)
+
+        return out
+
+    def _transform_json_array(self, skel, input, context):
+
+        out = []
+
+        # transform each item
+        for i in range(len(skel)):
+            if isinstance(skel[i], Transform):
+                out[i] = skel[i](input, context)
+            else:
+                out[i] = self._transform_skeleton(skel[i], input, context)
+
+        return out
+
+
 
 class MapJoin(Transform):
     """
@@ -418,7 +471,7 @@ class Function(Transform):
         string.
         """
         transf, args = cls._parse_function(funcstr)
-        return cls(engine, transf, args, name)
+        return cls(engine, transf, args, name=transf+"()")
 
     def _resolve_argstr(self, argstr):
         out = self.__class__._parse_argstr(argstr)
