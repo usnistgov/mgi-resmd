@@ -64,34 +64,35 @@ class StringTemplate(Transform):
 
     def parse_template_str(self, content):
 
-        # break up string at the braces
-        parts = self._braces_re.split(content)
-
-        # collapse template tokens with their surrounding braces
-        depth = 0
         parsed = []
-        for i in range(len(parts)):
-            item = parts[i]
-            parsed.append(item)
-            if item == '{':
-                depth += 1
-                if depth == 1:
-                    first = len(parsed)-1
-            elif item == '}':
-                depth -= 1
-                if depth < 0:
-                    raise StringTemplateSyntaxError("No matching { for }",
-                                                    ["".join(parsed), item, 
-                                                     "".join(parts)], content,
-                                                    self.name)
-                if depth == 0:
-                    parsed[first:] = [ "".join(parsed[first:]) ]
+        while len(content) > 0:
+            i = content.find('{')
+            if i < 0:
+                parsed.append(content)
+                content = ''
+                continue
+
+            if i > 0:
+                parsed.append(content[0:i])
+                content = content[i:]
+
+            try:
+                tok, content = parse.chomp_br_enclosure(content)
+                parsed.append(tok)
+            except parse.ConfigSyntaxError:
+                # no closing brace; treat like a normal string
+                if not parsed:
+                    parsed.append(content[0])
+                else:
+                    parsed[-1] += content[0]
+                content = content[1:]
+
 
         # resolve the tokens into transforms
-        if '{' in parts:
+        if len(filter(lambda p: p.startswith('{') and p.endswith('}'),parsed)) >0:
             for i in range(len(parsed)):
                 item = parsed[i]
-                if item.startswith('{'):
+                if item.startswith('{') and item.endswith('}'):
                     item = item[1:-1]
                     try:
                         # see if it matches a template or template-function

@@ -33,10 +33,9 @@ class TestStringTemplate(object):
 
     def test_tmpl2(self, engine):
         config = {"content": "{$lb"}
-        pytest.set_trace()
         transf = std.StringTemplate(config, engine, "goob", "stringtemplate")
         out = transf({}, {})
-        assert out == "{"
+        assert out == "{$lb"
 
 class TestFunctionTransform(object):
 
