@@ -8,6 +8,7 @@ import jsonspec.pointer as jsonptr
 from .exceptions import *
 from .base import *
 from .transforms import std
+from . import parse
 
 defaultContext = {
     "$secure": True,
@@ -264,6 +265,8 @@ class Engine(object):
         # functional form
         if std.Function.matches(name):
             return std.Function.parse(self, name)
+        if '(' in name or ')' in name:
+            raise parse.ConfigSyntaxError("Syntax error while invoking function (?): " + name)
 
         try:
             transf = self._transforms[name]
@@ -276,9 +279,10 @@ class Engine(object):
 
         return transf
 
-    def resolve_template(self, name):
+    def resolve_template(self, invoc):
         """
-        resolve the name into a template Transform instance, ready for use.  
+        resolve the template invocation into a template Transform instance, 
+        ready for use.  
         The template may not have been parsed and constructed into a Transform,
         yet; in this case, this will be done (causing all dependant transforms
         to be parsed as well).
@@ -287,15 +291,22 @@ class Engine(object):
         :exc TransformConfigParamError: if the configuration is invalid for 
                                 the transform's type.
         """
+        # first see if the tranform invocation (i.e. the name) matches the 
+        # functional form
+        args = None
+        name = invoc
+        if std.Function.matches(name):
+            name, args = parse.parse_function(name)
+
         if name not in self._templates:
             if name in self._transforms:
                 raise TransformNotFound(name, name +
                                       " transform not recognized as a template")
             raise TransformNotFound(name, "template not found: " + name)
 
-        return self.resolve_transform(name)
+        return self.resolve_transform(invoc)
 
-    def resolve_join(self, name):
+    def resolve_join(self, invoc):
         """
         resolve the name into a join Transform instance, ready for use.  The 
         join may not have been parsed and constructed into a Transform,
@@ -306,13 +317,18 @@ class Engine(object):
         :exc TransformConfigParamError: if the configuration is invalid for 
                                 the transform's type.
         """
-        if name not in self._templates:
-            if name in self._joins:
+        args = None
+        name = invoc
+        if std.Function.matches(name):
+            name, args = parse.parse_function(name)
+
+        if name not in self._joins:
+            if name in self._transforms:
                 raise TransformNotFound(name, name +
                                         " transform not recognized as a join")
             raise TransformNotFound(name, "join not found: " + name)
 
-        return self.resolve_transform(name)
+        return self.resolve_transform(invoc)
 
     def make_transform(self, config, name=None, type=None):
         """

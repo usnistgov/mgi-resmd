@@ -282,8 +282,8 @@ class Native(Transform):
         conf_args = list(config.get('args',[]))
 
         def impl(input, context, *args, **keys):
-            use = conf_args + args
-            return fimpl(self.engine, input, context, *args, **keys)
+            use = conf_args + list(args)
+            return fimpl(self.engine, input, context, *use, **keys)
         return impl
 
     def _load_function(self, funcname):
@@ -320,11 +320,11 @@ class Function(Transform):
     """
 
     def __init__(self, engine, transform, args, name=None, type="function"):
+        self._wrapped = transform
+        self._args = args
         super(Function, self).__init__({"args": tuple(args), 
                                         "transform": transform}, 
                                        engine, name, type)
-        self._wrapped = transform
-        self._args = args
 
     def mkfn(self, config, engine):
         if not config.has_key('args'):
@@ -333,7 +333,7 @@ class Function(Transform):
         if not isinstance(self._wrapped, Transform):
             self._wrapped = engine.resolve_transform(self._wrapped)
 
-        for i in len(self._args):
+        for i in range(len(self._args)):
             arg = self._args[i]
             if isinstance(arg, str) or isinstance(arg, unicode):
                 try:
@@ -477,6 +477,25 @@ def delimit(engine, input, context, delim=", ", *args, **keys):
     """
     join the input array with a delimiter
     """
-    use = _prep_array_for_join(input, name, input, context)
+    use = _prep_array_for_join(input)
     return delim.join(use)
 
+def _prep_array_for_join(data):
+    if isinstance(data, str) or isinstance(data, unicode):
+        return [data]
+
+    if isinstance(data, list):
+        out = []
+        for item in data:
+            if not isinstance(item, str) and not isinstance(item, unicode):
+                item = json.dumps(item)
+            out.append(item)
+
+        return out
+
+    if isinstance(data, dict):
+        return [json.dumps(data)]
+
+    return [str(data)]
+
+            

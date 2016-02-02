@@ -37,6 +37,14 @@ class TestStringTemplate(object):
         out = transf({}, {})
         assert out == "{$lb"
 
+    def test_tmpl3(self, engine):
+        config = {"content": "{delimit(' and ')}" }
+        transf = std.StringTemplate(config, engine, "goob", "stringtemplate")
+        out = transf(["neil", "jack", "me"], {})
+        assert out == "neil and jack and me"
+
+
+
 class TestFunctionTransform(object):
 
     pass
