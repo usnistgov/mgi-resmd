@@ -104,7 +104,7 @@ class Engine(object):
     """
     A class that represents the driver for applying transformations.
 
-    It includes a built in registry of transforms (and templates and joins) 
+    It includes a built-in registry of transforms (and templates and joins) 
     and prefix defintions which can be retrieved by name.  The available 
     transforms and prefixes can change depending on the current depth within
     a transform (stylesheet).  To facilitate this, an Engine can wrap another 

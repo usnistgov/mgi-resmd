@@ -231,6 +231,17 @@ class JSON(Transform):
 
         return out
 
+class Extract(Transform):
+    """
+    a transform that extracts data from the input via a data pointer
+    """
+
+    def mkfn(self, config, engine):
+        select = config.get("select", '')
+        def impl(input, context, *args, **keys):
+            return extract(engine, input, context, select)
+        return impl
+
 
 
 class MapJoin(Transform):
@@ -252,17 +263,6 @@ class MapJoin(Transform):
         def impl(input, context, *args, **keys):
             items = map(lambda i: itemmap(engine, i, context), input)
             return join(engine, items, context)
-        return impl
-
-class Extract(Transform):
-    """
-    a transform that extracts data from the input via a data pointer
-    """
-
-    def mkfn(self, config, engine):
-        select = config.get("select", '')
-        def impl(input, context, *args, **keys):
-            return extract(engine, input, context, select)
         return impl
 
 class Native(Transform):
