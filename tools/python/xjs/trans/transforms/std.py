@@ -99,7 +99,7 @@ class StringTemplate(Transform):
                     except TransformNotFound:
                         # it's a pointer
                         item = Extract({ "select": item }, self.engine, 
-                                       self.name+":(select)", "pointer")
+                                       self.name+":(select)", "extract")
                     parsed[i] = item
 
         return parsed
@@ -131,7 +131,11 @@ class JSON(Transform):
                     return self.engine.make_transform(skel["$val"], 
                                                       self.name+".(anon)")
                 else:
-                    return self.engine.resolve_transform(skel["$val"])
+                    try:
+                        return self.engine.resolve_transform(skel["$val"])
+                    except TransformNotFound:
+                        return Extract({"select": skel["$val"]}, self.engine,
+                                       self.name+":(select)", "extract")
             else:
                 self._resolve_json_object(skel)
         elif (isinstance(skel, str) or isinstance(skel, unicode)) and \

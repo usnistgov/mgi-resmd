@@ -44,6 +44,43 @@ class TestStringTemplate(object):
         assert out == "neil and jack and me"
 
 
+class TestJSON(object):
+
+    def test_tmpl1(self, engine):
+        config = { "content": "{$lb}" }
+        transf = std.JSON(config, engine, "goob", "json")
+        out = transf({}, {})
+        assert out == "{"
+
+    def test_tmpl2(self, engine):
+        config = { "content": 4 }
+        transf = std.JSON(config, engine, "goob", "json")
+        out = transf({}, {})
+        assert out == 4
+
+    def test_tmpl3(self, engine):
+        config = { "content":  [ True, "[{$lb}{$rb}]", 3]}
+        transf = std.JSON(config, engine, "goob", "json")
+        out = transf({}, {})
+        assert isinstance(out, list)
+        assert len(out) == 3
+        assert out[0] is True
+        assert out[1] == "[{}]"
+        assert out[2] is 3
+
+    def test_tmpl4(self, engine):
+        config = { "content":  { "a": [True, "[{$lb}{$rb}]", 3],
+                                 "b": { "$val": "numbers" } }    }
+        transf = std.JSON(config, engine, "goob", "json")
+        out = transf({"numbers": range(3)}, {})
+        assert isinstance(out, dict)
+        assert len(out) == 2
+        assert out['a'][0] is True
+        assert out['a'][1] == "[{}]"
+        assert out['a'][2] is 3
+        assert isinstance(out['b'], list)
+        assert out['b'][2] is 2
+
 
 class TestFunctionTransform(object):
 
