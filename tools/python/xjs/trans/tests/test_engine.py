@@ -138,3 +138,32 @@ class TestExamples(object):
         
         assert result == "Contact Bob via <bob@gmail.com>"
 
+    def test_template3(self):
+        input = { "contact": { "name": "Bob", "email": "bob@gmail.com" }}
+
+        with open(os.path.join(exdir,"testtemplate3.json")) as fd:
+            ss = json.load(fd)
+
+        engine = njn.DocEngine(ss)
+
+        tfunc = engine.resolve_template('')
+        result = tfunc(input, {})
+        
+        assert result == "Contact Bob via <bob@gmail.com>"
+
+    def test_template4(self):
+        input = { "contact": { "name": "Bob", "email": "bob@gmail.com" }}
+
+        with open(os.path.join(exdir,"testtemplate4.json")) as fd:
+            ss = json.load(fd)
+
+        engine = njn.DocEngine(ss)
+
+        tfunc = engine.resolve_transform('')
+        result = tfunc(input, {})
+        
+        assert isinstance(result, dict)
+        assert result['contacts'][0].keys()[0] == "Bob"
+        assert result['contacts'][0]["Bob"] == "Bob <bob@gmail.com>"
+
+
