@@ -1,0 +1,13 @@
+{
+    "$schema":  "http://mgi.nist.gov/mgi-json-trans/v0.1",
+
+    "type": "json",
+    "content": { 
+        "contacts": [ 
+            {
+                "{contact/name}": "{contact/name} <{contact/email}>"
+            }
+        ]
+    },
+    "returns": "object"
+}
