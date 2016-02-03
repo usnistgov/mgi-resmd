@@ -242,10 +242,7 @@
                             "type": "string"
                         },
                         "args": {
-                            "description": "an array that describes how to pass an arguments passed to this transform to the underlying implementation (using $argv directives",
-                            "notes": [
-                                "string items are interpreted as string templates that may contain '{$argv}' directives; all others will be passed in as literal values."
-                            ],
+                            "description": "an array of data to pass as extra arguments to the native implementation",
                             "type": "array"
                         },
                         "argv_supported": {
@@ -264,14 +261,14 @@
                 }
             ]
         },
-        "Pointer": {
+        "ExtractTransform": {
             "description": "",
             "allOf": [
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
                         "item": {
-                            "enum": ["pointer"]
+                            "enum": ["extract"]
                         },
                         "select": {
                             "description": "a data pointer to the JSON data to extract from the input.",
@@ -284,6 +281,36 @@
                         }
                     },
                     "required": [ "type", "select" ]
+                }
+            ]
+        },
+        "ApplyTransform": {
+            "description":  "a transform that applies another transform with different data set as the current input data",
+            "allOf": [
+                { "$ref": "#/definitons/Transform" },
+                {
+                    "properties": {
+                        "transform": {
+                            "description": "the name of the transform to apply to the specified input data"
+                        },
+                        "input": {
+                            "description": "a specification of the data to transform",
+                            "notes": [
+                                "The value can be one of several forms for different ways of providing or refering to the input data:",
+                                "a transform object -- a JSON object will be assumed to be an anonymous transform whose out put will be the input to this transform.",
+                                "a transform invoked as a function -- a string that contains an open or closed parenthesis will be assumed to be a functional transform invocation (although an error is raised if the string does not match the function pattern, f(arg, ...).  The output of executing the function will be used as the input to this transform",
+                                "a transform name -- a string that contains only legal characgters used for naming a transform (i.e. excluding (,), and /) will be interpreted as the name of a defined transform that whose output, when invoked, should be used as the input to this transform.",
+                                "a data pointer -- a string that contains a / or does not match to the name of a registered transform is assumed to be a data pointer.  This pointer will be applied to its target (the current document fragment, the context data, or an input argument list) to extract the data to be used as input to this transform.",
+                                "If a value is not provide, the default is $in:, i.e. the current input data."
+                            ],
+                            "default": "$in:"
+                        },
+                        "args": {
+                            "description": "the list of arguments to pass to the transform",
+                            "type": "array"
+                        }
+                    },
+                    "require": [ "transform" ]
                 }
             ]
         },

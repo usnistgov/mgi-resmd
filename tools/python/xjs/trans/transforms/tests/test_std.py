@@ -81,6 +81,52 @@ class TestJSON(object):
         assert isinstance(out['b'], list)
         assert out['b'][2] is 2
 
+class TestApply(object):
+
+    def test_anon(self, engine):
+        config = { "transform": { "type": "extract", "select": "contact/name" },
+                   "input": { "type": "json", 
+                              "content": { "contact": { "name": "bob" } }} }
+        transf = std.Apply(config, engine, "goob", "apply")
+        out = transf({}, {})
+        assert out == "bob"
+
+    def test_tname(self, engine):
+        config = { "transform": { "type": "extract", "select": "contact/name",
+                                  "transforms": {
+                                     "contactname": {"type": "json", 
+                              "content": { "contact": { "name": "bob" } }} }
+                                  },
+                   "input": "contactname" }
+        transf = std.Apply(config, engine, "goob", "apply")
+        out = transf({}, {})
+        assert out == "bob"
+
+    def test_datapointer(self, engine):
+        config = { "transform": { "type": "extract", "select": "name" },
+                   "input": "curation/contact" }
+        transf = std.Apply(config, engine, "goob", "apply")
+        out = transf({"curation": { "contact": { "name": "bob" }} }, {})
+        assert out == "bob"
+
+    def test_datapointer2(self, engine):
+        config = { "transform": { "type": "extract", "select": "contact/name" },
+                   "input": "curation" }
+        transf = std.Apply(config, engine, "goob", "apply")
+        out = transf({"curation": { "contact": { "name": "bob" }} }, {})
+        assert out == "bob"
+
+    def test_function(self, engine):
+        config = { "transform": { "type": "extract", "select": "0" },
+                   "input": "delimit(' and ')" }
+        transf = std.Apply(config, engine, "goob", "apply")
+        out = transf(["neil", "jack", "me"], {})
+        assert out == "neil and jack and me"
+
+
+
+
+
 
 class TestFunctionTransform(object):
 

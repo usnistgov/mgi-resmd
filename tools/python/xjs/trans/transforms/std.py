@@ -115,49 +115,47 @@ class JSON(Transform):
         except KeyError:
             raise MissingTranformData("content", self.name)
 
-        skel = self._resolve_skeleton(copy.deepcopy(content))
+        skel = self._resolve_skeleton(copy.deepcopy(content), engine)
         
         def impl(input, context, *args):
             return self._transform_skeleton(skel, input, context)
 
         return impl
 
-    def _resolve_skeleton(self, skel):
+    def _resolve_skeleton(self, skel, engine):
         if isinstance(skel, dict):
             if skel.has_key("$val"):
                 # $val means replace the object with the output from the
                 # Transform given as the value to $val
                 if isinstance(skel["$val"], dict):
-                    return self.engine.make_transform(skel["$val"], 
-                                                      self.name+".(anon)")
+                    return engine.make_transform(skel["$val"], 
+                                                 self.name+".(anon)")
                 else:
                     try:
-                        return self.engine.resolve_transform(skel["$val"])
+                        return engine.resolve_transform(skel["$val"])
                     except TransformNotFound:
-                        return Extract({"select": skel["$val"]}, self.engine,
+                        return Extract({"select": skel["$val"]}, engine,
                                        self.name+":(select)", "extract")
             else:
-                self._resolve_json_object(skel)
+                self._resolve_json_object(skel, engine)
         elif (isinstance(skel, str) or isinstance(skel, unicode)) and \
              "{" in skel and "}" in skel:
-            skel = self._resolve_json_string(skel)
+            skel = self._resolve_json_string(skel, engine)
         elif isinstance(skel, list) or isinstance(skel, tuple):
-            self._resolve_json_array(skel)
+            self._resolve_json_array(skel, engine)
 
         return skel
 
-    def _resolve_json_object(self, content):
+    def _resolve_json_object(self, content, engine):
         # resolve the values
         for key in content:
-            content[key] = self._resolve_skeleton(content[key])
+            content[key] = self._resolve_skeleton(content[key], engine)
 
         # resolve keys
         keytrans = {}
         for key in content.keys():
             if "{" in key and "}" in key:
-                keytrans[key] = self._resolve_json_string(key)
-                #newkey = _transform_json_string(key)
-                #content[newkey] = content.pop(key)
+                keytrans[key] = self._resolve_json_string(key, engine)
 
         if keytrans:
             # "\bkeytr" is a special key for holding Transforms that will 
@@ -166,17 +164,17 @@ class JSON(Transform):
 
         return content
 
-    def _resolve_json_array(self, content):
+    def _resolve_json_array(self, content, engine):
 
         # resolve each item
         for i in range(len(content)):
-            content[i] = self._resolve_skeleton(content[i])
+            content[i] = self._resolve_skeleton(content[i], engine)
 
         return content
 
-    def _resolve_json_string(self, content):
+    def _resolve_json_string(self, content, engine):
 
-        return StringTemplate({ "content": content, }, self.engine, self.name,
+        return StringTemplate({ "content": content, }, engine, self.name,
                               type="stringtemplate")
 
     def _transform_skeleton(self, skel, input, context):
@@ -242,8 +240,6 @@ class Extract(Transform):
             return extract(engine, input, context, select)
         return impl
 
-
-
 class MapJoin(Transform):
     """
     a transform that converts an array into a single string by applying the 
@@ -264,6 +260,64 @@ class MapJoin(Transform):
             items = map(lambda i: itemmap(engine, i, context), input)
             return join(engine, items, context)
         return impl
+
+class Apply(Transform):
+    """
+    A transform that applies another transform with different data set as the 
+    current input data.  
+    """
+    def mkfn(self, config, engine):
+        try:
+            transf = config['transform']
+        except KeyError:
+            raise MissingTransformData("transform", self.name)
+        if isinstance(transf, dict):
+            transf = engine.make_transform(transf)
+        elif isinstance(transf, str) or isinstance(transf, unicode):
+            transf = engine.resolve_transform(transf)
+        else:
+            raise TransformConfigTypeError('transform', 'dict or str', 
+                                           type(transf))
+
+        newin = self._resolve_input(config.get('input'), transf.engine)
+
+        targs = config.get('args', [])
+
+        def impl(input, context, *args, **keys):
+            
+            usein = newin
+            if isinstance(newin, Transform):
+                usein = newin(input, context)
+            
+            useargs = targs + list(args)
+
+            return transf(usein, context, *useargs)
+
+        return impl
+
+    def _resolve_input(self, input, engine):
+
+        if isinstance(input, dict):
+            # this is a transform configuration object
+            return engine.make_transform(input, "(anon)")
+
+        if not isinstance(input, str) and not isinstance(input, unicode):
+            raise TransformConfigTypeError('input', 'dict or str', type(input))
+
+        if '(' in input or ')' in input:
+            return engine.resolve_transform(input)
+
+        if '/' not in input:
+            try:
+                # see if it matches a transform name
+                return engine.resolve_transform(input)
+            except TransformNotFound:
+                # assume it is a data-pointer
+                pass
+
+        return Extract({"select": input }, engine, self.name+"(select)", 
+                       "extract")
+
 
 class Native(Transform):
     """
@@ -331,7 +385,7 @@ class Function(Transform):
 
     def mkfn(self, config, engine):
         if not config.has_key('args'):
-            raise MissingTranformData("arg", self.name)
+            raise MissingTranformData("args", self.name)
 
         if not isinstance(self._wrapped, Transform):
             self._wrapped = engine.resolve_transform(self._wrapped)
