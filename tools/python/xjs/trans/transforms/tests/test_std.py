@@ -124,6 +124,19 @@ class TestApply(object):
         assert out == "neil and jack and me"
 
 
+class TestExtractTransform(object):
+
+    def test_transform(self, engine):
+        config = { "select": "/curation/contact/name" }
+        transf = std.Extract(config, engine, 'goob', "apply")
+        out = transf({"curation": { "contact": { "name": "bob" }} }, {})
+        assert out == 'bob'
+
+    def test_function(self, engine):
+        config = { "content": "Call {extract(/curation/contact/name)}." }
+        transf = std.StringTemplate(config, engine, "goob", "stringtemplate")
+        out = transf({"curation": { "contact": { "name": "bob" }} }, {})
+        assert out == 'Call bob.'
 
 
 

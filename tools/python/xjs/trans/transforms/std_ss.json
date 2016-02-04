@@ -42,9 +42,13 @@
             "returns": "any"
         },
         "extract": {
-            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "native",
-            "impl": "$std.extract",
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/CallableTransform" ],
+            "type": "callable",
+            "transform_tmpl": {
+                "type": "extract",
+                "select": { "$val": "/0" }
+            },
+            "conf_args_index": [ 0 ],
             "argv_supported": [
                 {
                     "required": true,

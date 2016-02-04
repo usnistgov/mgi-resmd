@@ -95,7 +95,7 @@ class StringTemplate(Transform):
                     item = item[1:-1]
                     try:
                         # see if it matches a template or template-function
-                        item = self.engine.resolve_template(item)
+                        item = self.engine.resolve_transform(item)
                     except TransformNotFound:
                         # it's a pointer
                         item = Extract({ "select": item }, self.engine, 
@@ -378,7 +378,7 @@ class Function(Transform):
 
     def mkfn(self, config, engine):
         try:
-            args = list(config['args'])
+            targs = list(config['args'])
         except KeyError, ex:
             raise MissingTranformData("args", self.name)
         except TypeError, ex:
@@ -395,11 +395,11 @@ class Function(Transform):
             raise TransformConfigTypeError("transform", "str", 
                                            type(config['transform']), self._name)
 
-        uargs = args
+        uargs = targs
         if isinstance(wrapped, Callable):
-            uargs = self._build_args(wrapped, args, engine)
+            uargs = self._build_args(wrapped, targs, engine)
             args_index = wrapped.args_index
-            wrapped = self._wrap_callable(wrapped, args, engine)
+            wrapped = self._wrap_callable(wrapped, targs, engine)
 
         for i in range(len(uargs)):
             if isinstance(uargs[i], str) or isinstance(uargs[i], unicode):
@@ -448,8 +448,10 @@ class Function(Transform):
                 
         # apply the arguments to the transform template
         transtmpl = callable.config_template
-        transf = JSON(transtmpl, engine, callable.type+":(args)","json")
-        return transf(use, None)
+        transf = JSON({"content": transtmpl}, engine, 
+                      callable.type+":(args)","json")
+        config = transf(use, None)
+        return engine.make_transform(config)
 
     def _build_args(self, callable, args, engine):
         # extract the arguments that are used to configure the transform
@@ -594,7 +596,8 @@ types = { "literal": Literal,
           "mapjoin": MapJoin,
           "json": JSON,
           "extract": Extract,
-          "apply": Apply
+          "apply": Apply,
+          "callable": Callable
           }
 
 # function type implementations
@@ -630,13 +633,6 @@ def applytransform(engine, input, context, transform, select, *args, **keys):
         context = context.default_to(keys)
 
     return transfunc(engine, newin, context)
-
-def extract(engine, input, context, select, *args, **keys):
-    """
-    return the data pointed to by the given select data-pointer
-    :argument str select:  a data-pointer string for data to extract from input
-    """
-    return engine.extract(input, context, select)
 
 def wrap(engine, input, context, maxlen=75, *args, **keys):
     """
