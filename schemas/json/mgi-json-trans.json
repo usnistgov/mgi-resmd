@@ -13,9 +13,9 @@
             }
         },
         "DataPointer": {
-            "description": "a pointer into JSON data comprised of an optional data target ($in or $context) or prefix, a colon, and a path (a JSON pointer excluding the leading slash)",
+            "description": "a pointer into JSON data comprised of an optional data target ($in or $context) or prefix, a colon, and a JSON pointer",
             "type": "string",
-            "pattern": "^([a-zA-Z0-9_!@#$.]:)?[a-zA-Z0-9_!@#$.]+$"
+            "pattern": "^([a-zA-Z0-9_!@#$.]:)?(/[a-zA-Z0-9_!@#$.]*)*$"
         },
         "Transform": {
             "description": "a configuration of a transform that can be applied to JSON data structures",
@@ -242,10 +242,7 @@
                             "type": "string"
                         },
                         "args": {
-                            "description": "an array that describes how to pass an arguments passed to this transform to the underlying implementation (using $argv directives",
-                            "notes": [
-                                "string items are interpreted as string templates that may contain '{$argv}' directives; all others will be passed in as literal values."
-                            ],
+                            "description": "an array of data to pass as extra arguments to the native implementation",
                             "type": "array"
                         },
                         "argv_supported": {
@@ -264,14 +261,14 @@
                 }
             ]
         },
-        "Pointer": {
+        "ExtractTransform": {
             "description": "",
             "allOf": [
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
                         "item": {
-                            "enum": ["pointer"]
+                            "enum": ["extract"]
                         },
                         "select": {
                             "description": "a data pointer to the JSON data to extract from the input.",
@@ -287,14 +284,85 @@
                 }
             ]
         },
-        "MapJoinTransform": {
+        "ApplyTransform": {
+            "description":  "a transform that applies another transform with different data set as the current input data",
+            "allOf": [
+                { "$ref": "#/definitons/Transform" },
+                {
+                    "properties": {
+                        "transform": {
+                            "description": "the name of the transform to apply to the specified input data"
+                        },
+                        "input": {
+                            "description": "a specification of the data to transform",
+                            "notes": [
+                                "The value can be one of several forms for different ways of providing or refering to the input data:",
+                                "a transform object -- a JSON object will be assumed to be an anonymous transform whose out put will be the input to this transform.",
+                                "a transform invoked as a function -- a string that contains an open or closed parenthesis will be assumed to be a functional transform invocation (although an error is raised if the string does not match the function pattern, f(arg, ...).  The output of executing the function will be used as the input to this transform",
+                                "a transform name -- a string that contains only legal characgters used for naming a transform (i.e. excluding (,), and /) will be interpreted as the name of a defined transform that whose output, when invoked, should be used as the input to this transform.",
+                                "a data pointer -- a string that contains a / or does not match to the name of a registered transform is assumed to be a data pointer.  This pointer will be applied to its target (the current document fragment, the context data, or an input argument list) to extract the data to be used as input to this transform.",
+                                "If a value is not provide, the default is $in:, i.e. the current input data."
+                            ],
+                            "default": "$in:"
+                        },
+                        "args": {
+                            "description": "the list of arguments to pass to the transform",
+                            "type": "array"
+                        }
+                    },
+                    "require": [ "transform" ]
+                }
+            ]
+        },
+        "CallableTransform": {
+            "description": "a transform that can be used to turn other Tranform types into transforms that can be called in function form.",
+            "allOf": [
+                { "$ref": "#/definitions/Transform" },
+                { 
+                    "properties": {
+                        "item": {
+                            "enum": ["callable"]
+                        },
+                        "transform_tmpl": {
+                            "description": "a JSON template for transform configuration that will provide the implementation for the callable version",
+                            "notes": [
+                            ],
+                            "type": "object"
+                        },
+                        "conf_args_index": {
+                            "description": "an ordered list of argument indexes for selecting which arguments given to the function should be used to configure the underlying transform at resolve time.",
+                            "type": "array",
+                            "items": { "type": "integer" }
+                        },
+                        "args_index": {
+                            "description": "an ordered list of argument indexes for selecting which arguments given to the function should be passed to the underlying transform at transform time",
+                            "type": "array",
+                            "items": { "type": "integer" }
+                        },
+                        "argv_supported": {
+                            "description": "a specification of arguments that can be passed to the transform when invoked in function form",
+                            "notes": [
+                                "if any argument is defined as required, then the transform can only be invoked in function form"
+                            ],
+                            "comments": [
+                                "at the moment, I believe this property is only for documentation purposes"
+                            ],
+                            "type": "array",
+                            "items": { "$ref": "#/definitions/FunctionArg" }
+                        }
+                    },
+                    "required": [ "transform_tmpl", "conf_args_index" ]
+                }
+            ]
+        },
+        "MapTransform": {
             "description": "a transform that applies a transform on each of elements of an input array and then combines them with a join transform",
             "allOf": [
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
                         "item": {
-                            "enum": ["mapjoin"]
+                            "enum": ["map"]
                         },
                         "itemmap": {
                             "description": "the transform to apply to each element of the array",
@@ -308,22 +376,8 @@
                                     "$ref": "#/definitions/Transform"
                                 }
                             ]
-                        },
-                        "join": {
-                            "description": "the transform to apply to the array resulting from the map transform",
-                            "oneOf": [
-                                { 
-                                    "description": "a text-based reference to a transform",
-                                    "type": "string" 
-                                },
-                                {
-                                    "description": "a transform description object",
-                                    "$ref": "#/definitions/Transform"
-                                }
-                            ]
                         }
-                    },
-                    "required": [ "type", "itemmap", "join" ]
+                    }
                 }
             ]
         },

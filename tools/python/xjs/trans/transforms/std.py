@@ -1,7 +1,7 @@
 """
 transformers from the standard module
 """
-import json, copy, re, importlib
+import json, copy, re, importlib, textwrap
 import types as tps
 import json as jsp
 
@@ -95,11 +95,11 @@ class StringTemplate(Transform):
                     item = item[1:-1]
                     try:
                         # see if it matches a template or template-function
-                        item = self.engine.resolve_template(item)
+                        item = self.engine.resolve_transform(item)
                     except TransformNotFound:
                         # it's a pointer
                         item = Extract({ "select": item }, self.engine, 
-                                       self.name+":(select)", "pointer")
+                                       self.name+":(select)", "extract")
                     parsed[i] = item
 
         return parsed
@@ -115,45 +115,47 @@ class JSON(Transform):
         except KeyError:
             raise MissingTranformData("content", self.name)
 
-        skel = self._resolve_skeleton(copy.deepcopy(content))
+        skel = self._resolve_skeleton(copy.deepcopy(content), engine)
         
         def impl(input, context, *args):
             return self._transform_skeleton(skel, input, context)
 
         return impl
 
-    def _resolve_skeleton(self, skel):
+    def _resolve_skeleton(self, skel, engine):
         if isinstance(skel, dict):
             if skel.has_key("$val"):
                 # $val means replace the object with the output from the
                 # Transform given as the value to $val
                 if isinstance(skel["$val"], dict):
-                    return self.engine.make_transform(skel["$val"], 
-                                                      self.name+".(anon)")
+                    return engine.make_transform(skel["$val"], 
+                                                 self.name+".(anon)")
                 else:
-                    return self.engine.resolve_transform(skel["$val"])
+                    try:
+                        return engine.resolve_transform(skel["$val"])
+                    except TransformNotFound:
+                        return Extract({"select": skel["$val"]}, engine,
+                                       self.name+":(select)", "extract")
             else:
-                self._resolve_json_object(skel)
+                self._resolve_json_object(skel, engine)
         elif (isinstance(skel, str) or isinstance(skel, unicode)) and \
              "{" in skel and "}" in skel:
-            skel = self._resolve_json_string(skel)
+            skel = self._resolve_json_string(skel, engine)
         elif isinstance(skel, list) or isinstance(skel, tuple):
-            self._resolve_json_array(skel)
+            self._resolve_json_array(skel, engine)
 
         return skel
 
-    def _resolve_json_object(self, content):
+    def _resolve_json_object(self, content, engine):
         # resolve the values
         for key in content:
-            content[key] = self._resolve_skeleton(content[key])
+            content[key] = self._resolve_skeleton(content[key], engine)
 
         # resolve keys
         keytrans = {}
         for key in content.keys():
             if "{" in key and "}" in key:
-                keytrans[key] = self._resolve_json_string(key)
-                #newkey = _transform_json_string(key)
-                #content[newkey] = content.pop(key)
+                keytrans[key] = self._resolve_json_string(key, engine)
 
         if keytrans:
             # "\bkeytr" is a special key for holding Transforms that will 
@@ -162,17 +164,17 @@ class JSON(Transform):
 
         return content
 
-    def _resolve_json_array(self, content):
+    def _resolve_json_array(self, content, engine):
 
         # resolve each item
         for i in range(len(content)):
-            content[i] = self._resolve_skeleton(content[i])
+            content[i] = self._resolve_skeleton(content[i], engine)
 
         return content
 
-    def _resolve_json_string(self, content):
+    def _resolve_json_string(self, content, engine):
 
-        return StringTemplate({ "content": content, }, self.engine, self.name,
+        return StringTemplate({ "content": content, }, engine, self.name,
                               type="stringtemplate")
 
     def _transform_skeleton(self, skel, input, context):
@@ -227,29 +229,6 @@ class JSON(Transform):
 
         return out
 
-
-
-class MapJoin(Transform):
-    """
-    a transform that converts an array into a single string by applying the 
-    same processing on each element to create an array of strings and then join 
-    them into a single string as prescribed by the configuration.
-    """
-    def mkfn(self, config, engine):
-
-        itemmap = config.get('itemmap')
-        if itemmap:
-            itemmap = self.engine.resolve_template(itemmap)
-        else:
-            itemmap = tostr
-        join = config.get('join', 'concat')
-        join = self.engine.resolve_template(join)
-
-        def impl(input, context, *args, **keys):
-            items = map(lambda i: itemmap(engine, i, context), input)
-            return join(engine, items, context)
-        return impl
-
 class Extract(Transform):
     """
     a transform that extracts data from the input via a data pointer
@@ -258,8 +237,96 @@ class Extract(Transform):
     def mkfn(self, config, engine):
         select = config.get("select", '')
         def impl(input, context, *args, **keys):
-            return extract(engine, input, context, select)
+            return engine.extract(input, context, select)
         return impl
+
+class Map(Transform):
+    """
+    a transform that applies a specified transform to each item in the input
+    array.  
+    """
+    def mkfn(self, config, engine):
+
+        itemmap = config.get('itemmap', 'tostr')
+        if isinstance(itemmap, dict):
+            # it's an anonymous transform configuration
+            itemmap = engine.make_transform(itemmap)
+        else:
+            itemmap = engine.resolve_transform(itemmap)
+
+        strict = config.get('strict', False)
+
+        def impl(input, context, *args, **keys):
+            data = input
+            if not isinstance(data, list):
+                if not strict:
+                    data = [data]
+                else:
+                    raise TransformInputTypeError('array', type(data), 
+                                                  (self.name or "map"), data,
+                                                  context)
+            return map(lambda i: itemmap(i, context), data)
+
+        return impl
+
+class Apply(Transform):
+    """
+    A transform that applies another transform with different data set as the 
+    current input data.  
+    """
+    def mkfn(self, config, engine):
+        try:
+            transf = config['transform']
+        except KeyError:
+            raise MissingTransformData("transform", self.name)
+        if isinstance(transf, dict):
+            transf = engine.make_transform(transf)
+        elif isinstance(transf, str) or isinstance(transf, unicode):
+            transf = engine.resolve_transform(transf)
+        else:
+            raise TransformConfigTypeError('transform', 'dict or str', 
+                                           type(transf))
+
+        newin = self._resolve_input(config.get('input', ''), transf.engine)
+
+        targs = config.get('args', [])
+
+        def impl(input, context, *args, **keys):
+            
+            usein = newin
+            if isinstance(newin, Transform):
+                usein = newin(input, context)
+            
+            useargs = targs + list(args)
+
+            return transf(usein, context, *useargs)
+
+        return impl
+
+    def _resolve_input(self, input, engine):
+
+        if isinstance(input, dict):
+            # this is a transform configuration object
+            return engine.make_transform(input, "(anon)")
+
+        if not isinstance(input, str) and not isinstance(input, unicode):
+            raise TransformConfigTypeError('input', 'dict or str', type(input))
+
+        if '(' in input or ')' in input:
+            return engine.resolve_transform(input)
+
+        if '/' not in input:
+            try:
+                # see if it matches a transform name
+                return engine.resolve_transform(input)
+            except TransformNotFound:
+                # assume it is a data-pointer
+                pass
+
+        return Extract({"select": input }, engine, 
+                       (self.name or "extract")+"(select)", "extract")
+                       
+
 
 class Native(Transform):
     """
@@ -318,55 +385,106 @@ class Function(Transform):
     passed to the underlying implementation.
     """
 
-    def __init__(self, engine, transform, args, name=None, type="function"):
-        self._wrapped = transform
-        self._args = args
-        super(Function, self).__init__({"args": tuple(args), 
-                                        "transform": transform}, 
-                                       engine, name, type)
-
     def mkfn(self, config, engine):
-        if not config.has_key('args'):
-            raise MissingTranformData("arg", self.name)
+        try:
+            targs = list(config['args'])
+        except KeyError, ex:
+            raise MissingTranformData("args", self.name)
+        except TypeError, ex:
+            raise TransformConfigTypeError("args", "list", type(config['args']),
+                                           self._name)
 
-        if not isinstance(self._wrapped, Transform):
-            self._wrapped = engine.resolve_transform(self._wrapped)
+        try:
+            wrapped = config['transform']
+            if not isinstance(wrapped, Transform):
+                wrapped = engine.resolve_transform(wrapped)
+        except KeyError, ex:
+            raise MissingTranformData("transform", self.name)
+        except TypeError, ex:
+            raise TransformConfigTypeError("transform", "str", 
+                                           type(config['transform']), self._name)
 
-        for i in range(len(self._args)):
-            arg = self._args[i]
-            if isinstance(arg, str) or isinstance(arg, unicode):
+        uargs = targs
+        if isinstance(wrapped, Callable):
+            uargs = self._build_args(wrapped, targs, engine)
+            args_index = wrapped.args_index
+            wrapped = self._wrap_callable(wrapped, targs, engine)
+
+        for i in range(len(uargs)):
+            if isinstance(uargs[i], str) or isinstance(uargs[i], unicode):
                 try:
                     # try assuming the argument is JSON data
-                    if arg[0] == "'" and arg[-1] == "'":
-                        arg = '"'+arg[1:-1]+'"'
+                    if uargs[i][0] == "'" and uargs[i][-1] == "'":
+                        uargs[i] = '"'+uargs[i][1:-1]+'"'
 
-                    arg = json.loads(arg)
-                    if isinstance(arg, str) and "{" in arg:
-                        arg = StringTemplate({'content': arg}, engine, 
-                                             self.name+":(arg)", 
-                                             "stringtemplate")
-                    elif isinstance(arg, list) or isinstance(arg, dict):
-                        arg = JSON({'content': arg}, engine, self.name+":(arg)",
-                                   "json")
+                    uargs[i] = json.loads(uargs[i])
+                    if isinstance(uargs[i], str) and "{" in uargs[i]:
+                        uargs[i] = StringTemplate({'content': uargs[i]}, engine, 
+                                                  self.name+":(arg)", 
+                                                  "stringtemplate")
+                    elif isinstance(uargs[i], list) or isinstance(uargs[i],dict):
+                        uargs[i] = JSON({'content': uargs[i]}, engine, 
+                                        self.name+":(arg)", "json")
+                                       
                 except ValueError:
                     # It should be interpreted as a transform directive
-                    arg = engine.resolve_transform(arg)
+                    uargs[i] = engine.resolve_transform(uargs[i])
 
-                self._args[i] = arg
 
-        def impl(input, context, *args, **keys):
+        def impl(input, context, *eargs, **keys):
             use = []
 
             # execute all transform references included in argument list
-            for i in range(len(self._args)):
-                item = self._args[i]
+            for i in range(len(uargs)):
+                item = uargs[i]
                 if isinstance(item, Transform):
                     item = item(input, context)
                 use.append(item)
 
-            return self._wrapped(input, context, *use)
+            return wrapped(input, context, *use)
 
         return impl
+
+    def _wrap_callable(self, callable, args, engine):
+        # extract the arguments that are used to configure the transform
+        use = []
+        for idx in callable.config_args_index:
+            if idx >= len(args):
+                msg = TransformConfigException.make_message(callable.name,
+                        "Insufficient number of arguments provided")
+                raise TransformConfigException(msg, callable.name)
+            use.append(args[idx])
+                
+        # apply the arguments to the transform template
+        transtmpl = callable.config_template
+        transf = JSON({"content": transtmpl}, engine, 
+                      callable.type+":(args)","json")
+        config = transf(use, None)
+        return engine.make_transform(config)
+
+    def _build_args(self, callable, args, engine):
+        # extract the arguments that are used to configure the transform
+        use = []
+        for idx in callable.args_index:
+            if idx >= len(args):
+                msg = TransformConfigException.make_message(callable.name,
+                        "Insufficient number of arguments provided")
+                raise TransformConfigException(msg, callable.name)
+            use.append(args[idx])
+
+        used = set(callable.args_index).union(callable.config_args_index)
+        extra_index = list(set(xrange(len(args))).difference(used))
+        extra_index.sort()
+
+        for idx in extra_index:
+            use.append(args[idx])
+
+        return use
+
+
+        
+                
+
 
     @classmethod
     def matches(cls, invoc):
@@ -384,7 +502,8 @@ class Function(Transform):
         string.
         """
         transf, args = parse.parse_function(funcstr.strip())
-        return cls(engine, transf, args, name=transf+"()")
+        config = { "args": tuple(args), "transform": transf }
+        return cls(config, engine, transf+"()", "function")
 
     def _resolve_argstr(self, argstr):
         out = self.__class__._parse_argstr(argstr)
@@ -398,12 +517,96 @@ class FunctionSyntaxError(TransformConfigException):
     def __init__(self, message):
         super(FunctionSyntaxError, self).__init__(message)
 
+class Callable(Transform):
+    """
+    a transform that can be used to turn other Tranform types into transforms
+    that can be called in function form.
+    """
+
+    @property
+    def config_template(self):
+        """
+        a template for the configuration for the underlying transform.  This 
+        contains data pointers into the array of configuration arguments that 
+        are extracted (and reordered) via config_args_index.
+        """
+        return self._transf_config_template
+
+    @property
+    def config_args_index(self):
+        """
+        an ordered list of argument indexes for selecting which arguments given
+        to the function should be used to configure the underlying transform at 
+        resolve time.  Used by the Function Transform.  
+        """
+        return self._config_args_index
+
+    @property
+    def args_index(self):
+        """
+        an ordered list of argument indexes for selecting which arguments given
+        to the function should be passed to the underlying transform at transform
+        time.  Used by the Function Transform.  
+        """
+        return self._pass_args_index
+
+    def mkfn(self, config, engine):
+        try:
+            self._transf_config_template = config['transform_tmpl']
+        except KeyError:
+            raise MissingTranformData("transform_tmpl", self.name)
+        # check the type
+        if not isinstance(self._transf_config_template, dict):
+            raise TransformConfigTypeError('transform_tmpl', 'obj', 
+                                           type(self._transf_config_template),
+                                           self.name)
+
+        try: 
+            self._config_args_index = config['conf_args_index']
+        except KeyError:
+            raise MissingTranformData("conf_args_index", self.name)
+        # check the type
+        if not isinstance(self._config_args_index, list):
+            raise TransformConfigTypeError('conf_args_index', 'obj', 
+                                           type(self._config_args_index),
+                                           self.name)
+        bad = filter(lambda i: not isinstance(i, int), 
+                     self._config_args_index)
+        if len(bad):
+            raise TransformConfigTypeError('conf_args_index[]', 'int', 
+                                           type(bad[0]), self.name)
+                                           
+
+        self._pass_args_index = config.get('pass_args_index', [])
+        # check the type
+        if not isinstance(self._pass_args_index, list):
+            raise TransformConfigTypeError('pass_args_index', 'list', 
+                                           type(self._pass_args_index),
+                                           self.name)
+        bad = filter(lambda i: not isinstance(i, int), 
+                     self._pass_args_index)
+        if len(bad):
+            raise TransformConfigTypeError('pass_args_index[]', 'int', 
+                                           type(bad[0]), self.name)
+
+        def impl(input, context):
+            raise TransformApplicationException("Attempt to apply callable " +
+                        "transform directly (without wrapper)")
+
+        return impl
+
+            
+            
+
+
 types = { "literal": Literal, 
           "stringtemplate": StringTemplate, 
           "native": Native,
-          "mapjoin": MapJoin,
+          "map": Map,
           "json": JSON,
-          "extract": Extract
+          "extract": Extract,
+          "apply": Apply,
+          "callable": Callable
           }
 
 # function type implementations
@@ -415,14 +618,17 @@ def identity_func(engine, input, context, *args, **keys):
     """
     return input
 
-def tostr(engine, input, context, *args, **keys):
+def tostr(engine, input, context, data=None, *args, **keys):
     """
     convert the input data into a JSON string
     :return str:
     """
-    if isinstance(input, str):
-        return input
-    return jsp.dumps(input)
+    if not data:
+        data = input
+
+    if isinstance(data, str):
+        return data
+    return jsp.dumps(data)
 
 
 def applytransform(engine, input, context, transform, select, *args, **keys):
@@ -440,22 +646,39 @@ def applytransform(engine, input, context, transform, select, *args, **keys):
 
     return transfunc(engine, newin, context)
 
-def extract(engine, input, context, select, *args, **keys):
-    """
-    return the data pointed to by the given select data-pointer
-    :argument str select:  a data-pointer string for data to extract from input
-    """
-    return engine.extract(input, context, select)
-
-def wrap(engine, input, context, maxlen=75, *args, **keys):
+def wrap(engine, input, context, maxlen=75, text=None, *args, **keys):
     """
     convert a paragraph of text into an array of strings broken at word 
     boundarys that are less than a given maximum in length.  
     """
-    if not isinstance(input, str):
-        raise TransformInputTypeError("string", str(type(input)), "wrap", 
+    if not text:
+        text = input
+
+    if not isinstance(text, str) and not isinstance(text, unicode):
+        raise TransformInputTypeError("string", str(type(text)), "wrap", 
                                       input, context)
-    return text.wrap(input, maxlen)
+    if not isinstance(maxlen, int):
+        raise TransformInputTypeError("integer", str(type(maxlen)), "wrap", 
+                                      maxlen, context)
+
+    return textwrap.wrap(text, maxlen)
+
+def indent(engine, input, context, indlen=4, text=None, *args, **keys):
+    """
+    prepend a specified number of spaces in front of the input text.
+    """
+    if not text:
+        text = input
+
+    if not isinstance(text, str) and not isinstance(text, unicode):
+        raise TransformInputTypeError("string", str(type(text)), "indent", 
+                                      input, context)
+    if not isinstance(indlen, int):
+        raise TransformInputTypeError("integer", str(type(indlen)), "indent", 
+                                      indlen, context)
+    return (indlen * ' ') + text
+
+
 
 
 ## join transforms

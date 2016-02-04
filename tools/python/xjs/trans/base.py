@@ -69,7 +69,7 @@ class Transform(object):
                 break
             prop = None
         if prop:
-            engine = Engine(self.config, engine)
+            engine = engine.wrap(self.config)
         self.engine = engine
         self._check_status(config, engine)
         self._func = self.mkfn(config, engine)

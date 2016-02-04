@@ -60,7 +60,7 @@ class DataPointer(object):
 
         data_pointer := target ':' json_pointer
         target := prefix | resolved_target
-        resolved_target := '$' ( 'in' | 'context' | 'argv' )
+        resolved_target := '$' ( 'in' | 'context' )
         """
         parts = strrep.strip().rsplit(':')
         if len(parts) > 2:
@@ -104,7 +104,7 @@ class Engine(object):
     """
     A class that represents the driver for applying transformations.
 
-    It includes a built in registry of transforms (and templates and joins) 
+    It includes a built-in registry of transforms (and templates and joins) 
     and prefix defintions which can be retrieved by name.  The available 
     transforms and prefixes can change depending on the current depth within
     a transform (stylesheet).  To facilitate this, an Engine can wrap another 
@@ -406,7 +406,7 @@ class Engine(object):
                                      None, the engine's default context will 
                                      be used.
         """
-        resolved_targets = ("$in", "$context", "$argv")
+        resolved_targets = ("$in", "$context")
 
         if isinstance(dptr, DataPointer):
             out = dptr.copy()
@@ -438,19 +438,14 @@ class Engine(object):
 
         try:
             if use.target == "$in":
-                return jsonptr.extract(input, "/"+use.path)
+                return jsonptr.extract(input, use.path)
             elif use.target == "$context":
-                return jsonptr.extract(context, "/"+use.path)
+                return jsonptr.extract(context, use.path)
         except jsonptr.ExtractError, ex:
             raise DataExtractionError.due_to(ex, input, context)
         except Exception, ex:
-            raise StylesheetContentError("Data pointer (" + str(self) + 
-                                        " does not normalize to useable JSON " +
-                                         "pointer: /" + use.path)
+            raise DataPointerError.due_to(ex, use, select)
 
-        raise StylesheetContentError("Unresolvable prefix: " + use.target)
-
-        return select.extract_from(input, context, self)
 
     def wrap(self, transconfig):
         """
