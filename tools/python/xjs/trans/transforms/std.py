@@ -395,10 +395,9 @@ class Function(Transform):
             raise TransformConfigTypeError("transform", "str", 
                                            type(config['transform']), self._name)
 
-        uargs = self._build_args(wrapped, args, engine)
-
-        args_index = []
+        uargs = args
         if isinstance(wrapped, Callable):
+            uargs = self._build_args(wrapped, args, engine)
             args_index = wrapped.args_index
             wrapped = self._wrap_callable(wrapped, args, engine)
 
