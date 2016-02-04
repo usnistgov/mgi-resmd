@@ -237,7 +237,7 @@ class Extract(Transform):
     def mkfn(self, config, engine):
         select = config.get("select", '')
         def impl(input, context, *args, **keys):
-            return extract(engine, input, context, select)
+            return engine.extract(input, context, select)
         return impl
 
 class MapJoin(Transform):
@@ -461,7 +461,8 @@ types = { "literal": Literal,
           "native": Native,
           "mapjoin": MapJoin,
           "json": JSON,
-          "extract": Extract
+          "extract": Extract,
+          "apply": Apply
           }
 
 # function type implementations
