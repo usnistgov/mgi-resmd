@@ -355,14 +355,14 @@
                 }
             ]
         },
-        "MapJoinTransform": {
+        "MapTransform": {
             "description": "a transform that applies a transform on each of elements of an input array and then combines them with a join transform",
             "allOf": [
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
                         "item": {
-                            "enum": ["mapjoin"]
+                            "enum": ["map"]
                         },
                         "itemmap": {
                             "description": "the transform to apply to each element of the array",
@@ -376,22 +376,8 @@
                                     "$ref": "#/definitions/Transform"
                                 }
                             ]
-                        },
-                        "join": {
-                            "description": "the transform to apply to the array resulting from the map transform",
-                            "oneOf": [
-                                { 
-                                    "description": "a text-based reference to a transform",
-                                    "type": "string" 
-                                },
-                                {
-                                    "description": "a transform description object",
-                                    "$ref": "#/definitions/Transform"
-                                }
-                            ]
                         }
-                    },
-                    "required": [ "type", "itemmap", "join" ]
+                    }
                 }
             ]
         },

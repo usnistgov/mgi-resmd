@@ -14,6 +14,53 @@
             "value": "}",
             "expects": ["any"],
             "returns": "string"
+        },
+        "tostr": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "type": "native",
+            "impl": "$std.tostr",
+            "description": "convert input data to a string",
+            "argv_supported": [
+                {
+                    "name": "data",
+                    "description": "the data to convert (default: the current input data)",
+                    "type": "any"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "string"
+        },
+        "indent": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "type": "native",
+            "impl": "$std.indent",
+            "description": "prepend a specified number of spaces in front of the input text.",
+            "argv_supported": [
+                {
+                    "name": "indlen",
+                    "description": "the number of spaces to insert at the front of the text",
+                    "type": "string"
+                },
+                {
+                    "name": "data",
+                    "description": "the data to indent (default: the current input data)",
+                    "type": "any"
+                }
+            ],
+            "expects": ["string"],
+            "returns": "string"
+        },
+        "fill": {
+            "type": "apply",
+            "transform": "newline",
+            "input": {
+                "type": "apply",
+                "transform": {
+                    "type": "map",
+                    "itemmap": "indent(5)"
+                },
+                "input": "wrap(70)"
+            }
         }
     },
     "transforms": {
@@ -59,6 +106,23 @@
             "expects": ["any"],
             "returns": "any"
         },
+        "map": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/CallableTransform" ],
+            "type": "callable",
+            "transform_tmpl": {
+                "type": "map",
+                "itemmap": { "$val": "/0" }
+            },
+            "conf_args_index": [ 0 ],
+            "argv_supported": [
+                {
+                    "name": "itemmap",
+                    "type": "string"
+                }
+            ],
+            "expects": ["array"],
+            "returns": "array"            
+        },
         "wrap": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "native",
@@ -69,20 +133,15 @@
                     "name": "maxlen",
                     "description": "the maximum length of a line in number of characters",
                     "type": "integer"
+                },
+                {
+                    "name": "text",
+                    "description": "the text to break up (default: the current input data)",
+                    "type": "string"
                 }
             ],
             "expects": ["string"],
             "returns": "array"
-        },
-        "fill": {
-            "type": "chain",
-            "status": "disabled",
-            "steps": [
-                "wrap({0})", "newline"
-            ],
-            "argdesc": [ "int: maximum length of each line" ],
-            "expects": ["string"],
-            "returns": "string"
         }
     }, 
     "joins": {

@@ -1,7 +1,7 @@
 """
 transformers from the standard module
 """
-import json, copy, re, importlib
+import json, copy, re, importlib, textwrap
 import types as tps
 import json as jsp
 
@@ -240,25 +240,33 @@ class Extract(Transform):
             return engine.extract(input, context, select)
         return impl
 
-class MapJoin(Transform):
+class Map(Transform):
     """
-    a transform that converts an array into a single string by applying the 
-    same processing on each element to create an array of strings and then join 
-    them into a single string as prescribed by the configuration.
+    a transform that applies a specified transform to each item in the input
+    array.  
     """
     def mkfn(self, config, engine):
 
-        itemmap = config.get('itemmap')
-        if itemmap:
-            itemmap = self.engine.resolve_template(itemmap)
+        itemmap = config.get('itemmap', 'tostr')
+        if isinstance(itemmap, dict):
+            # it's an anonymous transform configuration
+            itemmap = engine.make_transform(itemmap)
         else:
-            itemmap = tostr
-        join = config.get('join', 'concat')
-        join = self.engine.resolve_template(join)
+            itemmap = engine.resolve_transform(itemmap)
+
+        strict = config.get('strict', False)
 
         def impl(input, context, *args, **keys):
-            items = map(lambda i: itemmap(engine, i, context), input)
-            return join(engine, items, context)
+            data = input
+            if not isinstance(data, list):
+                if not strict:
+                    data = [data]
+                else:
+                    raise TransformInputTypeError('array', type(data), 
+                                                  (self.name or "map"), data,
+                                                  context)
+            return map(lambda i: itemmap(i, context), data)
+
         return impl
 
 class Apply(Transform):
@@ -279,7 +287,7 @@ class Apply(Transform):
             raise TransformConfigTypeError('transform', 'dict or str', 
                                            type(transf))
 
-        newin = self._resolve_input(config.get('input'), transf.engine)
+        newin = self._resolve_input(config.get('input', ''), transf.engine)
 
         targs = config.get('args', [])
 
@@ -315,8 +323,9 @@ class Apply(Transform):
                 # assume it is a data-pointer
                 pass
 
-        return Extract({"select": input }, engine, self.name+"(select)", 
-                       "extract")
+        return Extract({"select": input }, engine, 
+                       (self.name or "extract")+"(select)", "extract")
+                       
 
 
 class Native(Transform):
@@ -593,7 +602,7 @@ class Callable(Transform):
 types = { "literal": Literal, 
           "stringtemplate": StringTemplate, 
           "native": Native,
-          "mapjoin": MapJoin,
+          "map": Map,
           "json": JSON,
           "extract": Extract,
           "apply": Apply,
@@ -609,14 +618,17 @@ def identity_func(engine, input, context, *args, **keys):
     """
     return input
 
-def tostr(engine, input, context, *args, **keys):
+def tostr(engine, input, context, data=None, *args, **keys):
     """
     convert the input data into a JSON string
     :return str:
     """
-    if isinstance(input, str):
-        return input
-    return jsp.dumps(input)
+    if not data:
+        data = input
+
+    if isinstance(data, str):
+        return data
+    return jsp.dumps(data)
 
 
 def applytransform(engine, input, context, transform, select, *args, **keys):
@@ -634,15 +646,39 @@ def applytransform(engine, input, context, transform, select, *args, **keys):
 
     return transfunc(engine, newin, context)
 
-def wrap(engine, input, context, maxlen=75, *args, **keys):
+def wrap(engine, input, context, maxlen=75, text=None, *args, **keys):
     """
     convert a paragraph of text into an array of strings broken at word 
     boundarys that are less than a given maximum in length.  
     """
-    if not isinstance(input, str):
-        raise TransformInputTypeError("string", str(type(input)), "wrap", 
+    if not text:
+        text = input
+
+    if not isinstance(text, str) and not isinstance(text, unicode):
+        raise TransformInputTypeError("string", str(type(text)), "wrap", 
                                       input, context)
-    return text.wrap(input, maxlen)
+    if not isinstance(maxlen, int):
+        raise TransformInputTypeError("integer", str(type(maxlen)), "wrap", 
+                                      maxlen, context)
+
+    return textwrap.wrap(text, maxlen)
+
+def indent(engine, input, context, indlen=4, text=None, *args, **keys):
+    """
+    prepend a specified number of spaces in front of the input text.
+    """
+    if not text:
+        text = input
+
+    if not isinstance(text, str) and not isinstance(text, unicode):
+        raise TransformInputTypeError("string", str(type(text)), "indent", 
+                                      input, context)
+    if not isinstance(indlen, int):
+        raise TransformInputTypeError("integer", str(type(indlen)), "indent", 
+                                      indlen, context)
+    return (indlen * ' ') + text
+
+
 
 
 ## join transforms
