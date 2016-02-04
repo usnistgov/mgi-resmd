@@ -2,6 +2,6 @@
     "$schema":  "http://mgi.nist.gov/mgi-json-trans/v0.1",
 
     "type": "stringtemplate",
-    "content": "Contact {contact/name} via <{contact/email}>",
+    "content": "Contact {/contact/name} via <{/contact/email}>",
     "returns": "string"
 }

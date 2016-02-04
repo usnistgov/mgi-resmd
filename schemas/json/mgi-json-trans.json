@@ -13,9 +13,9 @@
             }
         },
         "DataPointer": {
-            "description": "a pointer into JSON data comprised of an optional data target ($in or $context) or prefix, a colon, and a path (a JSON pointer excluding the leading slash)",
+            "description": "a pointer into JSON data comprised of an optional data target ($in or $context) or prefix, a colon, and a JSON pointer",
             "type": "string",
-            "pattern": "^([a-zA-Z0-9_!@#$.]:)?[a-zA-Z0-9_!@#$.]+$"
+            "pattern": "^([a-zA-Z0-9_!@#$.]:)?(/[a-zA-Z0-9_!@#$.]*)*$"
         },
         "Transform": {
             "description": "a configuration of a transform that can be applied to JSON data structures",

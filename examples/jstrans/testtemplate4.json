@@ -5,7 +5,7 @@
     "content": { 
         "contacts": [ 
             {
-                "{contact/name}": "{contact/name} <{contact/email}>"
+                "{/contact/name}": "{/contact/name} <{/contact/email}>"
             }
         ]
     },

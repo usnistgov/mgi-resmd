@@ -1,6 +1,7 @@
 """
 Exceptions that can occur while using trans transformations
 """
+import jsonspec.pointer as jsonptr
 
 class JSONTransformException(Exception):
     """
@@ -271,6 +272,33 @@ class DataExtractionError(TransformApplicationException):
         basemsg += "problem extracting data"
         msg = cls.make_message_from_cause(cause, basemsg=basemsg)
         return DataExtractionError(msg, input, context, name, cause)
+
+class DataPointerError(DataExtractionError):
+    """
+    an error indicating a failure extracting data due to a problem with the
+    data pointer itself.  Typically, this is because the pointer does not 
+    follow the proper syntax.
+    """
+
+    @classmethod
+    def due_to(cls, cause, dp, orig=None):
+        """
+        construct an exception that is mainly due to an underlying problem.
+
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  
+        :argument dp:  the (normalized) data pointer
+        :argument orig:  the unnormalized data pointer, if known
+        """
+        causemsg = str(cause)
+        if isinstance(cause, jsonptr.ParseError):
+            causemsg = "did not normalize to useable JSON pointer"
+        msg = "Problem using data pointer"
+        if orig:
+            msg += ", '"+str(orig)+"'"
+        msg += ": {0}: {1}".format(causemsg, str(dp))
+        return DataPointerError(msg, cause=cause)
+        
 
 class TransformInputTypeError(TransformApplicationException):
     """

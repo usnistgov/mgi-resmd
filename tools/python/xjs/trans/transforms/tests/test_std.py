@@ -70,7 +70,7 @@ class TestJSON(object):
 
     def test_tmpl4(self, engine):
         config = { "content":  { "a": [True, "[{$lb}{$rb}]", 3],
-                                 "b": { "$val": "numbers" } }    }
+                                 "b": { "$val": "/numbers" } }    }
         transf = std.JSON(config, engine, "goob", "json")
         out = transf({"numbers": range(3)}, {})
         assert isinstance(out, dict)
@@ -84,7 +84,7 @@ class TestJSON(object):
 class TestApply(object):
 
     def test_anon(self, engine):
-        config = { "transform": { "type": "extract", "select": "contact/name" },
+        config = { "transform": { "type": "extract", "select": "/contact/name" },
                    "input": { "type": "json", 
                               "content": { "contact": { "name": "bob" } }} }
         transf = std.Apply(config, engine, "goob", "apply")
@@ -92,7 +92,7 @@ class TestApply(object):
         assert out == "bob"
 
     def test_tname(self, engine):
-        config = { "transform": { "type": "extract", "select": "contact/name",
+        config = { "transform": { "type": "extract", "select": "/contact/name",
                                   "transforms": {
                                      "contactname": {"type": "json", 
                               "content": { "contact": { "name": "bob" } }} }
@@ -103,21 +103,21 @@ class TestApply(object):
         assert out == "bob"
 
     def test_datapointer(self, engine):
-        config = { "transform": { "type": "extract", "select": "name" },
-                   "input": "curation/contact" }
+        config = { "transform": { "type": "extract", "select": "/name" },
+                   "input": "/curation/contact" }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf({"curation": { "contact": { "name": "bob" }} }, {})
         assert out == "bob"
 
     def test_datapointer2(self, engine):
-        config = { "transform": { "type": "extract", "select": "contact/name" },
-                   "input": "curation" }
+        config = { "transform": { "type": "extract", "select": "/contact/name" },
+                   "input": "/curation" }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf({"curation": { "contact": { "name": "bob" }} }, {})
         assert out == "bob"
 
     def test_function(self, engine):
-        config = { "transform": { "type": "extract", "select": "0" },
+        config = { "transform": { "type": "extract", "select": "" },
                    "input": "delimit(' and ')" }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf(["neil", "jack", "me"], {})
