@@ -323,26 +323,21 @@
                         "item": {
                             "enum": ["callable"]
                         },
-                        "transform": {
-                            "description": "a transform configuration that will provide the implementation for the callable version",
+                        "transform_tmpl": {
+                            "description": "a JSON template for transform configuration that will provide the implementation for the callable version",
                             "notes": [
-                            ]
-                        },
-                        "dontpass": {
-                            "description": "a list of array indexes to the argument list provided to the function that should not be passed to the transform",
-                            "notes": [
-                                "This list should correspond to the argument references in the transform configuration.",
-                                "The arguments refered here will not only not be passed to the transform, they will be treated as literals when plugged into the transform configuration--that is, arguments in this set that look like transform invocations or data pointers will not be resolved (although the constructed transform may do that)."
                             ],
+                            "type": "object"
+                        },
+                        "conf_args_index": {
+                            "description": "an ordered list of argument indexes for selecting which arguments given to the function should be used to configure the underlying transform at resolve time.",
                             "type": "array",
                             "items": { "type": "integer" }
                         },
-                        "pass": {
-                            "description": "a template for the arguments to pass into the transform (constructed from the transform property)",
-                            "notes": [
-                                "This template will be treated like a JSON template (i.e. given as a JSON Transform's content property) and applied to the list of arguments as its input.  The array items that result from this will then be resolved into transforms as appropriate."
-                            ],
-                            "type": "array"
+                        "args_index": {
+                            "description": "an ordered list of argument indexes for selecting which arguments given to the function should be passed to the underlying transform at transform time",
+                            "type": "array",
+                            "items": { "type": "integer" }
                         },
                         "argv_supported": {
                             "description": "a specification of arguments that can be passed to the transform when invoked in function form",
