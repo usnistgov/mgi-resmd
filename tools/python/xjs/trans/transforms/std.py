@@ -390,38 +390,45 @@ class Function(Transform):
             if not isinstance(wrapped, Transform):
                 wrapped = engine.resolve_transform(wrapped)
         except KeyError, ex:
-            raise MissingTranformData("args", self.name)
+            raise MissingTranformData("transform", self.name)
         except TypeError, ex:
             raise TransformConfigTypeError("transform", "str", 
                                            type(config['transform']), self._name)
 
-        for i in range(len(args)):
-            if isinstance(args[i], str) or isinstance(args[i], unicode):
+        uargs = self._build_args(wrapped, args, engine)
+
+        args_index = []
+        if isinstance(wrapped, Callable):
+            args_index = wrapped.args_index
+            wrapped = self._wrap_callable(wrapped, args, engine)
+
+        for i in range(len(uargs)):
+            if isinstance(uargs[i], str) or isinstance(uargs[i], unicode):
                 try:
                     # try assuming the argument is JSON data
-                    if args[i][0] == "'" and args[i][-1] == "'":
-                        args[i] = '"'+args[i][1:-1]+'"'
+                    if uargs[i][0] == "'" and uargs[i][-1] == "'":
+                        uargs[i] = '"'+uargs[i][1:-1]+'"'
 
-                    args[i] = json.loads(args[i])
-                    if isinstance(args[i], str) and "{" in args[i]:
-                        args[i] = StringTemplate({'content': args[i]}, engine, 
-                                                 self.name+":(arg)", 
-                                                 "stringtemplate")
-                    elif isinstance(args[i], list) or isinstance(args[i], dict):
-                        args[i] = JSON({'content': args[i]}, engine, 
-                                       self.name+":(arg)", "json")
+                    uargs[i] = json.loads(uargs[i])
+                    if isinstance(uargs[i], str) and "{" in uargs[i]:
+                        uargs[i] = StringTemplate({'content': uargs[i]}, engine, 
+                                                  self.name+":(arg)", 
+                                                  "stringtemplate")
+                    elif isinstance(uargs[i], list) or isinstance(uargs[i],dict):
+                        uargs[i] = JSON({'content': uargs[i]}, engine, 
+                                        self.name+":(arg)", "json")
                                        
                 except ValueError:
                     # It should be interpreted as a transform directive
-                    args[i] = engine.resolve_transform(args[i])
+                    uargs[i] = engine.resolve_transform(uargs[i])
 
 
         def impl(input, context, *eargs, **keys):
             use = []
 
             # execute all transform references included in argument list
-            for i in range(len(args)):
-                item = args[i]
+            for i in range(len(uargs)):
+                item = uargs[i]
                 if isinstance(item, Transform):
                     item = item(input, context)
                 use.append(item)
@@ -429,6 +436,45 @@ class Function(Transform):
             return wrapped(input, context, *use)
 
         return impl
+
+    def _wrap_callable(self, callable, args, engine):
+        # extract the arguments that are used to configure the transform
+        use = []
+        for idx in callable.config_args_index:
+            if idx >= len(args):
+                msg = TransformConfigException.make_message(callable.name,
+                        "Insufficient number of arguments provided")
+                raise TransformConfigException(msg, callable.name)
+            use.append(args[idx])
+                
+        # apply the arguments to the transform template
+        transtmpl = callable.config_template
+        transf = JSON(transtmpl, engine, callable.type+":(args)","json")
+        return transf(use, None)
+
+    def _build_args(self, callable, args, engine):
+        # extract the arguments that are used to configure the transform
+        use = []
+        for idx in callable.args_index:
+            if idx >= len(args):
+                msg = TransformConfigException.make_message(callable.name,
+                        "Insufficient number of arguments provided")
+                raise TransformConfigException(msg, callable.name)
+            use.append(args[idx])
+
+        used = set(callable.args_index).union(callable.config_args_index)
+        extra_index = list(set(xrange(len(args))).difference(used))
+        extra_index.sort()
+
+        for idx in extra_index:
+            use.append(args[idx])
+
+        return use
+
+
+        
+                
+
 
     @classmethod
     def matches(cls, invoc):
@@ -460,6 +506,88 @@ class FunctionSyntaxError(TransformConfigException):
 
     def __init__(self, message):
         super(FunctionSyntaxError, self).__init__(message)
+
+class Callable(Transform):
+    """
+    a transform that can be used to turn other Tranform types into transforms
+    that can be called in function form.
+    """
+
+    @property
+    def config_template(self):
+        """
+        a template for the configuration for the underlying transform.  This 
+        contains data pointers into the array of configuration arguments that 
+        are extracted (and reordered) via config_args_index.
+        """
+        return self._transf_config_template
+
+    @property
+    def config_args_index(self):
+        """
+        an ordered list of argument indexes for selecting which arguments given
+        to the function should be used to configure the underlying transform at 
+        resolve time.  Used by the Function Transform.  
+        """
+        return self._config_args_index
+
+    @property
+    def args_index(self):
+        """
+        an ordered list of argument indexes for selecting which arguments given
+        to the function should be passed to the underlying transform at transform
+        time.  Used by the Function Transform.  
+        """
+        return self._pass_args_index
+
+    def mkfn(self, config, engine):
+        try:
+            self._transf_config_template = config['transform_tmpl']
+        except KeyError:
+            raise MissingTranformData("transform_tmpl", self.name)
+        # check the type
+        if not isinstance(self._transf_config_template, dict):
+            raise TransformConfigTypeError('transform_tmpl', 'obj', 
+                                           type(self._transf_config_template),
+                                           self.name)
+
+        try: 
+            self._config_args_index = config['conf_args_index']
+        except KeyError:
+            raise MissingTranformData("conf_args_index", self.name)
+        # check the type
+        if not isinstance(self._config_args_index, list):
+            raise TransformConfigTypeError('conf_args_index', 'obj', 
+                                           type(self._config_args_index),
+                                           self.name)
+        bad = filter(lambda i: not isinstance(i, int), 
+                     self._config_args_index)
+        if len(bad):
+            raise TransformConfigTypeError('conf_args_index[]', 'int', 
+                                           type(bad[0]), self.name)
+                                           
+
+        self._pass_args_index = config.get('pass_args_index', [])
+        # check the type
+        if not isinstance(self._pass_args_index, list):
+            raise TransformConfigTypeError('pass_args_index', 'list', 
+                                           type(self._pass_args_index),
+                                           self.name)
+        bad = filter(lambda i: not isinstance(i, int), 
+                     self._pass_args_index)
+        if len(bad):
+            raise TransformConfigTypeError('pass_args_index[]', 'int', 
+                                           type(bad[0]), self.name)
+
+        def impl(input, context):
+            raise TransformApplicationException("Attempt to apply callable " +
+                        "transform directly (without wrapper)")
+
+        return impl
+
+            
+            
+
 
 types = { "literal": Literal, 
           "stringtemplate": StringTemplate, 
