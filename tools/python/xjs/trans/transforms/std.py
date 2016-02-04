@@ -376,53 +376,57 @@ class Function(Transform):
     passed to the underlying implementation.
     """
 
-    def __init__(self, engine, transform, args, name=None, type="function"):
-        self._wrapped = transform
-        self._args = args
-        super(Function, self).__init__({"args": tuple(args), 
-                                        "transform": transform}, 
-                                       engine, name, type)
-
     def mkfn(self, config, engine):
-        if not config.has_key('args'):
+        try:
+            args = list(config['args'])
+        except KeyError, ex:
             raise MissingTranformData("args", self.name)
+        except TypeError, ex:
+            raise TransformConfigTypeError("args", "list", type(config['args']),
+                                           self._name)
 
-        if not isinstance(self._wrapped, Transform):
-            self._wrapped = engine.resolve_transform(self._wrapped)
+        try:
+            wrapped = config['transform']
+            if not isinstance(wrapped, Transform):
+                wrapped = engine.resolve_transform(wrapped)
+        except KeyError, ex:
+            raise MissingTranformData("args", self.name)
+        except TypeError, ex:
+            raise TransformConfigTypeError("transform", "str", 
+                                           type(config['transform']), self._name)
 
-        for i in range(len(self._args)):
-            arg = self._args[i]
-            if isinstance(arg, str) or isinstance(arg, unicode):
+        for i in range(len(args)):
+            if isinstance(args[i], str) or isinstance(args[i], unicode):
                 try:
                     # try assuming the argument is JSON data
-                    if arg[0] == "'" and arg[-1] == "'":
-                        arg = '"'+arg[1:-1]+'"'
+                    if args[i][0] == "'" and args[i][-1] == "'":
+                        args[i] = '"'+args[i][1:-1]+'"'
 
-                    arg = json.loads(arg)
-                    if isinstance(arg, str) and "{" in arg:
-                        arg = StringTemplate({'content': arg}, engine, 
-                                             self.name+":(arg)", 
-                                             "stringtemplate")
-                    elif isinstance(arg, list) or isinstance(arg, dict):
-                        arg = JSON({'content': arg}, engine, self.name+":(arg)",
-                                   "json")
+                    args[i] = json.loads(args[i])
+                    if isinstance(args[i], str) and "{" in args[i]:
+                        args[i] = StringTemplate({'content': args[i]}, engine, 
+                                                 self.name+":(arg)", 
+                                                 "stringtemplate")
+                    elif isinstance(args[i], list) or isinstance(args[i], dict):
+                        args[i] = JSON({'content': args[i]}, engine, 
+                                       self.name+":(arg)", "json")
+                                       
                 except ValueError:
                     # It should be interpreted as a transform directive
-                    arg = engine.resolve_transform(arg)
+                    args[i] = engine.resolve_transform(args[i])
 
-                self._args[i] = arg
 
-        def impl(input, context, *args, **keys):
+        def impl(input, context, *eargs, **keys):
             use = []
 
             # execute all transform references included in argument list
-            for i in range(len(self._args)):
-                item = self._args[i]
+            for i in range(len(args)):
+                item = args[i]
                 if isinstance(item, Transform):
                     item = item(input, context)
                 use.append(item)
 
-            return self._wrapped(input, context, *use)
+            return wrapped(input, context, *use)
 
         return impl
 
@@ -442,7 +446,8 @@ class Function(Transform):
         string.
         """
         transf, args = parse.parse_function(funcstr.strip())
-        return cls(engine, transf, args, name=transf+"()")
+        config = { "args": tuple(args), "transform": transf }
+        return cls(config, engine, transf+"()", "function")
 
     def _resolve_argstr(self, argstr):
         out = self.__class__._parse_argstr(argstr)
