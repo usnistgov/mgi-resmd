@@ -115,14 +115,14 @@ class Engine(object):
     """
     # TODO: context data input
 
-    def __init__(self, currtrans=None, base=None):
+    def __init__(self, currtrans=None, base=None, context=None):
         """
         wrap around another engine and then load the transforms and prefixes
         included there.  
 
         :argument object currtrans: the current transform where sub-transforms
                                     and prefixes may be defined.
-        :argument Engin base:  the engine to inherit configuration from
+        :argument Engine base:  the engine to inherit configuration from
         """
         if currtrans is None:
             currtrans = {}
@@ -135,13 +135,14 @@ class Engine(object):
             self._templates = set()
             self._joins = set()
             self._transCls = ScopedDict()
+            self.context = ScopedDict()
         else:
             self.prefixes = ScopedDict(base.prefixes)
             self._transforms = ScopedDict(base._transforms)
             self._templates = set(base._templates)
             self._joins = set(base._joins)
             self._transCls = ScopedDict(base._transCls)
-
+            self.context = ScopedDict(base.context)
 
         self.load_transform_defs(currtrans)
 
@@ -459,20 +460,18 @@ class StdEngine(Engine):
     an engine that loads the standard definitions.  
     """
 
-    def __init__(self):
+    def __init__(self, context=None):
         super(StdEngine, self).__init__()
-        self._load_std_defs()
+        self._load_transformer_mod(std)
 
-    def _load_std_defs(self):
-        # load the std Transform types
-        self.load_transform_types(std)
+    def _load_transformer_mod(self, mod):
+        # load the Transform types
+        self.load_transform_types(mod)
 
-        # load the std transforms and prefixes
-        defsfile = os.path.join(os.path.dirname(std.__file__), "std_ss.json")
-        with open(defsfile) as fd:
-            stddefs = json.load(fd)
+        self.load_stylesheet(mod.MOD_STYLESHEET)
+        # self.load_transform_defs(stddefs)
 
-        self.load_transform_defs(stddefs)
+        
 
 class DocEngine(Engine):
 

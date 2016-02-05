@@ -9,6 +9,8 @@ from ..exceptions import *
 from ..base import Transform
 from .. import parse
 
+MODULE_NAME = __name__
+
 joins = [ "delim" ]
 transforms = [ "identity_function", "applytransform", "extract", "wrap" ]
 templates = [ "tostr" ]
@@ -720,4 +722,35 @@ def _prep_array_for_join(data):
 
     return [str(data)]
 
-            
+# load in stylesheet-based definitions 
+
+MOD_STYLESHEET_FILE = "std_ss.json"
+
+ssfile = os.path.join(os.path.dirname(__file__), mod_stylesheet_file)
+with open(ssfile) as fd:
+    MOD_STYLESHEET = jsp.load(f)
+del ssfile
+
+# load the module's initial context data.  The defaults are specified here 
+# for documentation purposes; however, values set wihtin the stylesheet file 
+# will take precedence.
+
+p = MDDULE_NAME + "."
+
+def_context = {
+
+    # The prefered line width to use when filling data into paragraphs by 
+    # the fill transform
+    #
+    p+"fill.width": 75,
+
+    # The prefered indentation amount to use when filling data into 
+    # paragraphs by the fill transform
+    # 
+    p+"fill.indent": 0
+}
+
+# the module's default context data
+MOD_CONTEXT = ScopedDict(def_context).update(MOD_STYLESHEET)
+MOD_STYLESHEET['context'] = MOD_CONTEXT
+
