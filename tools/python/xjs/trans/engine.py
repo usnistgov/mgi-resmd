@@ -104,7 +104,7 @@ class Engine(object):
     """
     A class that represents the driver for applying transformations.
 
-    It includes a built-in registry of transforms (and templates and joins) 
+    It includes a built-in registry of transforms 
     and prefix defintions which can be retrieved by name.  The available 
     transforms and prefixes can change depending on the current depth within
     a transform (stylesheet).  To facilitate this, an Engine can wrap another 
@@ -132,16 +132,12 @@ class Engine(object):
         if self._basenjn is None:
             self.prefixes = ScopedDict()
             self._transforms = ScopedDict()
-            self._templates = set()
-            self._joins = set()
             self._transCls = ScopedDict()
             self.context = ScopedDict()
             self._system = ScopedDict(DEFAULT_ENV)
         else:
             self.prefixes = ScopedDict(base.prefixes)
             self._transforms = ScopedDict(base._transforms)
-            self._templates = set(base._templates)
-            self._joins = set(base._joins)
             self._transCls = ScopedDict(base._transCls)
             self.context = ScopedDict(base.context)
 
@@ -160,16 +156,13 @@ class Engine(object):
         configuration.  
 
         :argument dict config:  the dictionary containing the definitions via
-                                its properties, "prefixes", "transforms",
-                                "templates", and "joins".
+                                its properties, "prefixes" and "transforms"
         """
         # load any new prefixes
         self._loadprefixes(config.get('prefixes'))
 
-        # load any new transforms, templates, and joins
+        # load any new transforms
         self._loadtransforms(config.get('transforms'))
-        self._loadtemplates(config.get('templates'))
-        self._loadjoins(config.get('joins'))
 
     def _loadprefixes(self, defs):
         if not defs:
@@ -189,68 +182,11 @@ class Engine(object):
         for name in defs:
             self.add_transform(name, defs[name])
 
-    def _loadtemplates(self, defs):
-        if not defs:
-            return
-        if not isinstance(defs, dict):
-            raise TransformConfigException("'transforms' node not a dict: " + 
-                                           str(type(defs)))
-
-        for name in defs:
-            self.add_template(name, defs[name])
-
-    def _loadjoins(self, defs):
-        if not defs:
-            return
-        if not isinstance(defs, dict):
-            raise TransformConfigException("'transforms' node not a dict: " + 
-                                           str(type(defs)))
-
-        for name in defs:
-            self.add_join(name, defs[name])
-
     def add_transform(self, name, config):
         """
         register a named transform.
         """
         self._transforms[name] = config
-
-        if config.get('returns') == 'string':
-            self._templates.add(name)
-            # TODO: test for joins
-
-    def add_template(self, name, config):
-        """
-        register a named template.  A Template is a Transform that returns
-        a string.
-        """
-        self._transforms[name] = copy.deepcopy(config)
-
-        if config.get('returns', 'string') != 'string':
-            raise TransformConfigParamError('returns', name, 
-    name + " template: 'returns' not set to 'string': " + config.get('returns'))
-        self._templates.add(name)
-
-    def add_template(self, name, config):
-        """
-        register a named template.  A Template is a Transform that returns
-        a string.
-        """
-        self.add_transform(name, config)
-
-        if config.get('returns', 'string') != 'string':
-            raise TransformConfigParamError('returns', name, 
-    name + " template: 'returns' not set to 'string': " + config.get('returns'))
-        self._templates.add(name)
-
-    def add_join(self, name, config):
-        """
-        register a named join.  A Join is a Template that requires the input
-        to be an array of strings.
-        """
-        self.add_template(name, config)
-        # test for input type
-        self._joins.add(name)
 
     def resolve_prefix(self, name):
         return self.prefixes.get(name)
@@ -284,57 +220,6 @@ class Engine(object):
 
         return transf
 
-    def resolve_template(self, invoc):
-        """
-        resolve the template invocation into a template Transform instance, 
-        ready for use.  
-        The template may not have been parsed and constructed into a Transform,
-        yet; in this case, this will be done (causing all dependant transforms
-        to be parsed as well).
-
-        :exc TransformNotFound: if a transform with that name is not known
-        :exc TransformConfigParamError: if the configuration is invalid for 
-                                the transform's type.
-        """
-        # first see if the tranform invocation (i.e. the name) matches the 
-        # functional form
-        args = None
-        name = invoc
-        if std.Function.matches(name):
-            name, args = parse.parse_function(name)
-
-        if name not in self._templates:
-            if name in self._transforms:
-                raise TransformNotFound(name, name +
-                                      " transform not recognized as a template")
-            raise TransformNotFound(name, "template not found: " + name)
-
-        return self.resolve_transform(invoc)
-
-    def resolve_join(self, invoc):
-        """
-        resolve the name into a join Transform instance, ready for use.  The 
-        join may not have been parsed and constructed into a Transform,
-        yet; in this case, this will be done (causing all dependant transforms
-        to be parsed as well.
-
-        :exc TransformNotFound: if a transform with that name is not known
-        :exc TransformConfigParamError: if the configuration is invalid for 
-                                the transform's type.
-        """
-        args = None
-        name = invoc
-        if std.Function.matches(name):
-            name, args = parse.parse_function(name)
-
-        if name not in self._joins:
-            if name in self._transforms:
-                raise TransformNotFound(name, name +
-                                        " transform not recognized as a join")
-            raise TransformNotFound(name, "join not found: " + name)
-
-        return self.resolve_transform(invoc)
-
     def make_transform(self, config, name=None, type=None):
         """
         create a Transform instance from its configuration
@@ -342,7 +227,7 @@ class Engine(object):
         :argument dict config:  the JSON object that defines the transform.  
                                 This must have a 'type' property if the type
                                 is not given as an argument.
-        :argument name str:     the name associated with this template.  If 
+        :argument name str:     the name associated with this transform.  If 
                                 None, the transform is anonymous.  
         :argument type str:     the type of transform to assume for this 
                                 request.  Any 'type' property in the config
@@ -368,8 +253,8 @@ class Engine(object):
 
     def resolve_all_transforms(self):
         """
-        ensure that all loaded template configurations have been resolved
-        into Template instances.  This effectively validates the templates
+        ensure that all loaded transform configurations have been resolved
+        into Transform instances.  This effectively validates the transform
         configurations.  This will skip over any disabled transforms.
         """
         for name in self._transforms:
@@ -386,7 +271,7 @@ class Engine(object):
         :argument DataPointer dptr:  the data pointer to normalize, either as
                                      a DataPointer instance or its string 
                                      representation.
-        :argument Context context:   the template-specific context to use; if 
+        :argument Context context:   the transform-specific context to use; if 
                                      None, the engine's default context will 
                                      be used.
         """

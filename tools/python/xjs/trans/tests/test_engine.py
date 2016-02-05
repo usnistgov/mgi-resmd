@@ -84,7 +84,6 @@ class TestStdEngine(object):
 
         assert "literal" in engine._transCls
         assert "$lb" in engine._transforms
-        assert "$lb" in engine._templates
 
     def test_transform_lb(self):
         engine = njn.StdEngine()
@@ -120,7 +119,7 @@ class TestExamples(object):
 
         engine = njn.DocEngine(ss)
 
-        tfunc = engine.resolve_template('')
+        tfunc = engine.resolve_transform('')
         result = tfunc({}, {})
         
         assert result == "a substitution token looks like this: {texpr}"
@@ -133,7 +132,7 @@ class TestExamples(object):
 
         engine = njn.DocEngine(ss)
 
-        tfunc = engine.resolve_template('')
+        tfunc = engine.resolve_transform('')
         result = tfunc(input, {})
         
         assert result == "Contact Bob via <bob@gmail.com>"
@@ -146,7 +145,7 @@ class TestExamples(object):
 
         engine = njn.DocEngine(ss)
 
-        tfunc = engine.resolve_template('')
+        tfunc = engine.resolve_transform('')
         result = tfunc(input, {})
         
         assert result == "Contact Bob via <bob@gmail.com>"
