@@ -1,12 +1,12 @@
 """
 transformers from the standard module
 """
-import json, copy, re, importlib, textwrap
+import os, json, copy, re, importlib, textwrap
 import types as tps
 import json as jsp
 
 from ..exceptions import *
-from ..base import Transform
+from ..base import Transform, ScopedDict
 from .. import parse
 
 MODULE_NAME = __name__
@@ -15,7 +15,8 @@ joins = [ "delim" ]
 transforms = [ "identity_function", "applytransform", "extract", "wrap" ]
 templates = [ "tostr" ]
 
-TRANSFORMS_MOD = __name__.rsplit('.', 1)[0]
+TRANSFORMS_PKG = __name__.rsplit('.', 1)[0]
+DEF_CONTRIB_PKG = TRANSFORMS_PKG
 
 # Transform types:
 
@@ -342,7 +343,9 @@ class Native(Transform):
             raise MissingTranformData("impl", self.name)
 
         if fname.startswith('$'):
-           fname = ".".join([TRANSFORMS_MOD, fname[1:]])
+            fname = ".".join([TRANSFORMS_PKG, fname[1:]])
+        else:
+            fname = ".".join([engine._system['$sys.contrib_pkg'], fname])
         fimpl = self._load_function(fname) #throws exc for unresolvable func
 
         # configuration may provide a portion of the arguments supported by 
@@ -726,16 +729,16 @@ def _prep_array_for_join(data):
 
 MOD_STYLESHEET_FILE = "std_ss.json"
 
-ssfile = os.path.join(os.path.dirname(__file__), mod_stylesheet_file)
+ssfile = os.path.join(os.path.dirname(__file__), MOD_STYLESHEET_FILE)
 with open(ssfile) as fd:
-    MOD_STYLESHEET = jsp.load(f)
+    MOD_STYLESHEET = jsp.load(fd)
 del ssfile
 
 # load the module's initial context data.  The defaults are specified here 
 # for documentation purposes; however, values set wihtin the stylesheet file 
 # will take precedence.
 
-p = MDDULE_NAME + "."
+p = MODULE_NAME + "."
 
 def_context = {
 
@@ -747,10 +750,12 @@ def_context = {
     # The prefered indentation amount to use when filling data into 
     # paragraphs by the fill transform
     # 
-    p+"fill.indent": 0
+    p+"fill.indent": 0,
 }
+del p
 
 # the module's default context data
-MOD_CONTEXT = ScopedDict(def_context).update(MOD_STYLESHEET)
+MOD_CONTEXT = ScopedDict(def_context)
+MOD_CONTEXT.update(MOD_STYLESHEET.get('context',{}))
 MOD_STYLESHEET['context'] = MOD_CONTEXT
 

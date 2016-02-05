@@ -136,6 +136,7 @@ class Engine(object):
             self._joins = set()
             self._transCls = ScopedDict()
             self.context = ScopedDict()
+            self._system = ScopedDict(DEFAULT_ENV)
         else:
             self.prefixes = ScopedDict(base.prefixes)
             self._transforms = ScopedDict(base._transforms)
@@ -144,7 +145,10 @@ class Engine(object):
             self._transCls = ScopedDict(base._transCls)
             self.context = ScopedDict(base.context)
 
+            self._system = base._system
+
         self.load_transform_defs(currtrans)
+        self.add_transform('', currtrans)
 
         # wrap default transform classes for the different types
         if base:
@@ -347,7 +351,7 @@ class Engine(object):
         if not type:
             type = config.get('type')
         if not type:
-            raise MissingTransformData('type', name)
+            return Transform(config, self, name, type="identity")
 
         try:
             tcls = self._transCls[type]
@@ -373,27 +377,6 @@ class Engine(object):
                 self.resolve_transform(name)
             except TransformDisabled:
                 continue
-
-    def load_transform_types(self, module):
-        """
-        load the Transform classes defined in the given module.  The module
-        must have a symbol named 'types' that is a dict mapping type names
-        to Transform Class objects.  
-        """
-        if not hasattr(module, 'types'):
-            try:
-                modname = module.__name__
-            except AttributeError, ex:
-                raise TransformException("Failed to load tranform types; " +
-                                         "not a module? ("+ repr(ex) +")", ex)
-            raise TransformException("Failed to load tranform types: missing "+
-                                     "'types' dictionary")
-
-        if not isinstance(module.types, dict):
-            raise TransformException("Failed to load tranform types: 'types' "+
-                                     "is not a dictionary")
-
-        self._transCls.update(module.types)
 
     def normalize_datapointer(self, dptr, context=None):
         """
@@ -455,6 +438,15 @@ class Engine(object):
         return Engine(transconfig, self)
 
 
+    def transform(self, data):
+        """
+        Transform the given data against the current transform for this engine.
+        """
+        transf = self.resolve_transform('')
+        out = transf(data, self.context)
+        return out
+
+
 class StdEngine(Engine):
     """
     an engine that loads the standard definitions.  
@@ -462,25 +454,78 @@ class StdEngine(Engine):
 
     def __init__(self, context=None):
         super(StdEngine, self).__init__()
-        self._load_transformer_mod(std)
+        self.load_plugin(std)
 
-    def _load_transformer_mod(self, mod):
+    def load_plugin(self, mod):
+        """
+        load the plugin transforms from the given python module
+        """
         # load the Transform types
         self.load_transform_types(mod)
 
-        self.load_stylesheet(mod.MOD_STYLESHEET)
-        # self.load_transform_defs(stddefs)
+        # load the transforms
+        self.load_transform_defs(mod.MOD_STYLESHEET)
+        try:
+            # load the context data
+            self.context.update(mod.MOD_STYLESHEET['context'])
+        except KeyError:
+            pass
+
+    def load_transform_types(self, module):
+        """
+        load the Transform classes defined in the given module.  The module
+        must have a symbol named 'types' that is a dict mapping type names
+        to Transform Class objects.  
+        """
+        if not hasattr(module, 'types'):
+            try:
+                modname = module.__name__
+            except AttributeError, ex:
+                raise TransformException("Failed to load tranform types; " +
+                                         "not a module? ("+ repr(ex) +")", ex)
+            raise TransformException("Failed to load tranform types: missing "+
+                                     "'types' dictionary")
+
+        if not isinstance(module.types, dict):
+            raise TransformException("Failed to load tranform types: 'types' "+
+                                     "is not a dictionary")
+
+        self._transCls.update(module.types)
 
         
 
 class DocEngine(Engine):
+    """
+    A Transformation Engine intended for loading a base stylesheet document
+    and initiating the transformation.
+    """
 
-    def __init__(self, doctrans=None):
+    def __init__(self, doctrans=None, context=None, sysdata=None):
         """
         create an Engine from an initial transform.  
 
         :argument object doctrans: the initial transform sheet
         """
-        super(DocEngine, self).__init__(doctrans, StdEngine())
-        self.add_transform('', doctrans)
 
+        # Note that the application can override the default system context data
+        ctxt = ScopedDict(DEFAULT_APP_CONTEXT)
+        if context:
+            ctxt = ScopedDict(ctxt)
+            ctxt.update(context)
+
+        super(DocEngine, self).__init__(doctrans, StdEngine(context))
+        if sysdata:
+            self._system.update(sysdata)
+            
+
+
+DEFAULT_APP_CONTEXT = {
+
+}
+
+DEFAULT_ENV = {
+
+    # The python package containing contributed modules
+    "$sys.contrib_pkg":  "jsont_contrib"
+    
+}
