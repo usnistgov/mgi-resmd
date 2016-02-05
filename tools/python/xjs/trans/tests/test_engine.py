@@ -118,9 +118,7 @@ class TestExamples(object):
             ss = json.load(fd)
 
         engine = njn.DocEngine(ss)
-
-        tfunc = engine.resolve_transform('')
-        result = tfunc({}, {})
+        result = engine.transform({})
         
         assert result == "a substitution token looks like this: {texpr}"
 
@@ -131,9 +129,7 @@ class TestExamples(object):
             ss = json.load(fd)
 
         engine = njn.DocEngine(ss)
-
-        tfunc = engine.resolve_transform('')
-        result = tfunc(input, {})
+        result = engine.transform(input)
         
         assert result == "Contact Bob via <bob@gmail.com>"
 
@@ -144,9 +140,7 @@ class TestExamples(object):
             ss = json.load(fd)
 
         engine = njn.DocEngine(ss)
-
-        tfunc = engine.resolve_transform('')
-        result = tfunc(input, {})
+        result = engine.transform(input)
         
         assert result == "Contact Bob via <bob@gmail.com>"
 
@@ -157,9 +151,7 @@ class TestExamples(object):
             ss = json.load(fd)
 
         engine = njn.DocEngine(ss)
-
-        tfunc = engine.resolve_transform('')
-        result = tfunc(input, {})
+        result = engine.transform(input)
         
         assert isinstance(result, dict)
         assert result['contacts'][0].keys()[0] == "Bob"
