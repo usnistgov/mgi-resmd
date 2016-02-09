@@ -1,0 +1,19 @@
+{
+    "$schema":  "http://mgi.nist.gov/mgi-json-trans/v0.1",
+
+    "type": "apply",
+    "transform": "newline",
+    "select": "/content/subject",
+
+    "transforms": {
+        "subject": {
+            "type": "stringtemplate",
+            "content": "<subject> {$in:} </subject>"
+        },
+        "subjects": {
+            "type": "map",
+            "itemmap": "subject"
+        }
+    }
+
+}
