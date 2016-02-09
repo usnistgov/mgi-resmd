@@ -1,6 +1,6 @@
 {
     "$schema": "http://mgi.nist.gov/mgi-json-trans/v0.1",
-    "templates": {
+    "transforms": {
         "$lb": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/LiteralTransform" ],
             "type": "literal",
@@ -61,9 +61,7 @@
                 },
                 "input": "wrap(70)"
             }
-        }
-    },
-    "transforms": {
+        },
         "apply": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "native",
@@ -142,9 +140,7 @@
             ],
             "expects": ["string"],
             "returns": "array"
-        }
-    }, 
-    "joins": {
+        },
         "concat": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "type": "native",

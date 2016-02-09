@@ -1,19 +1,18 @@
 """
 transformers from the standard module
 """
-import json, copy, re, importlib, textwrap
+import os, json, copy, re, importlib, textwrap
 import types as tps
 import json as jsp
 
 from ..exceptions import *
-from ..base import Transform
+from ..base import Transform, ScopedDict
 from .. import parse
 
-joins = [ "delim" ]
-transforms = [ "identity_function", "applytransform", "extract", "wrap" ]
-templates = [ "tostr" ]
+MODULE_NAME = __name__
 
-TRANSFORMS_MOD = __name__.rsplit('.', 1)[0]
+TRANSFORMS_PKG = __name__.rsplit('.', 1)[0]
+DEF_CONTRIB_PKG = TRANSFORMS_PKG
 
 # Transform types:
 
@@ -30,8 +29,9 @@ class Literal(Transform):
 
 class StringTemplate(Transform):
     """
-    a template that will replace template tokens in a string
-    with strings derived from the input data
+    a transform based on a template for an output string.  It will replace 
+    template tokens in the string template with strings derived from the input 
+    data
     """
 
     def mkfn(self, config, engine):
@@ -94,7 +94,7 @@ class StringTemplate(Transform):
                 if item.startswith('{') and item.endswith('}'):
                     item = item[1:-1]
                     try:
-                        # see if it matches a template or template-function
+                        # see if it matches a transform or transform-function
                         item = self.engine.resolve_transform(item)
                     except TransformNotFound:
                         # it's a pointer
@@ -340,7 +340,9 @@ class Native(Transform):
             raise MissingTranformData("impl", self.name)
 
         if fname.startswith('$'):
-           fname = ".".join([TRANSFORMS_MOD, fname[1:]])
+            fname = ".".join([TRANSFORMS_PKG, fname[1:]])
+        else:
+            fname = ".".join([engine._system['$sys.contrib_pkg'], fname])
         fimpl = self._load_function(fname) #throws exc for unresolvable func
 
         # configuration may provide a portion of the arguments supported by 
@@ -720,4 +722,37 @@ def _prep_array_for_join(data):
 
     return [str(data)]
 
-            
+# load in stylesheet-based definitions 
+
+MOD_STYLESHEET_FILE = "std_ss.json"
+
+ssfile = os.path.join(os.path.dirname(__file__), MOD_STYLESHEET_FILE)
+with open(ssfile) as fd:
+    MOD_STYLESHEET = jsp.load(fd)
+del ssfile
+
+# load the module's initial context data.  The defaults are specified here 
+# for documentation purposes; however, values set wihtin the stylesheet file 
+# will take precedence.
+
+p = "std."
+
+def_context = {
+
+    # The prefered line width to use when filling data into paragraphs by 
+    # the fill transform
+    #
+    p+"fill.width": 75,
+
+    # The prefered indentation amount to use when filling data into 
+    # paragraphs by the fill transform
+    # 
+    p+"fill.indent": 0,
+}
+del p
+
+# the module's default context data
+MOD_CONTEXT = ScopedDict(def_context)
+MOD_CONTEXT.update(MOD_STYLESHEET.get('context',{}))
+MOD_STYLESHEET['context'] = MOD_CONTEXT
+

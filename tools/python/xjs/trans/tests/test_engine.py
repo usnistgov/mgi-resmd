@@ -1,4 +1,5 @@
 import os, pytest, json
+from cStringIO import StringIO
 
 input = { "goob": "gurn" }
 context = { "foo": "bar", "$count": 4 }
@@ -84,7 +85,6 @@ class TestStdEngine(object):
 
         assert "literal" in engine._transCls
         assert "$lb" in engine._transforms
-        assert "$lb" in engine._templates
 
     def test_transform_lb(self):
         engine = njn.StdEngine()
@@ -119,11 +119,17 @@ class TestExamples(object):
             ss = json.load(fd)
 
         engine = njn.DocEngine(ss)
-
-        tfunc = engine.resolve_template('')
-        result = tfunc({}, {})
+        result = engine.transform({})
         
         assert result == "a substitution token looks like this: {texpr}"
+
+        ostrm = StringIO()
+        engine.write(ostrm, {})
+        assert result+'\n' == ostrm.getvalue()
+
+        ostrm = StringIO()
+        engine.write(ostrm, {}, True)
+        assert '"'+result+'"' == ostrm.getvalue()
 
     def test_template2(self):
         input = { "contact": { "name": "Bob", "email": "bob@gmail.com" }}
@@ -132,9 +138,7 @@ class TestExamples(object):
             ss = json.load(fd)
 
         engine = njn.DocEngine(ss)
-
-        tfunc = engine.resolve_template('')
-        result = tfunc(input, {})
+        result = engine.transform(input)
         
         assert result == "Contact Bob via <bob@gmail.com>"
 
@@ -145,9 +149,7 @@ class TestExamples(object):
             ss = json.load(fd)
 
         engine = njn.DocEngine(ss)
-
-        tfunc = engine.resolve_template('')
-        result = tfunc(input, {})
+        result = engine.transform(input)
         
         assert result == "Contact Bob via <bob@gmail.com>"
 
@@ -158,12 +160,12 @@ class TestExamples(object):
             ss = json.load(fd)
 
         engine = njn.DocEngine(ss)
-
-        tfunc = engine.resolve_transform('')
-        result = tfunc(input, {})
+        result = engine.transform(input)
         
         assert isinstance(result, dict)
         assert result['contacts'][0].keys()[0] == "Bob"
         assert result['contacts'][0]["Bob"] == "Bob <bob@gmail.com>"
+
+        
 
 

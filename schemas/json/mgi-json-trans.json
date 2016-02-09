@@ -75,28 +75,6 @@
                     "patternProperties": {
                         "^[a-zA-Z0-9_!@#$.]+$": { "$ref": "#/definitions/Transform" }
                     }
-                },
-                "templates": {
-                    "description": "a named list of additional templates available to the current transform",
-                    "notes": [
-                        "A template is a transform that returns a string type result",
-                        "These transforms will be merged in with the current set of available transforms, overriding existing ones with the same name"
-                    ],
-                    "type": "object",
-                    "patternProperties": {
-                        "^[a-zA-Z0-9_!@#$.]+$": { "$ref": "#/definitions/Transform" }
-                    }
-                },
-                "joins": {
-                    "description": "a named list of additional join templates available to the current transform",
-                    "notes": [
-                        "A join template is a template that requires an array of strings as its input",
-                        "These transforms will be merged in with the current set of available transforms, overriding existing ones with the same name"
-                    ],
-                    "type": "object",
-                    "patternProperties": {
-                        "^[a-zA-Z0-9_!@#$.]+$": { "$ref": "#/definitions/Transform" }
-                    }
                 }
             }
         },

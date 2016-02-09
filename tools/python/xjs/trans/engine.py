@@ -104,7 +104,7 @@ class Engine(object):
     """
     A class that represents the driver for applying transformations.
 
-    It includes a built-in registry of transforms (and templates and joins) 
+    It includes a built-in registry of transforms 
     and prefix defintions which can be retrieved by name.  The available 
     transforms and prefixes can change depending on the current depth within
     a transform (stylesheet).  To facilitate this, an Engine can wrap another 
@@ -122,7 +122,7 @@ class Engine(object):
 
         :argument object currtrans: the current transform where sub-transforms
                                     and prefixes may be defined.
-        :argument Engin base:  the engine to inherit configuration from
+        :argument Engine base:  the engine to inherit configuration from
         """
         if currtrans is None:
             currtrans = {}
@@ -132,18 +132,19 @@ class Engine(object):
         if self._basenjn is None:
             self.prefixes = ScopedDict()
             self._transforms = ScopedDict()
-            self._templates = set()
-            self._joins = set()
             self._transCls = ScopedDict()
+            self.context = ScopedDict()
+            self._system = ScopedDict(DEFAULT_ENV)
         else:
             self.prefixes = ScopedDict(base.prefixes)
             self._transforms = ScopedDict(base._transforms)
-            self._templates = set(base._templates)
-            self._joins = set(base._joins)
             self._transCls = ScopedDict(base._transCls)
+            self.context = ScopedDict(base.context)
 
+            self._system = base._system
 
         self.load_transform_defs(currtrans)
+        self.add_transform('', currtrans)
 
         # wrap default transform classes for the different types
         if base:
@@ -155,16 +156,13 @@ class Engine(object):
         configuration.  
 
         :argument dict config:  the dictionary containing the definitions via
-                                its properties, "prefixes", "transforms",
-                                "templates", and "joins".
+                                its properties, "prefixes" and "transforms"
         """
         # load any new prefixes
         self._loadprefixes(config.get('prefixes'))
 
-        # load any new transforms, templates, and joins
+        # load any new transforms
         self._loadtransforms(config.get('transforms'))
-        self._loadtemplates(config.get('templates'))
-        self._loadjoins(config.get('joins'))
 
     def _loadprefixes(self, defs):
         if not defs:
@@ -184,68 +182,11 @@ class Engine(object):
         for name in defs:
             self.add_transform(name, defs[name])
 
-    def _loadtemplates(self, defs):
-        if not defs:
-            return
-        if not isinstance(defs, dict):
-            raise TransformConfigException("'transforms' node not a dict: " + 
-                                           str(type(defs)))
-
-        for name in defs:
-            self.add_template(name, defs[name])
-
-    def _loadjoins(self, defs):
-        if not defs:
-            return
-        if not isinstance(defs, dict):
-            raise TransformConfigException("'transforms' node not a dict: " + 
-                                           str(type(defs)))
-
-        for name in defs:
-            self.add_join(name, defs[name])
-
     def add_transform(self, name, config):
         """
         register a named transform.
         """
         self._transforms[name] = config
-
-        if config.get('returns') == 'string':
-            self._templates.add(name)
-            # TODO: test for joins
-
-    def add_template(self, name, config):
-        """
-        register a named template.  A Template is a Transform that returns
-        a string.
-        """
-        self._transforms[name] = copy.deepcopy(config)
-
-        if config.get('returns', 'string') != 'string':
-            raise TransformConfigParamError('returns', name, 
-    name + " template: 'returns' not set to 'string': " + config.get('returns'))
-        self._templates.add(name)
-
-    def add_template(self, name, config):
-        """
-        register a named template.  A Template is a Transform that returns
-        a string.
-        """
-        self.add_transform(name, config)
-
-        if config.get('returns', 'string') != 'string':
-            raise TransformConfigParamError('returns', name, 
-    name + " template: 'returns' not set to 'string': " + config.get('returns'))
-        self._templates.add(name)
-
-    def add_join(self, name, config):
-        """
-        register a named join.  A Join is a Template that requires the input
-        to be an array of strings.
-        """
-        self.add_template(name, config)
-        # test for input type
-        self._joins.add(name)
 
     def resolve_prefix(self, name):
         return self.prefixes.get(name)
@@ -279,57 +220,6 @@ class Engine(object):
 
         return transf
 
-    def resolve_template(self, invoc):
-        """
-        resolve the template invocation into a template Transform instance, 
-        ready for use.  
-        The template may not have been parsed and constructed into a Transform,
-        yet; in this case, this will be done (causing all dependant transforms
-        to be parsed as well).
-
-        :exc TransformNotFound: if a transform with that name is not known
-        :exc TransformConfigParamError: if the configuration is invalid for 
-                                the transform's type.
-        """
-        # first see if the tranform invocation (i.e. the name) matches the 
-        # functional form
-        args = None
-        name = invoc
-        if std.Function.matches(name):
-            name, args = parse.parse_function(name)
-
-        if name not in self._templates:
-            if name in self._transforms:
-                raise TransformNotFound(name, name +
-                                      " transform not recognized as a template")
-            raise TransformNotFound(name, "template not found: " + name)
-
-        return self.resolve_transform(invoc)
-
-    def resolve_join(self, invoc):
-        """
-        resolve the name into a join Transform instance, ready for use.  The 
-        join may not have been parsed and constructed into a Transform,
-        yet; in this case, this will be done (causing all dependant transforms
-        to be parsed as well.
-
-        :exc TransformNotFound: if a transform with that name is not known
-        :exc TransformConfigParamError: if the configuration is invalid for 
-                                the transform's type.
-        """
-        args = None
-        name = invoc
-        if std.Function.matches(name):
-            name, args = parse.parse_function(name)
-
-        if name not in self._joins:
-            if name in self._transforms:
-                raise TransformNotFound(name, name +
-                                        " transform not recognized as a join")
-            raise TransformNotFound(name, "join not found: " + name)
-
-        return self.resolve_transform(invoc)
-
     def make_transform(self, config, name=None, type=None):
         """
         create a Transform instance from its configuration
@@ -337,7 +227,7 @@ class Engine(object):
         :argument dict config:  the JSON object that defines the transform.  
                                 This must have a 'type' property if the type
                                 is not given as an argument.
-        :argument name str:     the name associated with this template.  If 
+        :argument name str:     the name associated with this transform.  If 
                                 None, the transform is anonymous.  
         :argument type str:     the type of transform to assume for this 
                                 request.  Any 'type' property in the config
@@ -346,7 +236,7 @@ class Engine(object):
         if not type:
             type = config.get('type')
         if not type:
-            raise MissingTransformData('type', name)
+            return Transform(config, self, name, type="identity")
 
         try:
             tcls = self._transCls[type]
@@ -363,8 +253,8 @@ class Engine(object):
 
     def resolve_all_transforms(self):
         """
-        ensure that all loaded template configurations have been resolved
-        into Template instances.  This effectively validates the templates
+        ensure that all loaded transform configurations have been resolved
+        into Transform instances.  This effectively validates the transform
         configurations.  This will skip over any disabled transforms.
         """
         for name in self._transforms:
@@ -372,27 +262,6 @@ class Engine(object):
                 self.resolve_transform(name)
             except TransformDisabled:
                 continue
-
-    def load_transform_types(self, module):
-        """
-        load the Transform classes defined in the given module.  The module
-        must have a symbol named 'types' that is a dict mapping type names
-        to Transform Class objects.  
-        """
-        if not hasattr(module, 'types'):
-            try:
-                modname = module.__name__
-            except AttributeError, ex:
-                raise TransformException("Failed to load tranform types; " +
-                                         "not a module? ("+ repr(ex) +")", ex)
-            raise TransformException("Failed to load tranform types: missing "+
-                                     "'types' dictionary")
-
-        if not isinstance(module.types, dict):
-            raise TransformException("Failed to load tranform types: 'types' "+
-                                     "is not a dictionary")
-
-        self._transCls.update(module.types)
 
     def normalize_datapointer(self, dptr, context=None):
         """
@@ -402,7 +271,7 @@ class Engine(object):
         :argument DataPointer dptr:  the data pointer to normalize, either as
                                      a DataPointer instance or its string 
                                      representation.
-        :argument Context context:   the template-specific context to use; if 
+        :argument Context context:   the transform-specific context to use; if 
                                      None, the engine's default context will 
                                      be used.
         """
@@ -454,34 +323,133 @@ class Engine(object):
         return Engine(transconfig, self)
 
 
+    def transform(self, data):
+        """
+        Transform the given data against the current transform for this engine.
+        """
+        transf = self.resolve_transform('')
+        out = transf(data, self.context)
+        return out
+
+
 class StdEngine(Engine):
     """
     an engine that loads the standard definitions.  
     """
 
-    def __init__(self):
+    def __init__(self, context=None):
         super(StdEngine, self).__init__()
-        self._load_std_defs()
+        self.context = ScopedDict(context)
+        self.load_plugin(std)
 
-    def _load_std_defs(self):
-        # load the std Transform types
-        self.load_transform_types(std)
+    def load_plugin(self, mod):
+        """
+        load the plugin transforms from the given python module
+        """
+        # load the Transform types
+        self.load_transform_types(mod)
 
-        # load the std transforms and prefixes
-        defsfile = os.path.join(os.path.dirname(std.__file__), "std_ss.json")
-        with open(defsfile) as fd:
-            stddefs = json.load(fd)
+        # load the transforms
+        self.load_transform_defs(mod.MOD_STYLESHEET)
+        try:
+            # load the context data
+            self.context.update(mod.MOD_STYLESHEET['context'])
+        except KeyError:
+            pass
 
-        self.load_transform_defs(stddefs)
+    def load_transform_types(self, module):
+        """
+        load the Transform classes defined in the given module.  The module
+        must have a symbol named 'types' that is a dict mapping type names
+        to Transform Class objects.  
+        """
+        if not hasattr(module, 'types'):
+            try:
+                modname = module.__name__
+            except AttributeError, ex:
+                raise TransformException("Failed to load tranform types; " +
+                                         "not a module? ("+ repr(ex) +")", ex)
+            raise TransformException("Failed to load tranform types: missing "+
+                                     "'types' dictionary")
+
+        if not isinstance(module.types, dict):
+            raise TransformException("Failed to load tranform types: 'types' "+
+                                     "is not a dictionary")
+
+        self._transCls.update(module.types)
+
+        
 
 class DocEngine(Engine):
+    """
+    A Transformation Engine intended for loading a base stylesheet document
+    and initiating the transformation.
+    """
 
-    def __init__(self, doctrans=None):
+    def __init__(self, doctrans=None, context=None, sysdata=None):
         """
         create an Engine from an initial transform.  
 
         :argument object doctrans: the initial transform sheet
         """
-        super(DocEngine, self).__init__(doctrans, StdEngine())
-        self.add_transform('', doctrans)
 
+        # Note that the application can override the default system context data
+        ctxt = ScopedDict(DEFAULT_APP_CONTEXT)
+        if context:
+            ctxt = ScopedDict(ctxt)
+            ctxt.update(context)
+
+        super(DocEngine, self).__init__(doctrans, StdEngine(ctxt))
+        if sysdata:
+            self._system.update(sysdata)
+            
+    def write(self, ostrm, data, force_json=False):
+        """
+        transform the input data and write the output to a stream
+
+        :argument file ostrm:  the output file stream to write the result to
+        :argument json data:   the input JSON data to transform
+        :argument bool force_json:  if True, always write out in JSON format.
+                               Normally (False), if the output is a string, 
+                               then that string will be written directly to the 
+                               output stream.  When True, a string output will 
+                               converted to a JSON-formatted string (with 
+                               surrounding quotes.
+        """
+        out = self.transform(data)
+        if not force_json and (isinstance(out, str) or isinstance(out, unicode)):
+            ostrm.write(out)
+            if out[-1] != '\n': 
+                ostrm.write('\n')
+        else:
+            json.dump(out, ostrm, indent=self.context['json.indent'],
+                      separators=(self.context['json.item_separator'],
+                                  self.context['json.dict_separator']))
+            ostrm.write('\n')
+
+
+
+
+DEFAULT_APP_CONTEXT = {
+
+    # When writing json documents out to a file, use this number of spaces
+    # to indent complex data (array items and object properties).  A negative
+    # number switches on "pretty printing".
+    "json.indent": None,
+
+    # When writing json documents out to a file, use this string to separate
+    # items  
+    "json.item_separator": ', ',
+
+    # When writing json documents out to a file, use this string to separate
+    # object property names from their values
+    "json.dict_separator": ': '
+
+}
+
+DEFAULT_ENV = {
+
+    # The python package containing contributed modules
+    "$sys.contrib_pkg":  "jsont_contrib",
+
+}
