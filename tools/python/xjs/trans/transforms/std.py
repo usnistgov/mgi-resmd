@@ -735,7 +735,7 @@ del ssfile
 # for documentation purposes; however, values set wihtin the stylesheet file 
 # will take precedence.
 
-p = MODULE_NAME + "."
+p = "std."
 
 def_context = {
 

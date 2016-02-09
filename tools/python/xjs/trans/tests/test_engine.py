@@ -1,4 +1,5 @@
 import os, pytest, json
+from cStringIO import StringIO
 
 input = { "goob": "gurn" }
 context = { "foo": "bar", "$count": 4 }
@@ -122,6 +123,14 @@ class TestExamples(object):
         
         assert result == "a substitution token looks like this: {texpr}"
 
+        ostrm = StringIO()
+        engine.write(ostrm, {})
+        assert result+'\n' == ostrm.getvalue()
+
+        ostrm = StringIO()
+        engine.write(ostrm, {}, True)
+        assert '"'+result+'"' == ostrm.getvalue()
+
     def test_template2(self):
         input = { "contact": { "name": "Bob", "email": "bob@gmail.com" }}
 
@@ -156,5 +165,7 @@ class TestExamples(object):
         assert isinstance(result, dict)
         assert result['contacts'][0].keys()[0] == "Bob"
         assert result['contacts'][0]["Bob"] == "Bob <bob@gmail.com>"
+
+        
 
 

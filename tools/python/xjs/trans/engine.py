@@ -115,7 +115,7 @@ class Engine(object):
     """
     # TODO: context data input
 
-    def __init__(self, currtrans=None, base=None, context=None):
+    def __init__(self, currtrans=None, base=None):
         """
         wrap around another engine and then load the transforms and prefixes
         included there.  
@@ -339,6 +339,7 @@ class StdEngine(Engine):
 
     def __init__(self, context=None):
         super(StdEngine, self).__init__()
+        self.context = ScopedDict(context)
         self.load_plugin(std)
 
     def load_plugin(self, mod):
@@ -398,19 +399,55 @@ class DocEngine(Engine):
             ctxt = ScopedDict(ctxt)
             ctxt.update(context)
 
-        super(DocEngine, self).__init__(doctrans, StdEngine(context))
+        super(DocEngine, self).__init__(doctrans, StdEngine(ctxt))
         if sysdata:
             self._system.update(sysdata)
             
+    def write(self, ostrm, data, force_json=False):
+        """
+        transform the input data and write the output to a stream
+
+        :argument file ostrm:  the output file stream to write the result to
+        :argument json data:   the input JSON data to transform
+        :argument bool force_json:  if True, always write out in JSON format.
+                               Normally (False), if the output is a string, 
+                               then that string will be written directly to the 
+                               output stream.  When True, a string output will 
+                               converted to a JSON-formatted string (with 
+                               surrounding quotes.
+        """
+        out = self.transform(data)
+        if not force_json and (isinstance(out, str) or isinstance(out, unicode)):
+            ostrm.write(out)
+            if out[-1] != '\n': 
+                ostrm.write('\n')
+        else:
+            json.dump(out, ostrm, indent=self.context['json.indent'],
+                      separators=(self.context['json.item_separator'],
+                                  self.context['json.dict_separator']))
+
 
 
 DEFAULT_APP_CONTEXT = {
+
+    # When writing json documents out to a file, use this number of spaces
+    # to indent complex data (array items and object properties).  A negative
+    # number switches on "pretty printing".
+    "json.indent": None,
+
+    # When writing json documents out to a file, use this string to separate
+    # items  
+    "json.item_separator": ', ',
+
+    # When writing json documents out to a file, use this string to separate
+    # object property names from their values
+    "json.dict_separator": ': '
 
 }
 
 DEFAULT_ENV = {
 
     # The python package containing contributed modules
-    "$sys.contrib_pkg":  "jsont_contrib"
-    
+    "$sys.contrib_pkg":  "jsont_contrib",
+
 }
