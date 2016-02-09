@@ -1,7 +1,7 @@
 import pytest, os, sys, json, argparse
 from cStringIO import StringIO
 
-from xjs.trans import cli
+from jsont import cli
 
 def test_opts():
 
@@ -59,7 +59,7 @@ def tstsys():
 
 exdirname = "jstrans"
 exdir = os.path.join(os.path.dirname(
-   os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))),
+   os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))),
                         "examples", exdirname)
 
 

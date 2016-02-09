@@ -1,6 +1,6 @@
 import os, pytest
 
-import xjs.trans.parse as parse
+import jsont.parse as parse
 
 def test_chomp_quote():
     quote, rest = parse.chomp_quote("'goob'--")

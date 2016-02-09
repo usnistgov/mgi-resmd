@@ -4,7 +4,7 @@ from cStringIO import StringIO
 input = { "goob": "gurn" }
 context = { "foo": "bar", "$count": 4 }
 
-import xjs.trans.engine as njn
+import jsont.engine as njn
 
 class TestContext(object):
 
@@ -101,7 +101,7 @@ class TestStdEngine(object):
         
 
 exdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "examples",
+    os.path.dirname(os.path.dirname(__file__))))), "examples",
                      "jstrans")
 
 class TestExamples(object):
@@ -129,7 +129,7 @@ class TestExamples(object):
 
         ostrm = StringIO()
         engine.write(ostrm, {}, True)
-        assert '"'+result+'"' == ostrm.getvalue()
+        assert '"'+result+'"\n' == ostrm.getvalue()
 
     def test_template2(self):
         input = { "contact": { "name": "Bob", "email": "bob@gmail.com" }}

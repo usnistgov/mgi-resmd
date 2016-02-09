@@ -3,7 +3,7 @@ import os, pytest, json
 input = { "goob": "gurn" }
 context = { "foo": "bar", "$count": 4 }
 
-import xjs.trans.base as base
+import jsont.base as base
 
 class TestScopedDict(object):
 
