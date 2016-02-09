@@ -4,10 +4,10 @@ input = { "goob": "gurn" }
 context = { "foo": "bar" }
 engine = object()
 
-import xjs.trans.transforms.std as std
+import jsont.transforms.std as std
 from xjs.validate import ExtValidator
-from xjs.trans.engine import StdEngine
-from xjs.trans.exceptions import *
+from jsont.engine import StdEngine
+from jsont.exceptions import *
 
 def test_literal():
 
@@ -286,7 +286,7 @@ class TestFunctionTransform(object):
         
 
 
-schemadir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))))), "schemas", "json")
+schemadir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "schemas", "json")
 moddir = os.path.dirname(os.path.dirname(__file__))
 
 @pytest.fixture(scope="module")

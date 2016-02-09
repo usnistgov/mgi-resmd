@@ -3,7 +3,7 @@ import os, pytest
 input = { "goob": "gurn" }
 context = { "foo": "bar" }
 
-from xjs.trans.exceptions import *
+from jsont.exceptions import *
 
 def test_JSONTransformException():
     try:
