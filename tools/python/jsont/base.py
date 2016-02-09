@@ -64,7 +64,7 @@ class Transform(object):
         self.config = config
 
         # wrap the engine if necessary
-        for prop in "prefixes transforms templates joins".split():
+        for prop in "prefixes transforms".split():
             if prop in self.config:
                 break
             prop = None
