@@ -425,6 +425,8 @@ class DocEngine(Engine):
             json.dump(out, ostrm, indent=self.context['json.indent'],
                       separators=(self.context['json.item_separator'],
                                   self.context['json.dict_separator']))
+            ostrm.write('\n')
+
 
 
 
