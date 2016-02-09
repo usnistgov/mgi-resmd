@@ -57,7 +57,7 @@ def tstsys():
 
     return out
 
-exdirname = "jstrans"
+exdirname = "jsont"
 exdir = os.path.join(os.path.dirname(
    os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))),
                         "examples", exdirname)

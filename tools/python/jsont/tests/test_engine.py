@@ -102,7 +102,7 @@ class TestStdEngine(object):
 
 exdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.dirname(__file__))))), "examples",
-                     "jstrans")
+                     "jsont")
 
 class TestExamples(object):
 
