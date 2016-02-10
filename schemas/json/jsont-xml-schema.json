@@ -1,0 +1,98 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id":  "http://mgi.nist.gov/jsont-xml-schema/v0.1",
+    "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-schema/v0.1" ],
+    "title": "JSONT internal schema for XML data",
+    "description": "This schema defines the representation of XML data internal to the JSONT transformer",
+
+    "definitions": {
+
+        "Attribute": {
+            "description": "a representation of an attribute",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "the attribute's local name",
+                    "type": "string"
+                },
+                "namespace": {
+                    "description": "the attributes's qualifying name URI",
+                    "type": "string"
+                },
+                "prefix": {
+                    "description": "the prefix to use with this attribute",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "the attribute's value",
+                    "type": "string"
+                }
+            },
+            "required": [ "name", "value" ]
+        },
+
+        "ElementContent": {
+            "description": "a representation of complex element content including an element's attributes and children (but not it's name).",
+            "type": "object",
+            "properties": {
+                "attrs": {
+                    "description": "an ordered list of attributes",
+                    "notes": [
+                        "The order represents the preferred ordering of the attributes when rendered in XML format."
+                    ],
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/Attribute" }
+                },
+                "children": {
+                    "description": "the child content of the element which can include both plain text and other elements.",
+                    "notes": [
+                        "The order represents the required ordering of the children when rendered in XML format."
+                    ],
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "array",
+                            "items": { 
+                                "oneOf": [
+                                    { "$ref": "#/definitions/Element" },
+                                    { "type": "string" }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+
+        "Element": {
+            "description": "a representation of an element including its name and its content",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "the element's local name",
+                    "type": "string"
+                },
+                "namespace": {
+                    "description": "the element's qualifying name URI",
+                    "type": "string"
+                },
+                "prefix": {
+                    "description": "the prefix to use with this element",
+                    "type": "string"
+                },
+                "content": {
+                    "description": "the element's typed content",
+                    "$ref": "#/definitions/ElementContent"
+                },
+                "hints": {
+                    "description": "a set of data representing hints for encoding this data in XML",
+                    "type": "object"
+                }
+            },
+            "required": [ "name" ]
+        }
+
+    }
+}

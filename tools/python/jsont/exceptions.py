@@ -256,8 +256,27 @@ class DataExtractionError(TransformApplicationException):
     from the transform input.
     """
 
+    def __init__(self, message, select=None, input=None, context=None, 
+                 name=None, cause=None):
+        """
+        construct the exception, providing an explanation.
+
+        :argument str message: an explanation of what went wrong
+        :argument input:    the JSON data that was being transformed
+        :argument context:  the context at the point of the exception
+        :argument str name:  the name of the transform being applied when
+                             the exception occured.  If None, the exception 
+                             is not known or not specific to a particular 
+                             transform.
+        :argument Exception cause:  the exception representing the underlying 
+                                      cause of the exception.  If None, there 
+                                      was no such underlying cause.
+        """
+        super(TransformApplicationException, self).__init__(message, cause)
+        self.select = select
+
     @classmethod
-    def due_to(cls, cause, input=None, context=None, name=None):
+    def due_to(cls, cause, select, input=None, context=None, name=None):
         """
         construct an exception that is mainly due to an underlying problem.
 
@@ -269,9 +288,9 @@ class DataExtractionError(TransformApplicationException):
         """
         basemsg = ""
         if name: basemsg += name + ' transform: '
-        basemsg += "problem extracting data"
+        basemsg += "problem extracting data with '" + select + "'"
         msg = cls.make_message_from_cause(cause, basemsg=basemsg)
-        return DataExtractionError(msg, input, context, name, cause)
+        return DataExtractionError(msg, select, input, context, name, cause)
 
 class DataPointerError(DataExtractionError):
     """

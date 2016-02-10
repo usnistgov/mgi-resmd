@@ -331,7 +331,8 @@ class Engine(object):
             elif use.target == "$context":
                 return jsonptr.extract(context, use.path)
         except jsonptr.ExtractError, ex:
-            raise DataExtractionError.due_to(ex, input, context)
+            # CONSIDER: return None?
+            raise DataExtractionError.due_to(ex, use.path, input, context)
         except Exception, ex:
             raise DataPointerError.due_to(ex, use, select)
 

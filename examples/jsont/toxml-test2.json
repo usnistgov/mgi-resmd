@@ -1,0 +1,37 @@
+{
+    "$schema":  "http://mgi.nist.gov/mgi-json-trans/v0.1",
+
+    "type": "apply",
+    "transform": "newline",
+    "input": "subjects",
+
+    "transforms": {
+        "subject": {
+            "type": "json",
+            "content": { "name": "subject",
+                         "content": {
+                             "children": "{$in:}",
+                             "attrs": [
+                             ]
+                         }
+                       }
+        },
+        "subjects": {
+            "type": "apply",
+            "transform": {
+                "type": "map",
+                "itemmap": {
+                    "type": "apply",
+                    "transform": "element",
+                    "input": "subject"
+                }
+            },
+            "input": "/content/subject"
+        },
+        "element": {
+            "type": "stringtemplate",
+            "content": "<{/name}> {/content/children} </{/name}>"
+        }
+    }
+
+}

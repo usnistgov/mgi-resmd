@@ -6,8 +6,10 @@
 
     "transforms": {
         "subject": {
-            "type": "stringtemplate",
-            "content": "<subject> {$in:} </subject>"
+            "type": "xml.element",
+            "name": "subject",
+            "attrs": { },
+            "content": "$in:"
         },
         "subjects": {
             "type": "apply",
