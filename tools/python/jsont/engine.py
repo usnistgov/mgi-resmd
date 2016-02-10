@@ -21,7 +21,7 @@ class Context(ScopedDict):
     """
     CONST_PREFIX = '$'
 
-    def __init__(self, defaults):
+    def __init__(self, defaults=None):
         super(Context, self).__init__(defaults)
 
     def __setitem__(self, key, value):
@@ -126,25 +126,29 @@ class Engine(object):
         """
         if currtrans is None:
             currtrans = {}
-        self._ct = currtrans
+        self._ct = None
+        self._cfg = None
+        if isinstance(currtrans, Transform):
+            self._ct = currtrans
+        else:
+            self._cfg = currtrans
 
         self._basenjn = base
         if self._basenjn is None:
             self.prefixes = ScopedDict()
             self._transforms = ScopedDict()
             self._transCls = ScopedDict()
-            self.context = ScopedDict()
+            self.context = Context()
             self._system = ScopedDict(DEFAULT_ENV)
         else:
             self.prefixes = ScopedDict(base.prefixes)
             self._transforms = ScopedDict(base._transforms)
             self._transCls = ScopedDict(base._transCls)
-            self.context = ScopedDict(base.context)
+            self.context = Context(base.context)
 
             self._system = base._system
 
         self.load_transform_defs(currtrans)
-        self.add_transform('', currtrans)
 
         # wrap default transform classes for the different types
         if base:
@@ -215,10 +219,21 @@ class Engine(object):
             raise TransformNotFound(name)
 
         if not isinstance(transf, Transform):
-            transf = self.make_transform(transf, name)
+            # determine if we need to update the context with a new engine
+            tengine = self._engine_for_transform(transf)
+            transf = tengine.make_transform(transf, name)
             self._transforms[name] = transf
 
         return transf
+
+    def _engine_for_transform(self, config):
+        # wrap the engine if necessary
+        for prop in "prefixes transforms context".split():
+            if prop in config:
+                # the context is updated for this transform; update it via a 
+                # new engine
+                return self.wrap(config)
+        return self
 
     def make_transform(self, config, name=None, type=None):
         """
@@ -233,10 +248,15 @@ class Engine(object):
                                 request.  Any 'type' property in the config
                                 is ignored.  
         """
+        # determine if we need to update the context with a new engine
+        tengine = self._engine_for_transform(config)
+        return self._make_transform_with(tengine, config, name, type)
+
+    def _make_transform_with(self, engine, config, name=None, type=None):
         if not type:
             type = config.get('type')
         if not type:
-            return Transform(config, self, name, type="identity")
+            return Transform(config, engine, name, type="identity")
 
         try:
             tcls = self._transCls[type]
@@ -249,7 +269,7 @@ class Engine(object):
             msg += "Unrecognized transform type: " + type
             raise TransformNotFound(name, msg)
 
-        return tcls(config, self, name, type)
+        return tcls(config, engine, name, type)
 
     def resolve_all_transforms(self):
         """
@@ -327,9 +347,9 @@ class Engine(object):
         """
         Transform the given data against the current transform for this engine.
         """
-        transf = self.resolve_transform('')
-        out = transf(data, self.context)
-        return out
+        if not self._ct:
+            self._ct = self._make_transform_with(self, self._cfg)
+        return self._ct(data, self.context)
 
 
 class StdEngine(Engine):

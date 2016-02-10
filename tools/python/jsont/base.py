@@ -63,13 +63,6 @@ class Transform(object):
         self.type = type
         self.config = config
 
-        # wrap the engine if necessary
-        for prop in "prefixes transforms".split():
-            if prop in self.config:
-                break
-            prop = None
-        if prop:
-            engine = engine.wrap(self.config)
         self.engine = engine
         self._check_status(config, engine)
         self._func = self.mkfn(config, engine)

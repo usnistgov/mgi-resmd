@@ -99,6 +99,7 @@ class TestApply(object):
                               "content": { "contact": { "name": "bob" } }} }
                                   },
                    "input": "contactname" }
+        #pytest.set_trace()
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf({}, {})
         assert out == "bob"
@@ -273,7 +274,6 @@ def test_fill(engine):
     text = "convert a paragraph of text into an array of strings broken at word boundarys that are less than a given maximum in length.  "
     config = { "type": "apply", "transform": "fill" }
     transf = engine.make_transform(config)
-    #pytest.set_trace()
     out = transf(text, None)
     assert out == "     convert a paragraph of text into an array of strings broken at word\n     boundarys that are less than a given maximum in length."
 
