@@ -93,13 +93,16 @@ class StringTemplate(Transform):
                 item = parsed[i]
                 if item.startswith('{') and item.endswith('}'):
                     item = item[1:-1]
-                    try:
-                        # see if it matches a transform or transform-function
-                        item = self.engine.resolve_transform(item)
-                    except TransformNotFound:
+                    if item == '' or ':' in item or item.startswith('/'):
                         # it's a pointer
                         item = Extract({ "select": item }, self.engine, 
-                                       self.name+":(select)", "extract")
+                                       (self.name or "extract")+":(select)", 
+                                       "extract")
+                    else:
+                        # see if it matches a transform or transform-function
+                        # (may raise a TransformNotFound)
+                        item = self.engine.resolve_transform(item)
+
                     parsed[i] = item
 
         return parsed
@@ -131,11 +134,15 @@ class JSON(Transform):
                     return engine.make_transform(skel["$val"], 
                                                  self.name+".(anon)")
                 else:
-                    try:
-                        return engine.resolve_transform(skel["$val"])
-                    except TransformNotFound:
-                        return Extract({"select": skel["$val"]}, engine,
+                    item = skel['$val']
+                    if item == '' or ':' in item or item.startswith('/'):
+                        # it's a pointer
+                        return Extract({ "select": item }, self.engine, 
                                        self.name+":(select)", "extract")
+
+                    # else see if it matches a transform or transform-function
+                    # (may raise a TransformNotFound)
+                    return self.engine.resolve_transform(item)
             else:
                 self._resolve_json_object(skel, engine)
         elif (isinstance(skel, str) or isinstance(skel, unicode)) and \
@@ -315,17 +322,14 @@ class Apply(Transform):
         if '(' in input or ')' in input:
             return engine.resolve_transform(input)
 
-        if '/' not in input:
-            try:
-                # see if it matches a transform name
-                return engine.resolve_transform(input)
-            except TransformNotFound:
-                # assume it is a data-pointer
-                pass
+        if input == '' or ':' in input or input.startswith('/'):
+            # it's a pointer
+            return Extract({ "select": input }, engine, 
+                           (self.name or "extract")+":(select)", "extract")
 
-        return Extract({"select": input }, engine, 
-                       (self.name or "extract")+"(select)", "extract")
-                       
+        # see if it matches a transform or transform-function
+        # (may raise a TransformNotFound)
+        return engine.resolve_transform(input)
 
 
 class Native(Transform):
