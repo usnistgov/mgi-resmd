@@ -8,8 +8,11 @@
         "subject": {
             "type": "xml.element",
             "name": "subject",
-            "attrs": { },
-            "content": "$in:"
+            "content": {
+                "attrs": [ ]
+                "children": "$in:"
+            }
+                
         },
         "subjects": {
             "type": "apply",
