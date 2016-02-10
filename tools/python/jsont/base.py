@@ -56,16 +56,28 @@ class Transform(object):
     a realization of a tranform that can be applied to input data
     """
 
-    def __init__(self, config, engine, name=None, type=None):
+    def __init__(self, config, engine, name=None, type=None, skipwrap=False):
         self.name = name
         if not type:
             type = config.get('type')
         self.type = type
         self.config = config
 
-        self.engine = engine
+        self.engine = self._engine_to_use(engine, skipwrap)
         self._check_status(config, engine)
         self._func = self.mkfn(config, engine)
+
+    def _engine_to_use(self, engine, skipwrap):
+        if skipwrap: 
+            return engine
+
+        # wrap the engine if necessary
+        for prop in "prefixes transforms context".split():
+            if prop in self.config:
+                # the context is updated for this transform; update it via a 
+                # new engine
+                return engine.wrap(self.config)
+        return engine
 
     def __call__(self, input, context, *args):
         return self._func(input, context, *args)

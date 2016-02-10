@@ -220,22 +220,12 @@ class Engine(object):
 
         if not isinstance(transf, Transform):
             # determine if we need to update the context with a new engine
-            tengine = self._engine_for_transform(transf)
-            transf = tengine.make_transform(transf, name)
+            transf = self.make_transform(transf, name)
             self._transforms[name] = transf
 
         return transf
 
-    def _engine_for_transform(self, config):
-        # wrap the engine if necessary
-        for prop in "prefixes transforms context".split():
-            if prop in config:
-                # the context is updated for this transform; update it via a 
-                # new engine
-                return self.wrap(config)
-        return self
-
-    def make_transform(self, config, name=None, type=None):
+    def make_transform(self, config, name=None, type=None, ignorecontext=False):
         """
         create a Transform instance from its configuration
 
@@ -247,16 +237,14 @@ class Engine(object):
         :argument type str:     the type of transform to assume for this 
                                 request.  Any 'type' property in the config
                                 is ignored.  
+        :argument ignorecontext boolean:  ignore any changes to the context 
+                                (i.e. new transforms, prefixes, and context 
+                                data) included in the transform configuration.
         """
-        # determine if we need to update the context with a new engine
-        tengine = self._engine_for_transform(config)
-        return self._make_transform_with(tengine, config, name, type)
-
-    def _make_transform_with(self, engine, config, name=None, type=None):
         if not type:
             type = config.get('type')
         if not type:
-            return Transform(config, engine, name, type="identity")
+            return Transform(config, self, name, type="identity")
 
         try:
             tcls = self._transCls[type]
@@ -269,7 +257,7 @@ class Engine(object):
             msg += "Unrecognized transform type: " + type
             raise TransformNotFound(name, msg)
 
-        return tcls(config, engine, name, type)
+        return tcls(config, self, name, type, ignorecontext)
 
     def resolve_all_transforms(self):
         """
@@ -348,7 +336,7 @@ class Engine(object):
         Transform the given data against the current transform for this engine.
         """
         if not self._ct:
-            self._ct = self._make_transform_with(self, self._cfg)
+            self._ct = self.make_transform(self._cfg, ignorecontext=True)
         return self._ct(data, self.context)
 
 
