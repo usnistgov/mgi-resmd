@@ -1,10 +1,11 @@
 """
 transforms for creating XML from JSON data
 """
-import os, json, copy, re
+import os, json, copy, re, textwrap
 
 from ..exceptions import *
 from ..base import Transform, ScopedDict
+from ..engine import Context
 from .std import JSON, Extract
 
 MODULE_NAME = __name__
@@ -262,6 +263,8 @@ class toElement(Transform):
         pref = _generate_name(config.get('prefix'), tname+" El prefix", ttype)
         content = _generate_object(config.get('content'), engine, 
                                    tname+" content", ttype)
+        prefixes = _generate_object(config.get('prefixes'), engine, 
+                                    tname+" prefixes", ttype)
                                    
         def impl(input, context, *args):
             out = {}
@@ -280,6 +283,10 @@ class toElement(Transform):
                 out['prefix'] = pref
                 if isinstance(pref, Transform):
                     out['prefix'] = pref(input, context)
+            if prefixes:
+                out['prefixes'] = prefixes
+                if isinstance(prefixes, Transform):
+                    out['prefixes'] = prefixes(input, context)
 
             return out
 
@@ -308,92 +315,207 @@ class toXML(Transform):
 
             root = transf(input, context)
 
-            return self.format_element(root, context)
+            return format_element(root, context, prefixes, self.name)
 
-    def format_element(self, el, context, prefixes=None):
+def format_element(el, context, prefixes=None, transname=None):
+    """
+    format the data in an element data object into XML according to preferences
+    from the context.  
+    """
 
-        if prefixes is None:
-            prefixes = ScopedDict()
+    if prefixes is None:
+        prefixes = ScopedDict()
+    else:
+        prefixes = ScopedDict(prefixes)
 
-        hints = {}
-        if el.get('hints'):
-            hints = el['hints']
-            context = Context(context)
-            context.update(hints)
+    hints = {}
+    newxmlns = None
+    if el.get('hints'):
+        # The element data carries hints on rendering the data; these override
+        # preferences given in the context.  So...
+        # load the hints about formatting into our context
+        hints = el['hints']
+        if hints.get('xmlns') != context.get('xmlns',''):
+            newxmlns
+        context = Context(context)
+        context.update(hints)
 
-        indent = context('xml.indent', 0)
-        step = context('xml.indent_step', 2)
+    if context.get('xml.style','pretty') == 'compact':
+        context['xml.indent'] = 0
+        context['xml.indent_step'] = -1
+        context['xml.text_packing'] = 'compact'
+    elif context.get('xml.value_pad', 0) > 0:
+        context['xml.text_packing'] = 'pretty'
 
-        try: 
-            opentag = (indent * ' ') + '<' + el['name']
+    indent = context.get('xml.indent', 0)
+    step = context.get('xml.indent_step', 2)
 
-            if el.get('content',{}).get('attrs'):
-                opentag += ' '
-                atts = self.format_atts(el['content']['attrs'], len(opentag1),
-                                        context)
-                opentag += atts
+    try: 
+        # determine if we need a prefix
+        prefix, pfxdefs = determine_prefix(el.get('namespace'), el.get('prefix'),
+                                           context, prefixes)
 
-            if not el.get('content', {}).get('children'):
-                opentag += '/>'
-                if step >= 0:
-                    opentag += '\n'
-                return opentag
+        # preface opening tag with indent
+        indentsp = (indent * ' ')
+        opentag = indentsp + '<' + prefix + el['name']
 
+        # add in any attributes
+        if el.get('content',{}).get('attrs'):
+            atts = format_atts(el['content']['attrs'], len(opentag),
+                               context, prefixes)
+            opentag += atts
+
+        if not el.get('content', {}).get('children'):
+            opentag += '/>'
+            if step >= 0:
+                opentag += '\n'
+            return opentag
+
+        else:
+            opentag += '>'
+            closetag = '</' + prefix + el['name'] + '>'
+
+            maxlen = context.get('xml.max_line_length', 78)
+            minlen = context.get('xml.min_line_length', 30)
+
+            if len(el['content']['children']) == 1 and \
+               (isinstance(el['content']['children'][0], str) or 
+                isinstance(el['content']['children'][0], unicode)):
+
+               # single text value
+               child = el['content']['children'][0]
+               if context.get('xml.value_pad', 0) <= 0 or \
+                  context.get('xml.text_packing','pretty') == 'pretty' and \
+                  len(child) < maxlen - len(opentag) - len(closetag):
+
+                   #short enough to fit into one line
+                   if context.get('xml.value_pad', 0) > 0:
+                       pad = context['xml.value_pad'] * ' '
+                       child = pad + child + pad
+
+                   # return the single line
+                   return opentag + child + closetag
+
+            # treat like multi-child content
+            parts = [ opentag ]
+            subcontext = Context(context)
+            if step < 0:
+                # don't insert newlines
+                subcontext['xml.indent'] = 0
+                subcontext['xml.indent_step'] = -1
             else:
-                opentag += '>'
-                closetag = '</' + el['name'] + '>'
-
-                maxlen = context('xml.max_line_length', 78)
-                minlen = context('xml.min_line_length', 30)
-
-
-
-                parts = [ opentag ]
-
-                subcontext = Context(context)
-                if step < 0:
-                    # don't insert newlines
-                    subcontext['xml.indent'] = 0
-                    subcontext['xml.indent_step'] = -1
+                subcontext['xml.indent'] = indent + step
+                
+            for child in el['content']['children']:
+                if isinstance(child, str) or isinstance(child, unicode):
+                    parts.append(format_text(child, subcontext))
                 else:
-                    subcontext['xml.indent'] = indent + step
-                    
-                for child in el['content']['children']:
-                    if isinstance(child, str) or isinstance(child, unicode):
-                        parts.append(self.format_text(child, subcontext))
-                    else:
-                        parts.append(self.format_element(child, subcontext,
-                                                         prefixes))
-
+                    parts.append(format_element(child, subcontext, prefixes))
+                                                
+            if step < 0:
                 parts.append(closetag)
-                if step < 0:
-                    return ''.join(parts)
+                return ''.join(parts)
 
-                return '\n'.join(parts)
+            parts.append(indentsp + closetag)
+            return '\n'.join(parts)
 
-        except KeyError, ex:
-            raise MissingXMLData.due_to(ex, self.name)
+    except KeyError, ex:
+        raise MissingXMLData.due_to(ex, transname)
 
-    def format_text(self, text, context=None):
+def format_text(text, context=None):
+    """
+    format the given text for inclusion as the content for an element
+    """
 
-        if context is None:
-            context = Context()
+    if context is None:
+        context = Context()
 
-        indent = context('xml.indent', 0)
-        step = context('xml.indent_step', 2)
-        maxlen = context('xml.max_line_length', 78)
-        minlen = context('xml.min_line_length', 78)
-        pad = context('xml.text_pad', 0)
+    step = context.get('xml.indent_step', 2)
+    pack = context.get('xml.text_packing', 'compact')
+    if pack == 'compact' or step < 0:
+        return text
 
-        if step < 0:
-            sp = pad * ' '
-            return sp + text + sp
+    indent = context.get('xml.indent', 0)
+    if pack == 'loose':
+        return (indent * ' ') + text
 
-        sublen = maxlen-indent
-        if sublen < minlen:
-            sublen = minlen
-        return map(lambda l: (indent * ' ') + l, textwrap.wrap(text, sublen))
+    maxlen = context.get('xml.max_line_length', 78)
+    minlen = context.get('xml.min_line_length', 30)
 
+    sublen = maxlen - indent
+    if sublen < minlen:
+        sublen = minlen
+
+    return "\n".join(map(lambda l: (indent * ' ') + l, 
+                         textwrap.wrap(text, sublen)))
+
+def determine_prefix(ns, prefix, context, prefixes):
+
+    pfxdefs = []
+
+    xmlns = context.get('xml.xmlns', '')
+    if ns and not context.get('xml.prefer_prefix', False) and ns == xmlns:
+        # namespace matches xmlns
+        return ('', pfxdefs)
+
+    if ns:
+        if prefix:
+            if prefix != prefixes.get(ns):
+                prefixes[ns] = prefix
+                pfxdefs.append('xmlns:{0}="{1}"'.format(prefix, ns))
+        else:
+            prefix = prefixes.get(ns)
+
+        if not prefix:
+            autopat = re.compile(r'^ns\d+')
+            nums = map(lambda i: int(i), 
+                       map(lambda p: p[2:], 
+                           filter(lambda x: autopat.match(x),
+                                  prefixes.values())))
+            if not nums:
+                nums = [0]
+            prefix = 'ns'+str(max(nums)+1)
+            prefixes[ns] = prefix
+            pfxdefs.append('xmlns:{0}="{1}"'.format(prefix, ns))
+
+    if prefix:
+        return (prefix+':', pfxdefs)
+    return ('', pfxdefs)
+
+def format_atts(atts, indent, context, prefixes):
+    """
+    format the attributes for insertion into an opening element tag.
+    When many attributes are present, these can be wrapped onto separate lines.
+    """
+    style = context.get('xml.style', 'pretty')
+    maxlen = context.get('xml.max_line_length', 78)
+    minlen = context.get('xml.min_line_length', 30)
+    attlen = maxlen - indent
+
+    out = ['']
+    atts = list(atts)
+    while len(atts) > 0:
+        att = atts.pop(0)
+        if isinstance(att, dict):
+
+            prefix, pfxdefs = determine_prefix(att.get('namespace'), 
+                                               att.get('prefix'),
+                                               context, prefixes)
+            if len(pfxdefs) > 0:
+                atts.extend(pfxdefs)
+            nxt = prefix+att['name'] + '="' + att['value'] + '"'
+        else:
+            # assume it's already formatted (better be a string)
+            nxt = att
+
+        if style == 'pretty' and \
+           len(out[-1]) > minlen and len(nxt) + len(out[-1]) + 1 > attlen:
+            out.append('')
+        out[-1] += ' '+nxt
+
+    if style == 'pretty':
+        return ('\n'+(indent * ' ')).join(out)
+    return ''.join(out)
 
 
 
