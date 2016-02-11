@@ -11,62 +11,6 @@ from .std import JSON, Extract
 MODULE_NAME = __name__
 TRANSFORMS_PKG = __name__.rsplit('.', 1)[0]
 
-class ElementContent(object):
-    """
-    a representation of complex element content including an element's 
-    attributes and children (but not it's name).  It's data is packaged
-    as JSON data.
-    """
-
-    def __init__(self, data=None):
-        self.data = data
-        if self.data is None:
-            self.data = {}
-
-    @property
-    def attributes(self):
-        if not self.data.has_key('attrs'):
-            self.data['attrs'] = []
-        return self.data['attrs']
-
-    def add_attribute(self, attr):
-        """
-        append an attribute definition
-        """
-        self.attributes.append(attr)
-
-class Attribute(object):
-    """
-    a representation of an XML attribute.  It's data is packaged
-    as JSON data.
-    """
-
-    def __init__(self, data):
-        if data is None:
-            raise ValueError("None provided as attribute data")
-        self.data = data
-
-        missing = []
-        for prop in "name value".split():
-            if prop not in self.data:
-                missing.append(prop)
-        if len(missing) > 0:
-            raise ValueError("dictionary contents does not look like an " +
-                             "attribute (missing " + str(missing) + 
-                             "): "+str(self.data))
-
-    @classmethod
-    def create(cls, name, value, prefix=None, ns=None):
-        data = {"name": name, "value": value }
-        if prefix is not None:
-            data['prefix'] = prefix
-        if ns is not None:
-            data['namespace'] = ns
-
-        return cls(data)
-
-############
-
 def _generate_name(spec, engine, tname=None, ttype=None):
     return _generate_value(spec, engine, tname, ttype, True)
 
@@ -165,7 +109,7 @@ class ToAttribute(Transform):
         except KeyError, ex:
             raise MissingTransformData("value", self.name)
 
-        ns = _generate_value(config.get('namespace'), tname+" Attr ns", ttype)
+        ns = _generate_name(config.get('namespace'), tname+" Attr ns", ttype)
         pref = _generate_name(config.get('prefix'), tname+" Attr prefix", ttype)
 
         def impl(input, context, *args):

@@ -1,0 +1,115 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id":  "http://mgi.nist.gov/jsont-xml-transf/v0.1",
+    "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-schema/v0.1" ],
+    "title": "JSON Transformations: XML module",
+    "description": "This is the schema for JSON Transformation stylesheets",
+    "definitions": {
+        "ToAttributeTransform": {
+            "description": "a transform for generating the data for an XML attribute",
+            "notes": [
+                "The output of this transform is a JSON object using an internal schema (jsont-xml-schema).  It is to be combined with an Element JSON object to build up the XML data."
+            ],
+            "allOf": [
+                { "$ref": "#/definitions/Transform" },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": [ "xml.attribute" ] 
+                        },
+                        "name": {
+                            "description": "the local name for the element"
+                            "notes": [
+                                "This can be string (which will be treated as a template if it contains {} directives), a {$val} object, or an anonymous transform."
+                            ],
+                            "oneOf": [
+                                { "type": "string" },
+                                { "type": "object" }
+                            ]
+                        },
+                        "value": {
+                            "description": "the value for the attribute"
+                            "notes": [
+                                "This can be string (which will be treated as a template if it contains {} directives), a number, a boolean, a {$val} object, or a JSON template."
+                            ],
+                            "oneOf": [
+                                { "type": "string" },
+                                { "type": "number" },
+                                { "type": "boolean" },
+                                { "type": "object" }
+                            ]
+                        },
+                        "prefix": {
+                            "description": "the prefix to use with this attribute"
+                            "notes": [
+                                "This can be string (which will be treated as a template if it contains {} directives), a {$val} object, or an anonymous transform.",
+                                "if not provided, none will be applied unless namespace is specified"
+                            ],
+                            "oneOf": [
+                                { "type": "string" },
+                                { "type": "object" }
+                            ]
+                        },
+                        "namespace": {
+                            "description": "the namespace that this attribute is part of"
+                            "notes": [
+                                "This can be string (which will be treated as a template if it contains {} directives), a {$val} object, or an anonymous transform.",
+                                "If provided without an associated prefix, a prefix may be generated automatically upon formatting."
+                            ],
+                            "oneOf": [
+                                { "type": "string" },
+                                { "type": "object" }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+
+        "ToElementContent": {
+            "description": "a transform type for generating the content data of an XML element, including both the children and the attributes",
+            "notes": [
+                "The output of this transform is a JSON object using an internal schema (jsont-xml-schema).  It is to be combined with an Element JSON object to build up the XML data."
+            ],
+            "allOf": [
+                { "$ref": "#/definitions/Transform" },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": [ "xml.elementContent" ] 
+                        },
+                        "attrs": {
+                            "description": "an ordered list of the attributes",
+                            "notes": [
+                                "Normally, each value in the list is a transform for generating the attribute data.  This can be in the form of a JSON template, a {$val} object, a named template, or a data pointer",
+                                "The order is the order they will appear in the otuput.",
+                                "The behavior is undefined if two attributes have the same qualified name"
+                            ],
+                            "type": "array",
+                            "items": {
+                                "oneOf": [
+                                    { "type": "string" },
+                                    { "type": "object" }
+                                ]
+                            }
+                        },
+                        "children": {
+                            "description": "an ordered list of the element's children",
+                            "notes": [
+                                "Normally, each value in the list is a transform for generating the attribute data.  This can be in the form of a JSON template, a {$val} object, a named template, or a data pointer",
+                                "The order is the order they will appear in the otuput."
+                            ],
+                            "type": "array",
+                            "items": {
+                                "oneOf": [
+                                    { "type": "string" },
+                                    { "type": "object" }
+                                ]
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
