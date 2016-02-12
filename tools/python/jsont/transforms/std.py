@@ -23,7 +23,6 @@ class Literal(Transform):
     def mkfn(self, config, engine):
         val = config.get("value", "")
         def impl(input, context, *args):  
-            assert self.engine
             return val
         return impl
 
@@ -44,7 +43,7 @@ class StringTemplate(Transform):
             raise TransformConfigTypeError("content", "str", type(content), 
                                            self.name)
 
-        parsed = self.parse_template_str(content)
+        parsed = self.parse_template_str(content, engine)
 
         def impl(input, context, *args, **keys):
             out = []
@@ -61,7 +60,7 @@ class StringTemplate(Transform):
             return "".join(out)
         return impl
 
-    def parse_template_str(self, content):
+    def parse_template_str(self, content, engine):
 
         parsed = []
         while len(content) > 0:
@@ -95,13 +94,13 @@ class StringTemplate(Transform):
                     item = item[1:-1]
                     if item == '' or ':' in item or item.startswith('/'):
                         # it's a pointer
-                        item = Extract({ "select": item }, self.engine, 
+                        item = Extract({ "select": item }, engine, 
                                        (self.name or "extract")+":(select)", 
                                        "extract")
                     else:
                         # see if it matches a transform or transform-function
                         # (may raise a TransformNotFound)
-                        item = self.engine.resolve_transform(item)
+                        item = engine.resolve_transform(item)
 
                     parsed[i] = item
 

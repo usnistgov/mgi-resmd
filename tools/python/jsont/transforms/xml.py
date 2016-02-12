@@ -6,7 +6,7 @@ import json as jsp
 
 from ..exceptions import *
 from ..base import Transform, ScopedDict, Context
-from .std import JSON, Extract
+from .std import JSON, Extract, StringTemplate, Function
 
 MODULE_NAME = __name__
 TRANSFORMS_PKG = __name__.rsplit('.', 1)[0]
@@ -30,7 +30,8 @@ def _generate_value(spec, engine, tname=None, ttype=None, forname=False):
             return engine.make_transform(spec)
 
         if isinstance(spec, str) or isinstance(spec, unicode):
-            if spec == '' or ':' in spec or spec.startswith('/'):
+            if not Function.matches(spec) and \
+               (spec == '' or ':' in spec or spec.startswith('/')):
                 return Extract({'select': spec}, engine, tname, ttype)
 
             return engine.resolve_transform(spec)
@@ -42,8 +43,8 @@ def _generate_value(spec, engine, tname=None, ttype=None, forname=False):
         if '{' in spec and '}' in spec:
             # it's a string template
             return StringTemplate({'content': spec}, engine, 
-                                  (self.spec or 'attr')+" spec", 
-                                  "xml.attribute")
+                                  "attr spec", "xml.attribute")
+                                  
     else:
         raise TransformConfigTypeError("spec", "string or object",
                                        type(spec), self.spec)
@@ -67,7 +68,8 @@ def _generate_object(spec, engine, tname=None, ttype=None):
         return engine.make_transform(spec)
 
     if isinstance(spec, str) or isinstance(spec, unicode):
-        if spec == '' or ':' in spec or spec.startswith('/'):
+        if not Function.matches(spec) and \
+           (spec == '' or ':' in spec or spec.startswith('/')):
             # it's a data pointer to select data
             return Extract({'select': spec}, engine, tname, ttype)
 
@@ -101,16 +103,20 @@ class ToAttribute(Transform):
         ttype = "xml.attribute"
 
         try:
-            name = _generate_name(config['name'], tname+" Attr name", ttype)
+            name = _generate_name(config['name'], engine, tname+" Attr name", 
+                                  ttype)
         except KeyError, ex:
             raise MissingTransformData("name", self.name)
         try:
-            value = _generate_value(config['value'],tname+" Attr val",ttype)
+            value = _generate_value(config['value'], engine, 
+                                    tname+" Attr val",ttype)
         except KeyError, ex:
             raise MissingTransformData("value", self.name)
 
-        ns = _generate_name(config.get('namespace'), tname+" Attr ns", ttype)
-        pref = _generate_name(config.get('prefix'), tname+" Attr prefix", ttype)
+        ns = _generate_name(config.get('namespace'), engine, 
+                            tname+" Attr ns", ttype)
+        pref = _generate_name(config.get('prefix'), engine, 
+                              tname+" Attr prefix", ttype)
 
         def impl(input, context, *args):
             out = {}
@@ -142,15 +148,23 @@ class ToElementContent(Transform):
 
         attrs = None
         if config.has_key("attrs"):
-            if not isinstance(config['attrs'], list):
+            if isinstance(config['attrs'], list):
+                attrs = []
+                for attr in config['attrs']:
+                    attr = _generate_object(attr, engine, 
+                                            "{0} attr".format((self.name or '')),
+                                            ttype)
+                    attrs.append(attr)
+
+            elif isinstance(config['attrs'], dict):
+                attrs = engine.make_transform(config['attrs'])
+
+            elif isinstance(config['attrs'], str):
+                attrs = engine.resolve_transform(config['attrs'])
+
+            else:
                 raise TransformConfigTypeError("attrs", "array", 
                                                type(config['attrs']), ttype)
-            attrs = []
-            for attr in config['attrs']:
-                attr = _generate_object(attr, engine, 
-                                        "{0} attr".format((self.name or '')),
-                                        ttype)
-                attrs.append(attr)
         
         children = None
         if config.has_key("children"):
@@ -212,12 +226,15 @@ class ToElement(Transform):
         ttype = "xml.element"
 
         try:
-            name = _generate_name(config['name'], tname+" Element name", ttype)
+            name = _generate_name(config['name'], engine, 
+                                  tname+" Element name", ttype)
         except KeyError, ex:
             raise MissingTransformData("name", self.name)
 
-        ns = _generate_value(config.get('namespace'), tname+" El ns", ttype)
-        pref = _generate_name(config.get('prefix'), tname+" El prefix", ttype)
+        ns = _generate_value(config.get('namespace'), engine, tname+" El ns", 
+                             ttype)
+        pref = _generate_name(config.get('prefix'), engine, tname+" El prefix", 
+                              ttype)
         content = _generate_object(config.get('content'), engine, 
                                    tname+" content", ttype)
         prefixes = _generate_object(config.get('prefixes'), engine, 
@@ -544,7 +561,7 @@ class MissingXMLData(TransformApplicationException):
 
 # load in stylesheet-based definitions 
 
-MOD_STYLESHEET_FILE = "std_ss.json"
+MOD_STYLESHEET_FILE = "xml_ss.json"
 
 ssfile = os.path.join(os.path.dirname(__file__), MOD_STYLESHEET_FILE)
 with open(ssfile) as fd:

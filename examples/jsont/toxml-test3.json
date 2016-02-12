@@ -8,6 +8,10 @@
     },
     "input": "/content",
 
+    "context": {
+        "xml.value_pad": 1
+    },
+
     "transforms": {
         "content": {
             "type": "xml.element",
@@ -31,7 +35,8 @@
                         "type": "apply",
                         "transform": "subject"
                     }
-                }
+                },
+                "attrs": [ "xml.attribute(xmlns:xsi,{xml.xsiuri})" ]
             },
             "input": "/subject"
         },

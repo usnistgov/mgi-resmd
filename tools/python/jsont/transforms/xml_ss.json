@@ -15,6 +15,30 @@
             "value": "{xml.xsiuri}",
             "expects": ["any"],
             "returns": "string"
+        },
+        "xml.attribute": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/CallableTransform" ],
+            "type": "callable",
+            "transform_tmpl": {
+                "type": "xml.attribute",
+                "name": { "$val": "/0" },
+                "value": "{/1}"
+            },
+            "conf_args_index": [ 0, 1 ],
+            "argv_supported": [
+                {
+                    "required": true,
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "required": true,
+                    "name": "value",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "object"
         }
     }
 }
