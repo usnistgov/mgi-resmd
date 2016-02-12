@@ -246,6 +246,46 @@ class Extract(Transform):
             return engine.extract(input, context, select)
         return impl
 
+class ForEach(Transform):
+    """
+    a transform that applies a specified transform to each property in the input
+    object.  The data delivered to the transform will be a two-item array 
+    containing the property name and the value.  
+    """
+    def mkfn(self, config, engine):
+
+        itemmap = config.get('propmap', 'tostr')
+        if isinstance(itemmap, dict):
+            # it's an anonymous transform configuration
+            itemmap = engine.make_transform(itemmap)
+        else:
+            itemmap = engine.resolve_transform(itemmap)
+
+        strict = config.get('strict', False)
+
+        def impl(input, context, *args, **keys):
+            data = input
+            if not isinstance(data, object) and isinstance(data, list):
+                if not strict:
+                    data = [data]
+                else:
+                    raise TransformInputTypeError('object', type(data), 
+                                                  (self.name or "foreach"), data,
+                                                  context)
+            if isinstance(data, list):
+                if strict:
+                    raise TransformInputTypeError('object', type(data), 
+                                                  (self.name or "foreach"), data,
+                                                  context)
+
+                return map(lambda i: itemmap(i, context), data)
+
+            data = list[data.items()]
+            return map(lambda i: itemmap(i, context), data)
+
+
+        return impl
+
 class Map(Transform):
     """
     a transform that applies a specified transform to each item in the input
@@ -486,11 +526,6 @@ class Function(Transform):
 
         return use
 
-
-        
-                
-
-
     @classmethod
     def matches(cls, invoc):
         """
@@ -608,6 +643,7 @@ types = { "literal": Literal,
           "stringtemplate": StringTemplate, 
           "native": Native,
           "map": Map,
+          "foreach": ForEach,
           "json": JSON,
           "extract": Extract,
           "apply": Apply,
@@ -724,6 +760,16 @@ def _prep_array_for_join(data):
         return [json.dumps(data)]
 
     return [str(data)]
+
+def prop_names(engine, input, context, *args):
+    """
+    return an array containing the names of the properties in the input
+    object.
+    """
+    if isinstance(input, dict):
+        return input.keys()
+
+    return []
 
 # load in stylesheet-based definitions 
 

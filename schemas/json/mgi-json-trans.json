@@ -298,7 +298,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "type": {
                             "enum": ["callable"]
                         },
                         "transform_tmpl": {
@@ -333,6 +333,40 @@
                 }
             ]
         },
+        "ForEachTransform": {
+            "description": "a transform that will apply a specified transform to each property in the input object.",
+            "notes": [
+                "The data delivered to the transform will be a two-item array containing the property name and the value."
+            ],
+            "allOf": [
+                { "$ref": "#/definitions/Transform" },
+                { 
+                    "properties": {
+                        "type": {
+                            "enum": ["callable"]
+                        },
+                        "propmap": {
+                            "description": "the transform to apply to each name-value array pair representing each property in the target object",
+                            "oneOf": [
+                                { 
+                                    "description": "a text-based reference to a transform",
+                                    "type": "string" 
+                                },
+                                {
+                                    "description": "a transform description object",
+                                    "$ref": "#/definitions/Transform"
+                                }
+                            ]
+                        },
+                        "strict": {
+                            "description": "if true, fail if the input data is not an object",
+                            "type": "boolean",
+                            "default": "false"
+                        }
+                    }
+                }
+            ]
+        },
         "MapTransform": {
             "description": "a transform that applies a transform on each of elements of an input array and then combines them with a join transform",
             "allOf": [
@@ -354,6 +388,11 @@
                                     "$ref": "#/definitions/Transform"
                                 }
                             ]
+                        },
+                        "strict": {
+                            "description": "if true, fail if the input data is not an array",
+                            "type": "boolean",
+                            "default": "false"
                         }
                     }
                 }

@@ -180,6 +180,14 @@
             "args": [ "\n\n" ],
             "expects": ["array"],
             "returns": "string"
+        },
+        "propNames": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "type": "native",
+            "impl": "$std.prop_names",
+            "description": "places a blank line between each item",
+            "expects": ["object"],
+            "returns": "array"
         }
     }
 }
