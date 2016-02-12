@@ -7,45 +7,12 @@ import jsonspec.pointer as jsonptr
 
 from .exceptions import *
 from .base import *
-from .transforms import std
+from .transforms import std, xml
 from . import parse
 
 defaultContext = {
     "$secure": True,
 }
-
-class Context(ScopedDict):
-    """
-    a special dictionary for containing context data.  Keys that begin with
-    "$" cannot be overridden.
-    """
-    CONST_PREFIX = '$'
-
-    def __init__(self, defaults=None):
-        super(Context, self).__init__(defaults)
-
-    def __setitem__(self, key, value):
-        if key.startswith(self.CONST_PREFIX):
-            raise KeyError(key + ": cannot be updated")
-        ScopedDict.__setitem__(self, key, value)
-
-    def __delitem__(self, key):
-        if key.startswith(self.CONST_PREFIX):
-            raise KeyError(key + ": cannot be deleted")
-        ScopedDict.__delitem__(self, key)
-
-    def __set(self, key, value):
-        try:
-            self.__setitem__(key, value)
-        except KeyError:
-            pass
-
-    def update(self, other=None, **keys):
-        if other is not None:
-            for key in other:
-                self.__set(key, other[key])
-        for key in keys:
-            self.__set(key, keys[key])
 
 class DataPointer(object):
     """
@@ -149,10 +116,19 @@ class Engine(object):
             self._system = base._system
 
         self.load_transform_defs(currtrans)
+        self.update_context(currtrans)
 
         # wrap default transform classes for the different types
         if base:
             self._transCls = ScopedDict(base._transCls)
+
+    def update_context(self, trans):
+        """
+        update the context data from the new definitions in the given
+        transform configuration
+        """
+        if trans.has_key('context') and isinstance(trans['context'], dict):
+            self.context.update(trans['context'])
 
     def load_transform_defs(self, config):
         """
@@ -348,8 +324,10 @@ class StdEngine(Engine):
 
     def __init__(self, context=None):
         super(StdEngine, self).__init__()
-        self.context = ScopedDict(context)
         self.load_plugin(std)
+        self.load_plugin(xml)
+        self.context = ScopedDict(self.context)
+        self.context.update(context)
 
     def load_plugin(self, mod):
         """

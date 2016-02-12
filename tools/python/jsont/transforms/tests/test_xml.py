@@ -273,3 +273,24 @@ def test_format_text_hier():
     assert text == formatted
 
     
+schemadir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "schemas", "json")
+moddir = os.path.dirname(os.path.dirname(__file__))
+
+@pytest.fixture(scope="module")
+def validator(request):
+    return ExtValidator.with_schema_dir(schemadir)
+
+def validate(validator, filename):
+    validator.validate_file(os.path.join(schemadir, filename), False, True)
+
+def test_ss(validator):
+    ss = os.path.join(moddir, "xml_ss.json")
+    validate(validator, ss)
+
+def test_transf_schema(validator):
+    ss = os.path.join(schemadir, "jsont-xml-transf.json")
+    validate(validator, ss)
+
+def test_int_schema(validator):
+    ss = os.path.join(schemadir, "jsont-xml-schema.json")
+    validate(validator, ss)

@@ -1,7 +1,7 @@
 """
 Command-line front end into tranformations
 """
-import os, sys, errno, json, re
+import os, sys, errno, json, re, traceback
 from argparse import ArgumentParser
 
 from .engine import DocEngine
@@ -65,7 +65,9 @@ class Runner(object):
         try:
             return self.run()
         except Exception, ex:
-            return self.fail(UNEXPECTED, "Unexpected exception: " + repr(ex))
+            tb = sys.exc_info()[2]
+            origin = traceback.extract_tb(tb)[-1]
+            return self.fail(UNEXPECTED, "Unexpected exception at {0}, line {1}: {2}".format(origin[0], origin[1], repr(ex)))
 
     def run(self):
         return 0

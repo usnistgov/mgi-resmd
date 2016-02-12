@@ -1,11 +1,11 @@
 """
 transforms for creating XML from JSON data
 """
-import os, json, copy, re, textwrap
+import os, copy, re, textwrap
+import json as jsp
 
 from ..exceptions import *
-from ..base import Transform, ScopedDict
-from ..engine import Context
+from ..base import Transform, ScopedDict, Context
 from .std import JSON, Extract
 
 MODULE_NAME = __name__
@@ -158,16 +158,26 @@ class ToElementContent(Transform):
                isinstance(config['children'], unicode):
                 children = [children]
 
-            if not isinstance(config['children'], list):
-                raise TransformConfigTypeError("children", "array or string", 
-                                               type(config['children']), ttype)
+            if isinstance(config['children'], list):
 
-            children = []
-            for child in config['children']:
-                child = _generate_object(attr, engine, 
-                                         "{0} child".format((self.name or '')),
-                                         ttype)
-                children.append(child)
+                children = []
+                for child in config['children']:
+                    child = _generate_object(child, engine, 
+                                          "{0} child".format((self.name or '')),
+                                             ttype)
+                    children.append(child)
+
+            elif isinstance(config['children'], dict):
+                children = engine.make_transform(config['children'])
+
+            elif isinstance(config['children'], str):
+                children = engine.resolve_transform(config['children'])
+
+            else:
+                raise TransformConfigTypeError("children", 
+                                               got=type(config['children']), 
+                                               type=ttype)
+
         
         def impl(input, context, *args):
             out = {}
@@ -181,17 +191,20 @@ class ToElementContent(Transform):
 
             if children is not None:
                 ol = []
-                for child in children:
-                    if isinstance(child, Transform):
-                        attr = child(input, context)
-                    ol.append(child)
+                if isinstance(children, Transform):
+                    ol = children(input, context)
+                else:
+                    for child in children:
+                        if isinstance(child, Transform):
+                            child = child(input, context)
+                        ol.append(child)
                 out['children'] = ol
 
             return out
 
         return impl
 
-class toElement(Transform):
+class ToElement(Transform):
 
     def mkfn(self, config, engine):
 
@@ -216,7 +229,7 @@ class toElement(Transform):
             if isinstance(name, Transform):
                 out['name'] = name(input, context)
             out['content'] = content
-            if isinstance(value, Transform):
+            if isinstance(content, Transform):
                 out['content'] = content(input, context)
 
             if ns:
@@ -236,7 +249,7 @@ class toElement(Transform):
 
         return impl
 
-class toXML(Transform):
+class ToXML(Transform):
     """
     formats XML data into an output string
     """
@@ -259,7 +272,16 @@ class toXML(Transform):
 
             root = transf(input, context)
 
-            return format_element(root, context, prefixes, self.name)
+            return format_element(root, context, None, self.name)
+
+        return impl
+
+types = {
+    "xml.print": ToXML,
+    "xml.attribute": ToAttribute,
+    "xml.elementContent": ToElementContent,
+    "xml.element": ToElement
+}
 
 def format_element(el, context, prefixes=None, transname=None):
     """
@@ -303,13 +325,30 @@ def format_element(el, context, prefixes=None, transname=None):
         indentsp = (indent * ' ')
         opentag = indentsp + '<' + prefix + el['name']
 
-        # add in any attributes
-        if el.get('content',{}).get('attrs'):
-            atts = format_atts(el['content']['attrs'], len(opentag),
-                               context, prefixes)
+        # assemble the attribute data
+        atts = el.get('content', {}).get('attrs', [])
+        if pfxdefs:
+            atts.extend(pfxdefs)
+        if el.get('prefixes'):
+            for p, ns in el['prefixes']:
+                if ns not in prefixes or prefixes[ns] != p:
+                    prefixes[ns] = p
+                    atts.append('xmlns:{0}="{1}"'.format(p, ns))
+        if el.get('content', {}).get('children'):
+            for child in el['content']['children']:
+                p, pfxdefs = determine_prefix(el.get('namespace'), 
+                                              el.get('prefix'),
+                                              context, prefixes)
+                atts.extend(pfxdefs)
+
+        # now insert attributes into the opening tag
+        if atts:
+            atts = format_atts(atts, len(opentag), context, prefixes)
             opentag += atts
 
+        # format the child nodes
         if not el.get('content', {}).get('children'):
+            # there are none
             opentag += '/>'
             if step >= 0:
                 opentag += '\n'
@@ -503,8 +542,43 @@ class MissingXMLData(TransformApplicationException):
 
         
 
+# load in stylesheet-based definitions 
 
-        
+MOD_STYLESHEET_FILE = "std_ss.json"
+
+ssfile = os.path.join(os.path.dirname(__file__), MOD_STYLESHEET_FILE)
+with open(ssfile) as fd:
+    MOD_STYLESHEET = jsp.load(fd)
+del ssfile
+
+# load the module's initial context data.  The defaults are specified here 
+# for documentation purposes; however, values set wihtin the stylesheet file 
+# will take precedence.
+
+p = "xml."
+
+def_context = {
+
+    # The prefered line width to use when filling data into paragraphs by 
+    # the fill transform
+    #
+    p+"max_line_width": 75,
+
+    # The prefered indentation amount to use when filling data into 
+    # paragraphs by the fill transform
+    # 
+    p+"style": 'compact',
+
+    # The number of spaces to add to indentation with each step into the 
+    # XML hierarchy
+    p+"ident_step": 2
+}
+del p
+
+# the module's default context data
+MOD_CONTEXT = ScopedDict(def_context)
+MOD_CONTEXT.update(MOD_STYLESHEET.get('context',{}))
+MOD_STYLESHEET['context'] = MOD_CONTEXT
 
         
         

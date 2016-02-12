@@ -51,6 +51,39 @@ class ScopedDict(MutableMapping):
         """
         return self._defaults
 
+class Context(ScopedDict):
+    """
+    a special dictionary for containing context data.  Keys that begin with
+    "$" cannot be overridden.
+    """
+    CONST_PREFIX = '$'
+
+    def __init__(self, defaults=None):
+        super(Context, self).__init__(defaults)
+
+    def __setitem__(self, key, value):
+        if key.startswith(self.CONST_PREFIX):
+            raise KeyError(key + ": cannot be updated")
+        ScopedDict.__setitem__(self, key, value)
+
+    def __delitem__(self, key):
+        if key.startswith(self.CONST_PREFIX):
+            raise KeyError(key + ": cannot be deleted")
+        ScopedDict.__delitem__(self, key)
+
+    def __set(self, key, value):
+        try:
+            self.__setitem__(key, value)
+        except KeyError:
+            pass
+
+    def update(self, other=None, **keys):
+        if other is not None:
+            for key in other:
+                self.__set(key, other[key])
+        for key in keys:
+            self.__set(key, keys[key])
+
 class Transform(object):
     """
     a realization of a tranform that can be applied to input data
