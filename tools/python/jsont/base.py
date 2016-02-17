@@ -145,8 +145,8 @@ class Transform(object):
         self.config = config
 
         self.engine = self._engine_to_use(engine, skipwrap)
-        self._check_status(config, engine)
-        self._func = self.mkfn(config, engine)
+        self._check_status(config, self.engine)
+        self._func = self._mkfn(config, self.engine)
 
     def _engine_to_use(self, engine, skipwrap):
         if skipwrap: 
@@ -181,7 +181,7 @@ class Transform(object):
         def _impl(input, context, *args):
             if input_transf:
                 input = input_transf(input, context)
-            return transf(input, context)
+            return transf(input, context, *args)
 
         return _impl
 
@@ -218,9 +218,11 @@ class Transform(object):
             return engine.resolve_transform(input)
 
         if ':' in input or input.startswith('/'):
-            # it's a pointer
-            return Extract({ "select": input }, engine, 
-                           (self.name or "extract")+":(select)", "extract")
+            # it's a pointer; build an Extract transform
+            config = { "$type": "extract", "select": input }
+            return engine.make_transform(config, 
+                                         (self.name or "extract")+":(select)")
+                           
 
         # see if it matches a transform or transform-function
         # (may raise a TransformNotFound)

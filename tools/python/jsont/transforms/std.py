@@ -345,7 +345,11 @@ class Apply(Transform):
     A transform that applies another transform with different data set as the 
     current input data.  
     """
-    def mkfn(self, config, engine):
+    def _mkfn(self, config, engine):
+        # Note that we are overriding _mkfn rather than mkfn; this is because
+        # we need to handle input slightly differently.  We want to make new
+        # transforms defined in the 'transform' parameter available to input.
+
         try:
             transf = config['transform']
         except KeyError:
@@ -358,42 +362,21 @@ class Apply(Transform):
             raise TransformConfigTypeError('transform', 'dict or str', 
                                            type(transf))
 
-        newin = self._resolve_input(config.get('input', ''), transf.engine)
+        input_transf = None
+        if "input" in config:
+            input_transf = self._resolve_input(config['input'], transf.engine)
 
         targs = config.get('args', [])
 
         def impl(input, context, *args, **keys):
             
-            usein = newin
-            if isinstance(newin, Transform):
-                usein = newin(input, context)
-            
-            useargs = targs + list(args)
+            if input_transf:
+                input = input_transf(input, context)
 
-            return transf(usein, context, *useargs)
+            useargs = targs + list(args)
+            return transf(input, context, *useargs)
 
         return impl
-
-    def _resolve_input(self, input, engine):
-
-        if isinstance(input, dict):
-            # this is a transform configuration object
-            return engine.make_transform(input, "(anon)")
-
-        if not isinstance(input, str) and not isinstance(input, unicode):
-            raise TransformConfigTypeError('input', 'dict or str', type(input))
-
-        if '(' in input or ')' in input:
-            return engine.resolve_transform(input)
-
-        if input == '' or ':' in input or input.startswith('/'):
-            # it's a pointer
-            return Extract({ "select": input }, engine, 
-                           (self.name or "extract")+":(select)", "extract")
-
-        # see if it matches a transform or transform-function
-        # (may raise a TransformNotFound)
-        return engine.resolve_transform(input)
 
 
 class Native(Transform):
