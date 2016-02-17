@@ -21,7 +21,7 @@
             "description": "a configuration of a transform that can be applied to JSON data structures",
             "type": "object",
             "properties": {
-                "type": {
+                "$type": {
                     "description": "the name of the type of template this is.  This determines the other properties used to configure the transform.",
                     "type": "string",
                     "pattern": "^([a-zA-Z0-9_!@#$.])+$"
@@ -190,7 +190,7 @@
                 { "$ref": "#/definitions/Transform" },
                 {
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": [ "literal" ] 
                         },
                         "value": {
@@ -208,7 +208,7 @@
                 { "$ref": "#/definitions/Transform" },
                 {
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": [ "native" ] 
                         },
                         "impl": {
@@ -245,7 +245,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "$type": {
                             "enum": ["extract"]
                         },
                         "select": {
@@ -268,6 +268,9 @@
                 { "$ref": "#/definitons/Transform" },
                 {
                     "properties": {
+                        "$type": {
+                            "enum": "apply"
+                        },
                         "transform": {
                             "description": "the name of the transform to apply to the specified input data"
                         },
@@ -373,7 +376,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "type": {
                             "enum": ["map"]
                         },
                         "itemmap": {
@@ -404,7 +407,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "$type": {
                             "enum": ["json"]
                         },
                         "content": {
@@ -422,7 +425,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "$type": {
                             "enum": ["stringtemplate"]
                         },
                         "content": {

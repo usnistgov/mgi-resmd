@@ -206,19 +206,19 @@ class Engine(object):
         create a Transform instance from its configuration
 
         :argument dict config:  the JSON object that defines the transform.  
-                                This must have a 'type' property if the type
+                                This must have a '$type' property if the type
                                 is not given as an argument.
         :argument name str:     the name associated with this transform.  If 
                                 None, the transform is anonymous.  
         :argument type str:     the type of transform to assume for this 
-                                request.  Any 'type' property in the config
+                                request.  Any '$type' property in the config
                                 is ignored.  
         :argument ignorecontext boolean:  ignore any changes to the context 
                                 (i.e. new transforms, prefixes, and context 
                                 data) included in the transform configuration.
         """
         if not type:
-            type = config.get('type')
+            type = config.get('$type')
         if not type:
             return Transform(config, self, name, type="identity")
 
