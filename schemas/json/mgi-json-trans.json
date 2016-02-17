@@ -198,7 +198,7 @@
                             "$ref": "#/definitions/AnyType" 
                         }
                     },
-                    "required": [ "type", "value" ]
+                    "required": [ "$type", "value" ]
                 }
             ]
         },
@@ -235,7 +235,7 @@
                             "items": { "$ref": "#/definitions/FunctionArg" }
                         }
                     },
-                    "required": [ "type", "impl" ]
+                    "required": [ "$type", "impl" ]
                 }
             ]
         },
@@ -258,7 +258,7 @@
                             "type": "string"
                         }
                     },
-                    "required": [ "type", "select" ]
+                    "required": [ "$type", "select" ]
                 }
             ]
         },
@@ -269,7 +269,7 @@
                 {
                     "properties": {
                         "$type": {
-                            "enum": "apply"
+                            "enum": ["apply"]
                         },
                         "transform": {
                             "description": "the name of the transform to apply to the specified input data"
@@ -301,7 +301,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": ["callable"]
                         },
                         "transform_tmpl": {
@@ -332,7 +332,7 @@
                             "items": { "$ref": "#/definitions/FunctionArg" }
                         }
                     },
-                    "required": [ "transform_tmpl", "conf_args_index" ]
+                    "required": [ "$type", "transform_tmpl", "conf_args_index" ]
                 }
             ]
         },
@@ -345,7 +345,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": ["callable"]
                         },
                         "propmap": {
@@ -376,7 +376,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": ["map"]
                         },
                         "itemmap": {
@@ -415,7 +415,7 @@
                             "$ref": "#/definitions/AnyType"
                         }
                     },
-                    "required": [ "type", "content" ]
+                    "required": [ "$type", "content" ]
                 }
             ]
         },
@@ -433,7 +433,7 @@
                             "type": "string"
                         }
                     },
-                    "required": [ "type", "content" ]
+                    "required": [ "$type", "content" ]
                 }
             ]
         },

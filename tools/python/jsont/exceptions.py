@@ -272,7 +272,8 @@ class DataExtractionError(TransformApplicationException):
                                       cause of the exception.  If None, there 
                                       was no such underlying cause.
         """
-        super(TransformApplicationException, self).__init__(message, cause)
+        super(DataExtractionError, self).__init__(message, input, context, name,
+                                                  cause)
         self.select = select
 
     @classmethod

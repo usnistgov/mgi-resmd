@@ -11,7 +11,7 @@ from jsont.exceptions import *
 
 def test_literal():
 
-    t = std.Literal({'value': '{', "type": "literal"}, engine, "ptr")
+    t = std.Literal({'value': '{', "$type": "literal"}, engine, "ptr")
     assert t(input, context) == '{'
 
 @pytest.fixture(scope="module")
@@ -85,17 +85,17 @@ class TestJSON(object):
 class TestApply(object):
 
     def test_anon(self, engine):
-        config = { "transform": { "type": "extract", "select": "/contact/name" },
-                   "input": { "type": "json", 
+        config = { "transform": { "$type": "extract", "select": "/contact/name"},
+                   "input": { "$type": "json", 
                               "content": { "contact": { "name": "bob" } }} }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf({}, {})
         assert out == "bob"
 
     def test_tname(self, engine):
-        config = { "transform": { "type": "extract", "select": "/contact/name",
+        config = { "transform": { "$type": "extract", "select": "/contact/name",
                                   "transforms": {
-                                     "contactname": {"type": "json", 
+                                     "contactname": {"$type": "json", 
                               "content": { "contact": { "name": "bob" } }} }
                                   },
                    "input": "contactname" }
@@ -105,21 +105,21 @@ class TestApply(object):
         assert out == "bob"
 
     def test_datapointer(self, engine):
-        config = { "transform": { "type": "extract", "select": "/name" },
+        config = { "transform": { "$type": "extract", "select": "/name" },
                    "input": "/curation/contact" }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf({"curation": { "contact": { "name": "bob" }} }, {})
         assert out == "bob"
 
     def test_datapointer2(self, engine):
-        config = { "transform": { "type": "extract", "select": "/contact/name" },
+        config = { "transform": { "$type": "extract", "select": "/contact/name"},
                    "input": "/curation" }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf({"curation": { "contact": { "name": "bob" }} }, {})
         assert out == "bob"
 
     def test_function(self, engine):
-        config = { "transform": { "type": "extract", "select": "" },
+        config = { "transform": { "$type": "extract", "select": "" },
                    "input": "delimit(' and ')" }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf(["neil", "jack", "me"], {})
@@ -218,7 +218,7 @@ def test_wrap(engine):
     assert len(split) == 1
     assert split[0] == "Yeah, man!"
 
-    config = { "type": "apply",
+    config = { "$type": "apply",
                "transform": "wrap",
                "args": [ 45 ] }
     transf = engine.make_transform(config)
@@ -272,7 +272,7 @@ class TestMap(object):
 def test_fill(engine):
 
     text = "convert a paragraph of text into an array of strings broken at word boundarys that are less than a given maximum in length.  "
-    config = { "type": "apply", "transform": "fill" }
+    config = { "$type": "apply", "transform": "fill" }
     transf = engine.make_transform(config)
     out = transf(text, None)
     assert out == "     convert a paragraph of text into an array of strings broken at word\n     boundarys that are less than a given maximum in length."

@@ -3,14 +3,14 @@
     "transforms": {
         "xml.xsiuri": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/LiteralTransform" ],
-            "type": "literal",
+            "$type": "literal",
             "value": "http://www.w3.org/2001/XMLSchema-instance",
             "expects": ["any"],
             "returns": "string"
         }, 
         "xml.define_xsi": {
             "$extensionSchemas": [ "http://mgi.nist.gov/jsont-xml-transf/v0.1#/definitions/ToAttributeTransform" ],
-            "type": "xml.attribute",
+            "$type": "xml.attribute",
             "name": "xmlns:xsi",
             "value": "{xml.xsiuri}",
             "expects": ["any"],
@@ -18,9 +18,9 @@
         },
         "xml.attribute": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/CallableTransform" ],
-            "type": "callable",
+            "$type": "callable",
             "transform_tmpl": {
-                "type": "xml.attribute",
+                "$type": "xml.attribute",
                 "name": { "$val": "/0" },
                 "value": "{/1}"
             },

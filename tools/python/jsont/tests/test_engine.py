@@ -107,7 +107,7 @@ exdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
 class TestExamples(object):
 
     def test_simple(self):
-        ss = { "type": "literal", "value": "@" }
+        ss = { "$type": "literal", "value": "@" }
         engine = njn.StdEngine()
         tfunc = engine.make_transform(ss, "$at")
         result = tfunc({}, {})

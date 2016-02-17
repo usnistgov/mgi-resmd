@@ -235,6 +235,41 @@ class Engine(object):
 
         return tcls(config, self, name, type, ignorecontext)
 
+    def make_JSON_transform(self, template, input=None):
+        """
+        convert the given JSON data template into a JSON Transform instance.
+        A JSON data template is a JSON structure (dict, list, or string) that
+        contains embedded substitution directives.  Such a directive comes in 
+        one of four forms:
+           * a sub string within a string value of the form {...}, where the
+             the contents inside the braces is a transform name or a data 
+             pointer.  This braces and its contents will be replaced with a 
+             string value resulting from the application of the transform or 
+             pointer to the input data.  This can appear in either property
+             names or in string values.
+           * an object (dict) containing a "$val" property.  The value of this
+             property can be an anonymous or named transform or data poitner. 
+             This object containg "$val" will be replaced by the result of 
+             applying the transform/pointer to the input data.
+           * an array (list) item that is an object containing a "$ins" property.
+             The value of this property is interpreted in the same way as "$val"
+             except that the result of applying the transform is expected to be
+             an array (list).  The object containing the "$ins" property will be
+             replaced by the items from the transform result and, thus, inserted
+             into the containing array. 
+           * an object (dict) containing a "$type" property.  The value of this
+             string is a string.  This object will be interpreted as an 
+             anonymous transform and will be replaced by the result of applying 
+             it to the input data
+           
+        :argument template: the JSON structure containing {} directives
+        :argument input:  a reference to a transform to apply to select data
+                          from the input data to apply to the template.  
+        :returns JSON: a JSON Tranform instance
+        """
+        return std.JSON({"content": template, "input": input},
+                        name="(anon)", type="json")
+
     def resolve_all_transforms(self):
         """
         ensure that all loaded transform configurations have been resolved
@@ -326,8 +361,9 @@ class StdEngine(Engine):
         super(StdEngine, self).__init__()
         self.load_plugin(std)
         self.load_plugin(xml)
-        self.context = ScopedDict(self.context)
-        self.context.update(context)
+        if context: 
+            self.context = ScopedDict(self.context)
+            self.context.update(context)
 
     def load_plugin(self, mod):
         """

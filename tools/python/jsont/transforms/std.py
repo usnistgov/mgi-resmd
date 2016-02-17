@@ -109,6 +109,31 @@ class StringTemplate(Transform):
 class JSON(Transform):
     """
     a Transform that converts the input data to a new JSON structure.
+
+    The content config parameter provides the template for the output JSON 
+    structure.  Its value is a JSON structure (dict, list, or string) that
+    contains embedded substitution directives.  Such a directive comes in 
+    one of four forms:
+       * a sub string within a string value of the form {...}, where the
+         the contents inside the braces is a transform name or a data 
+         pointer.  This braces and its contents will be replaced with a 
+         string value resulting from the application of the transform or 
+         pointer to the input data.  This can appear in either property
+         names or in string values.
+       * an object (dict) containing a "$val" property.  The value of this
+         property can be an anonymous or named transform or data poitner. 
+         This object containg "$val" will be replaced by the result of 
+         applying the transform/pointer to the input data.
+       * an array (list) item that is an object containing a "$ins" property.
+         The value of this property is interpreted in the same way as "$val"
+         except that the result of applying the transform is expected to be
+         an array (list).  The object containing the "$ins" property will be
+         replaced by the items from the transform result and, thus, inserted
+         into the containing array. 
+       * an object (dict) containing a "$type" property.  The value of this
+         string is a string.  This object will be interpreted as an 
+         anonymous transform and will be replaced by the result of applying 
+         it to the input data
     """
 
     def mkfn(self, config, engine):

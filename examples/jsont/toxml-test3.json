@@ -1,9 +1,9 @@
 {
     "$schema":  "http://mgi.nist.gov/mgi-json-trans/v0.1",
 
-    "type": "apply",
+    "$type": "apply",
     "transform": {
-        "type": "xml.print",
+        "$type": "xml.print",
         "element": "content"
     },
     "input": "/content",
@@ -14,25 +14,25 @@
 
     "transforms": {
         "content": {
-            "type": "xml.element",
+            "$type": "xml.element",
             "name": "content",
             "content": "subjects"
         },
         "subject": {
-            "type": "xml.element",
+            "$type": "xml.element",
             "name": "subject",
             "content": {
                 "children": [ "{$in:}" ]
             }
         },
         "subjects": {
-            "type": "apply",
+            "$type": "apply",
             "transform": {
-                "type": "xml.elementContent",
+                "$type": "xml.elementContent",
                 "children": {
-                    "type": "map",
+                    "$type": "map",
                     "itemmap": {
-                        "type": "apply",
+                        "$type": "apply",
                         "transform": "subject"
                     }
                 },
@@ -41,7 +41,7 @@
             "input": "/subject"
         },
         "element": {
-            "type": "stringtemplate",
+            "$type": "stringtemplate",
             "content": "<{/name}> {/content/children} </{/name}>"
         }
     }

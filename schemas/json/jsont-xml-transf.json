@@ -15,7 +15,7 @@
                 { "$ref": "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/Transform" },
                 {
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": [ "xml.attribute" ] 
                         },
                         "name": {
@@ -76,7 +76,7 @@
                 { "$ref": "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/Transform" },
                 {
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": [ "xml.elementContent" ] 
                         },
                         "attrs": {
@@ -189,7 +189,7 @@
                 { "$ref": "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/Transform" },
                 {
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": [ "xml.print" ] 
                         },
                         "element": {

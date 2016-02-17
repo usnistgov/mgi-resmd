@@ -227,40 +227,44 @@ def test_DataExtractionError():
         assert ex.message == "Oops"
         assert ex.cause is None
         assert ex.input is None
+        assert ex.select is None
         assert ex.context is None
 
     try:
-        raise DataExtractionError("Oops", input, context)
+        raise DataExtractionError("Oops", "/my/select", input, context)
         pytest.fail("failed to raise")
     except JSONTransformException, ex:
         assert ex.message == "Oops"
         assert ex.cause is None
         assert ex.input is input
+        assert ex.select == "/my/select"
         assert ex.context is context
         assert ex.transform is None
 
     try:
-        raise DataExtractionError("Oops", input, context, "toxml", 
-                                            RuntimeError("dangit"))
+        raise DataExtractionError("Oops", "/my/select", input, context, "toxml", 
+                                  RuntimeError("dangit"))
         pytest.fail("failed to raise")
     except JSONTransformException, ex:
         assert ex.message == "Oops"
         assert ex.cause is not None
         assert isinstance(ex.cause, Exception)
         assert str(ex.cause) == "dangit"
+        assert ex.select == "/my/select"
         assert ex.input is input
         assert ex.context is context
         assert ex.transform == "toxml"
 
     try:
-        raise DataExtractionError.due_to(RuntimeError("dangit"),
+        raise DataExtractionError.due_to(RuntimeError("dangit"), "/my/select",
                                          input, context, "toxml")
         pytest.fail("failed to raise")
     except JSONTransformException, ex:
-        assert ex.message == "toxml transform: problem extracting data: RuntimeError('dangit',)"
+        assert ex.message == "toxml transform: problem extracting data with '/my/select': RuntimeError('dangit',)"
         assert ex.cause is not None
         assert isinstance(ex.cause, Exception)
         assert str(ex.cause) == "dangit"
+        assert ex.select == "/my/select"
         assert ex.input is input
         assert ex.context is context
         assert ex.transform == "toxml"

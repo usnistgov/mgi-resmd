@@ -1,13 +1,13 @@
 {
     "$schema":  "http://mgi.nist.gov/mgi-json-trans/v0.1",
 
-    "type": "apply",
+    "$type": "apply",
     "transform": "newline",
     "input": "subjects",
 
     "transforms": {
         "subject": {
-            "type": "json",
+            "$type": "json",
             "content": { "name": "subject",
                          "content": {
                              "children": "{$in:}",
@@ -17,11 +17,11 @@
                        }
         },
         "subjects": {
-            "type": "apply",
+            "$type": "apply",
             "transform": {
-                "type": "map",
+                "$type": "map",
                 "itemmap": {
-                    "type": "apply",
+                    "$type": "apply",
                     "transform": "element",
                     "input": "subject"
                 }
@@ -29,7 +29,7 @@
             "input": "/content/subject"
         },
         "element": {
-            "type": "stringtemplate",
+            "$type": "stringtemplate",
             "content": "<{/name}> {/content/children} </{/name}>"
         }
     }
