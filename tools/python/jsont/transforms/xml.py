@@ -235,8 +235,8 @@ class ToElement(Transform):
                              ttype)
         pref = _generate_name(config.get('prefix'), engine, tname+" El prefix", 
                               ttype)
-        content = _generate_object(config.get('content'), engine, 
-                                   tname+" content", ttype)
+        content = self._generate_content(config.get('content'), engine, 
+                                         tname+" content", ttype)
         prefixes = _generate_object(config.get('prefixes'), engine, 
                                     tname+" prefixes", ttype)
                                    
@@ -265,6 +265,40 @@ class ToElement(Transform):
             return out
 
         return impl
+
+    def _generate_content(spec, engine, tname, ttype):
+        # a plain object (no $val or $type) is an implicit ToElementContent
+        # transform
+
+        if spec is None:
+            return None
+
+        if isinstance(spec, dict):
+            # it's an object, either a transform or JSON template
+            if spec.has_key('$val'):
+                spec = spec["$val"]
+            elif not spec.has_key('$type'):
+                # treat as a ToElementContent transform
+                return ToElementContent('spec', engine, 
+                                        self.name, 'elementContent')
+
+        if isinstance(spec, dict):
+            # it's an anonymous transform
+            return engine.make_transform(spec)
+
+        if isinstance(spec, str) or isinstance(spec, unicode):
+            if not Function.matches(spec) and \
+               (spec == '' or ':' in spec or spec.startswith('/')):
+                # it's a data pointer to select data
+                return Extract({'select': spec}, engine, tname, ttype)
+
+            # it's a named transform or transform function
+            return engine.resolve_transform(spec)
+
+        raise TransformConfigTypeError('content', 'dict or str', type(spec))
+        
+
+        
 
 class ToXML(Transform):
     """
