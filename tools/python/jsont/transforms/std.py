@@ -14,6 +14,64 @@ MODULE_NAME = __name__
 TRANSFORMS_PKG = __name__.rsplit('.', 1)[0]
 DEF_CONTRIB_PKG = TRANSFORMS_PKG
 
+METAPROPNAMES = ["$val", "$ins", "$upd"]
+
+def is_metaproperty(propname):
+    """
+    return true if the given property name represents a metaproperty for 
+    a metapropety transform directive.  True is returned if it matches
+    one of "$val", "$ins", or "$upd".
+    """
+    return propname in METAPROPNAMES
+
+def has_metaproperty(obj):
+    """
+    return true if the given object includes a metaproperty directive name
+    """
+    if not isinstance(obj, collections.Mapping):
+        return False
+    for name in METAPROPNAMES:
+        if name in obj:
+            return True
+    return False
+
+def resolve_meta_directive(dval, engine, name, defTransCls=None):
+    """
+    resolve the value to a meta-property directive--i.e. a property with 
+    the name "$val", "$ins", or "$upd"
+
+    :argument dval:           the value of the directive
+    :argument Engine engine:  the current Engine to use to resolve transforms
+    :argument str name:       the name to associate with the generated transform
+    :argument Transform.class defTransCls: the Transform class to interpret a 
+                              the directive object value with if it is not an
+                              anonymous transform.
+    """
+    if isinstance(dval, dict):
+        if '$type' in dval:
+            # it's an anonymous transform
+            return engine.make_transform(dval, name+"(anon)")
+        elif defTransCls:
+            return defTransCls(dval, engine, name)
+
+    if isinstance(dval, str) or isinstance(dval, unicode):
+        if '(' in dval or ')' in dval:
+            # treat like a function.  This could raise a syntax error
+            return engine.resolve_transform(dval)
+
+        if dval == '' or ':' in dval or dval.startswith('/'):
+            # it's a data pointer
+            return Extract({ "select": dval }, engine, name+"(select)","extract")
+
+        # else see if it matches a transform or transform-function
+        # (may raise a TransformNotFound)
+        return engine.resolve_transform(dval)
+
+    # Otherwise, treat it as a JSON template:
+    return JSON({"content": dval}, engine, name+"(json)", "json")
+        
+    
+
 # Transform types:
 
 class Literal(Transform):
@@ -164,32 +222,8 @@ class JSON(Transform):
             if skel.has_key("$val"):
                 # $val means replace the object with the output from the
                 # Transform given as the value to $val
-                if isinstance(skel['$val'], dict) and '$type' in skel['$val']:
-                    # it's an anonymous transform
-                    return engine.make_transform(skel['$val'], 
-                                                 self.name+".$val(anon)")
-
-                elif isinstance(skel['$val'], str) or \
-                     isinstance(skel['$val'], unicode):
-
-                    item = skel['$val']
-                    if '(' in item or ')' in item:
-                        # treat it like a function
-                        return self.engine.resolve_transform(item)
-
-                    if item == '' or ':' in item or item.startswith('/'):
-                        # it's a pointer
-                        return Extract({ "select": item }, self.engine, 
-                                       self.name+":(select)", "extract")
-
-                    # else see if it matches a transform or transform-function
-                    # (may raise a TransformNotFound)
-                    return self.engine.resolve_transform(item)
-
-                else:
-                    # treat it like a JSON template
-                    return self._resolve_skeleton(skel['$val'], engine)
-                    
+                return resolve_meta_directive(skel['$val'], engine, 
+                                              self.name+":$val")
             else:
                 self._resolve_json_object(skel, engine)
         elif (isinstance(skel, str) or isinstance(skel, unicode)) and \
@@ -204,33 +238,8 @@ class JSON(Transform):
         # resolve the values
         for key in content:
             if key == '$ins' or key == '$val' or key == '$upd':
-                # value should be a transform of some sort
-                if isinstance(content[key], dict) and '$type' in content[key]:
-                    # an anonymous transform
-                    content[key] = engine.make_transform(content[key], 
-                                                     self.name+":"+key+"(anon)")
-                elif isinstance(content[key], str) or \
-                     isinstance(content[key], unicode):
-
-                    if '(' in content[key] or ')' in content[key]:
-                        # treat it like a function
-                        content[key]= self.engine.resolve_transform(content[key])
-
-                    elif content[key] == '' or ':' in content[key] or \
-                         content[key].startswith('/'):
-                        # it's a pointer
-                        content[key] = Extract({ "select": content[key] }, 
-                                               self.engine, 
-                                               self.name+":"+key+"(select)", 
-                                               "extract")
-
-                    else:
-                        # else see if it matches a transform or 
-                        # transform-function (may raise a TransformNotFound)
-                        content[key]= self.engine.resolve_transform(content[key])
-
-                else:
-                    content[key] = self._resolve_skeleton(content[key], engine)
+                content[key] = resolve_meta_directive(content[key], engine,
+                                                      self.name+':'+key)
             else:
                 content[key] = self._resolve_skeleton(content[key], engine)
 

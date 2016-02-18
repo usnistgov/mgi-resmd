@@ -2,7 +2,7 @@ import os, pytest, types
 
 import jsont.transforms.xml as xml
 from xjs.validate import ExtValidator
-from jsont.engine import StdEngine
+from jsont.engine import StdEngine, DocEngine
 from jsont.exceptions import *
 
 @pytest.fixture(scope="module")
@@ -271,6 +271,97 @@ def test_format_text_hier():
 
     text = xml.format_element(element, context)
     assert text == formatted
+
+class TestToAttribute(object):
+
+    def test_simple_literal(self, engine):
+        config = {
+            "name": "role",
+            "value": "report"
+        }
+
+        #pytest.set_trace()
+        transf = xml.ToAttribute(config, engine, type="attribute")
+        el = transf({'foo': 'bar'}, {})
+
+        assert el['name'] == "role"
+        assert el['value'] == "report"
+
+class TestToElementContent(object):
+
+    def test_simple_literal(self, engine):
+        config = {
+            "children": [ "metals" ],
+            "attrs": [
+                {
+                    "$type": "xml.attribute",
+                    "name": "role",
+                    "value": "report"
+                },
+                {
+                    "$type": "xml.attribute",
+                    "name": "xmlns",
+                    "value": ""
+                }
+            ]
+        }
+
+        #pytest.set_trace()
+        transf = xml.ToElementContent(config, engine, type="elementContent")
+        el = transf({'foo': 'bar'}, {})
+
+        assert el['children'] == [ "metals" ]
+        assert el['attrs' ][0]['name'] == "role"
+        assert el['attrs' ][1]['name'] == "xmlns"
+
+class TestToElement(object):
+
+    def test_simple_literal(self, engine):
+        config = {
+            "name": "subject",
+            "content": {
+                "children": [ "metals" ],
+                "attrs": [
+                    {
+                        "name": "role",
+                        "value": "report"
+                    },
+                    {
+                        "name": "xmlns",
+                        "value": ""
+                    }
+                ]
+            },
+            "hints": { "xml.value_pad": 1 }
+        }
+
+        transf = xml.ToElement(config, engine, type="element")
+        el = transf({'foo': 'bar'}, {})
+
+        assert el['name'] == "subject"
+        assert el['content']['children'] == [ "metals" ]
+        assert el['content']['attrs' ][0]['name'] == "role"
+        assert el['content']['attrs' ][1]['name'] == "xmlns"
+
+        out = xml.format_element(el, {})
+        assert out == '<subject role="report" xmlns=""> metals </subject>'
+
+class TestToTextElement(object):
+
+    def test_literal(self, engine):
+        config = {
+            "name": "subject",
+            "value": "metals",
+            "hints": { "xml.value_pad": 1 }
+        }
+
+        transf = xml.ToTextElement(config, engine, type="textElement")
+        el = transf({'foo': 'bar'}, {})
+        assert el['name'] == "subject"
+        assert el['content']['children'] == [ "metals" ]
+
+        out = xml.format_element(el, {})
+        assert out == "<subject> metals </subject>"
 
     
 schemadir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "schemas", "json")

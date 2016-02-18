@@ -1,12 +1,13 @@
 """
 transforms for creating XML from JSON data
 """
-import os, copy, re, textwrap
+import os, copy, re, textwrap, collections
 import json as jsp
 
 from ..exceptions import *
 from ..base import Transform, ScopedDict, Context
 from .std import JSON, Extract, StringTemplate, Function
+from . import std
 
 MODULE_NAME = __name__
 TRANSFORMS_PKG = __name__.rsplit('.', 1)[0]
@@ -145,78 +146,128 @@ class ToElementContent(Transform):
 
     def mkfn(self, config, engine):
         ttype = "xml.elementContent"
+        name = self.name or "(anon)"
 
         attrs = None
         if config.has_key("attrs"):
+            # attrs can be 
+            #  1) a list where each element forms an attribute
+            #  2) a dict representing a transform ({$val}, {$type}) that 
+            #       generates a list of attributes
+            #  3) a string providing a named transform or datapointer that 
+            #       generates a list of attributes
             if isinstance(config['attrs'], list):
                 attrs = []
                 for attr in config['attrs']:
-                    attr = _generate_object(attr, engine, 
-                                            "{0} attr".format((self.name or '')),
-                                            ttype)
+                    attr = self._generate_attribute(attr, engine, 
+                                                    "{0} attr".format(name),
+                                                    ttype)
                     attrs.append(attr)
 
-            elif isinstance(config['attrs'], dict):
-                attrs = engine.make_transform(config['attrs'])
-
-            elif isinstance(config['attrs'], str):
-                attrs = engine.resolve_transform(config['attrs'])
-
             else:
-                raise TransformConfigTypeError("attrs", "array", 
-                                               type(config['attrs']), ttype)
+                # some reference to a transform that should result in an array.
+                # the value is interpreted just like a metaproperty directive
+                attrs = std.resolve_meta_property(config['attrs'], engine,
+                                                  name+':(attrs)')
         
         children = None
         if config.has_key("children"):
-            if isinstance(config['children'], str) or \
-               isinstance(config['children'], unicode):
-                children = [children]
-
-            if isinstance(config['children'], list):
-
+            if isinstance(config['children'], list) or \
+               isinstance(config['children'], tuple):
                 children = []
                 for child in config['children']:
-                    child = _generate_object(child, engine, 
-                                          "{0} child".format((self.name or '')),
-                                             ttype)
+                    if isinstance(child, list) or isinstance(child, tuple):
+                        raise TransformConfigTypeError("children item", 
+                                                       "str or dict",type(child),
+                                                       name)
+
+                    elif isinstance(child, collections.Mapping):
+                        child = self._generate_element(attr, engine, 
+                                                       "{0} child".format(name),
+                                                       ttype)
+
                     children.append(child)
 
-            elif isinstance(config['children'], dict):
-                children = engine.make_transform(config['children'])
-
-            elif isinstance(config['children'], str):
-                children = engine.resolve_transform(config['children'])
-
             else:
-                raise TransformConfigTypeError("children", 
-                                               got=type(config['children']), 
-                                               type=ttype)
+                # some reference to a transform that should result in an array.
+                # the value is interpreted just like a metaproperty directive
+                attrs = std.resolve_meta_property(config['children'], engine,
+                                                  name+':(children)')
 
         
         def impl(input, context, *args):
             out = {}
             if attrs is not None:
-                ol = []
-                for attr in attrs:
-                    if isinstance(attr, Transform):
-                        attr = attr(input, context)
-                    ol.append(attr)
-                out['attrs'] = ol
+                if isinstance(attrs, Transform):
+                    out['attrs'] = attrs(input, context)
+                else:
+                    ol = []
+                    for attr in attrs:
+                        if isinstance(attr, Transform):
+                            attr = attr(input, context)
+                        elif isinstance(attr, collections.Mapping):
+                            if '$ins' in attr:
+                                attr = attr['$ins'](input, context)
+                                if hasattr(attr, '__iter__'):
+                                    ol.extend(attr)
+                                    continue
+                            elif '$upd' in attr:
+                                # shouldn't happen
+                                attr = attr['$upd'](input, context)
+                        ol.append(attr)
+
+                    out['attrs'] = ol
 
             if children is not None:
-                ol = []
                 if isinstance(children, Transform):
-                    ol = children(input, context)
+                    out['children'] = children(input, context)
                 else:
+                    ol = []
                     for child in children:
                         if isinstance(child, Transform):
                             child = child(input, context)
+                        elif isinstance(child, collections.Mapping):
+                            if '$ins' in child:
+                                child = child['$ins'](input, context)
+                                if hasattr(child, '__iter__'):
+                                    ol.extend(child)
+                                    continue
+                            elif '$upd' in child:
+                                # shouldn't happen
+                                child = child['$upd'](input, context)
                         ol.append(child)
-                out['children'] = ol
+
+                    out['children'] = ol
 
             return out
 
         return impl
+
+    def _generate_attribute(self, spec, engine, name, type=None):
+        return self._gen_cont_item(spec, engine, name, ToAttribute, type)
+
+    def _gen_cont_item(self, spec, engine, name, cls, type=None):
+
+        if isinstance(spec, collections.Mapping):
+            if '$val' in spec:
+                return std.resolve_meta_directive(spec['$val'], engine, 
+                                                  name+":$val")
+
+            if '$ins' in spec or '$upd' in spec:
+                key = '$upd'
+                if '$ins' in spec:
+                    key = '$ins'
+                spec[key] = std.resolve_meta_directive(spec[key], engine, 
+                                                          name+":"+key)
+                return spec
+
+        # assume this is a cls transform if it isn't some other
+        # reference to a transform
+        return std.resolve_meta_directive(spec, engine, name, cls)
+        
+    def _generate_element(self, spec, engine, name, type=None):
+        return self._gen_cont_item(spec, engine, name, ToElement, type)
+        
 
 class ToElement(Transform):
 
@@ -262,42 +313,50 @@ class ToElement(Transform):
                 if isinstance(prefixes, Transform):
                     out['prefixes'] = prefixes(input, context)
 
+            if config.has_key('hints'):
+                out['hints'] = copy.deepcopy(config['hints'])
+
             return out
 
         return impl
 
-    def _generate_content(spec, engine, tname, ttype):
+    def _generate_content(self, spec, engine, tname, ttype):
         # a plain object (no $val or $type) is an implicit ToElementContent
         # transform
 
         if spec is None:
             return None
 
-        if isinstance(spec, dict):
-            # it's an object, either a transform or JSON template
-            if spec.has_key('$val'):
-                spec = spec["$val"]
-            elif not spec.has_key('$type'):
-                # treat as a ToElementContent transform
-                return ToElementContent('spec', engine, 
-                                        self.name, 'elementContent')
-
-        if isinstance(spec, dict):
-            # it's an anonymous transform
-            return engine.make_transform(spec)
-
-        if isinstance(spec, str) or isinstance(spec, unicode):
-            if not Function.matches(spec) and \
-               (spec == '' or ':' in spec or spec.startswith('/')):
-                # it's a data pointer to select data
-                return Extract({'select': spec}, engine, tname, ttype)
-
-            # it's a named transform or transform function
-            return engine.resolve_transform(spec)
-
-        raise TransformConfigTypeError('content', 'dict or str', type(spec))
+        return std.resolve_meta_directive(spec, engine, tname, ToElementContent)
         
 
+class ToTextElement(Transform):
+    """
+    formats an XML element that contains only text as its contents (attributes
+    are optional).
+
+    """
+
+    def mkfn(self, config, engine):
+
+        elcfg = copy.deepcopy(config)
+        elcfg['$type'] = 'element'
+        content = { }
+        if "value" in elcfg:
+            content['children'] = [ elcfg['value'] ]
+            del elcfg['value']
+        if "attrs" in elcfg:
+            content['attrs'] = [ elcfg['attrs'] ]
+            del elcfg['attrs']
+        elcfg['content'] = content
+
+        transf = ToElement(elcfg, engine, self.name, 'element', True)
+
+        def impl(input, context, *args):
+            return transf(input, context, *args)
+
+        return impl
+                    
         
 
 class ToXML(Transform):
@@ -331,7 +390,8 @@ types = {
     "xml.print": ToXML,
     "xml.attribute": ToAttribute,
     "xml.elementContent": ToElementContent,
-    "xml.element": ToElement
+    "xml.element": ToElement,
+    "xml.textElement": ToTextElement
 }
 
 def format_element(el, context, prefixes=None, transname=None):

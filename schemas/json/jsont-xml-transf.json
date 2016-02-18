@@ -114,7 +114,7 @@
         },
 
         "ToElementTransform": {
-            "description": "a transform for generating the data for an XML attribute",
+            "description": "a transform for generating the data for an XML element",
             "notes": [
                 "The output of this transform is a JSON object using an internal schema (jsont-xml-schema).  It is to be combined with an Element JSON object to build up the XML data."
             ],
@@ -124,6 +124,74 @@
                     "properties": {
                         "type": {
                             "enum": [ "xml.element" ] 
+                        },
+                        "name": {
+                            "description": "the local name for the element",
+                            "notes": [
+                                "This can be string (which will be treated as a template if it contains {} directives), a {$val} object, or an anonymous transform."
+                            ],
+                            "oneOf": [
+                                { "type": "string" },
+                                { "type": "object" }
+                            ]
+                        },
+                        "prefix": {
+                            "description": "the prefix to use with this attribute",
+                            "notes": [
+                                "This can be string (which will be treated as a template if it contains {} directives), a {$val} object, or an anonymous transform.",
+                                "if not provided, none will be applied unless namespace is specified"
+                            ],
+                            "oneOf": [
+                                { "type": "string" },
+                                { "type": "object" }
+                            ]
+                        },
+                        "namespace": {
+                            "description": "the namespace that this attribute is part of",
+                            "notes": [
+                                "This can be string (which will be treated as a template if it contains {} directives), a {$val} object, or an anonymous transform.",
+                                "If provided without an associated prefix, a prefix may be generated automatically upon formatting."
+                            ],
+                            "oneOf": [
+                                { "type": "string" },
+                                { "type": "object" }
+                            ]
+                        },
+                        "value": {
+                            "description": "the value for the element content",
+                            "notes": [
+                                "This can be string (which will be treated as a template if it contains {} directives), a number, a boolean, a {$val} object, or a JSON template."
+                            ],
+                            "oneOf": [
+                                { "type": "string" },
+                                { "type": "number" },
+                                { "type": "boolean" },
+                                { "type": "object" }
+                            ]
+                        },
+                        "prefixes": {
+                            "description": "a set of namespace prefixes to define where the keys are the prefixes and the values are the namespace URIs they identify",
+                            "notes": [
+                                "The object will be treated like a JSON template so that the values can be generated from the input."
+                            ],
+                            "type": "object"
+                        }
+                    }
+                }
+            ]
+        },
+
+        "ToTextElementTransform": {
+            "description": "a transform for generating the data for an XML element containing only a single text child",
+            "notes": [
+                "The output of this transform is a JSON object using an internal schema (jsont-xml-schema).  It is to be combined with an Element JSON object to build up the XML data."
+            ],
+            "allOf": [
+                { "$ref": "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/Transform" },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": [ "xml.textElement" ] 
                         },
                         "name": {
                             "description": "the local name for the element",

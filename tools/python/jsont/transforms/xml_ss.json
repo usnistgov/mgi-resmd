@@ -39,6 +39,32 @@
             ],
             "expects": ["any"],
             "returns": "object"
+        },
+        "xml.textElement": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/CallableTransform" ],
+            "$type": "callable",
+            "transform_tmpl": {
+                "$type": "xml.textElement",
+                "name": { "$val": "/0" },
+                "value": "{/1}"
+            },
+            "conf_args_index": [ 0, 1 ],
+            "argv_supported": [
+                {
+                    "required": true,
+                    "name": "name",
+                    "description": "the element name to create",
+                    "type": "string"
+                },
+                {
+                    "required": true,
+                    "name": "value",
+                    "description": "the string contents to give the element",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "object"
         }
     }
 }
