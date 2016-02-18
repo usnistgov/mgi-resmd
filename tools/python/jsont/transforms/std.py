@@ -1,7 +1,7 @@
 """
 transformers from the standard module
 """
-import os, json, copy, re, importlib, textwrap
+import os, json, copy, re, importlib, textwrap, collections
 import types as tps
 import json as jsp
 
@@ -259,6 +259,143 @@ class JSON(Transform):
                 out.append(self._transform_skeleton(skel[i], input, context))
 
         return out
+
+class ExpandableArray(Transform):
+    """
+    a transform that implements the {"$ins": } directive within an array.  
+    This cannot be invoke directly by the user; rather, it is invoked 
+    transparently via the use of the {$ins} directive as part of another 
+    transform.
+
+    The use of the {$ins} directive controls the handling of an array (list) 
+    of data.  If an item of an array is an object with a "$ins" property, then
+    the value of the "$ins" property is taken to be a transform (or a reference
+    to one) that results in an array.  The items in the resulting array are to 
+    be inserted in the enclosing array, replacing the object containing the 
+    "$ins" property.  That is, the enclosing array is expanded with the items
+    resulting from the the "$ins" transform.  If the transform produces an empty 
+    array, the enclosing array effectively shrinks by one item.  If the transform
+    produces a scalor result, that result will replace the "$ins" object as a 
+    single item, resulting in no change in the number of items in the enclosing
+    array.  
+    """
+
+    @classmethod
+    def contains_insertable(cls, array):
+        if not hasattr(array, '__iter__'):
+            return False
+        return bool(len(filter(lambda i: isinstance(i, dict) and "$ins" in i, 
+                               array)))
+
+    def __init__(self, array, engine, name=None):
+        """
+        create the transform.  This class is intended to be instantiated only 
+        within another transform (e.g. JSON) when processing an array with 
+        embedded transforms.  The items in the input array are expected to be 
+        already resolved into Transform instances where applicable.  In 
+        particular, each item that is an invocation of the {$ins} directive 
+        should be an object with an "$ins" property whose value is a
+        Transform instance.  
+        """
+        type = "{$ins}"
+        if not name:
+            name = type
+
+        if not hasattr(array, '__iter__'):
+            array = [array]
+        self.array = array
+
+        super(ExpandableArray, self).__init__({}, engine, name, type, True)
+
+    def mkfn(self, config, engine):
+
+        def impl(input, context):
+            out = []
+            for item in self.array:
+                if isinstance(item, Transform):
+                    item = item(input, config) 
+                elif isinstance(item, dict) and item.has_key('$ins'):
+                    if isinstance(item['$ins'], Transform):
+                        item = item['$ins'](input, config)
+                    else:
+                        item = item['$ins']
+
+                if not hasattr(item, '__iter__'):
+                    item = [ item ] 
+
+                out.extend(item)
+
+            return out
+        
+        return impl
+
+class ExpandableObject(Transform):
+    """
+    a transform that implements the {"$ins": } directive within an object.  
+    This cannot be invoke directly by the user; rather, it is invoked 
+    transparently via the use of the {$ins} directive as part of another 
+    transform.
+
+    The use of the {$ins} directive controls the handling of an object (dict) 
+    of data.  If an object contains an "$ins" property, then the value of the 
+    "$ins" property is taken to be a transform (or a reference to one) that 
+    results in another object.  The properties in the resulting object are to 
+    be inserted in the enclosing object, replacing the object containing the 
+    "$ins" property as well as an other properties with the same names.  That 
+    is, the enclosing object is typically expanded with properties resulting 
+    from the the "$ins" transform.  If the transform produces an empty object, 
+    the enclosing object effectively shrinks by one property (the "$ins" 
+    property).  If the transform produces a scalor result, that result is 
+    ignored and treated as if an empty object was returned.  
+    """
+
+    @classmethod
+    def contains_insertable(cls, obj):
+        if not isinstance(obj, collections.Mapping):
+            return False
+        return "$ins" in obj
+
+    def __init__(self, obj, engine, name=None):
+        """
+        create the transform.  This class is intended to be instantiated only 
+        within another transform (e.g. JSON) when processing an object with 
+        embedded transforms.  The properties in the input object are expected to 
+        be already resolved into Transform instances where applicable.  In 
+        particular, the value of the "$ins" property should be a Transform 
+        instance.  
+        """
+        type = "{$ins}"
+        if not name:
+            name = type
+
+        if not isinstance(obj, collections.Mapping):
+            raise TypeError("ExpandableObject invoked on non-dictionary: "+
+                            str(obj))
+        self.obj = obj
+
+        super(ExpandableObject, self).__init__({}, engine, name, type, True)
+
+    def mkfn(self, config, engine):
+
+        def impl(input, context):
+            out = {}
+            upd = {}
+            for prop in self.obj:
+                val = self.obj[prop]
+                if isinstance(val, Transform):
+                    val = val(input, context)
+
+                if prop == '$ins':
+                    if isinstance(val, collections.Mapping):
+                        upd.update(val)
+                else:
+                    out[prop] = val
+
+            out.update(upd)
+            return out
+        
+        return impl
+
 
 class Extract(Transform):
     """
