@@ -240,7 +240,7 @@ class Engine(object):
         convert the given JSON data template into a JSON Transform instance.
         A JSON data template is a JSON structure (dict, list, or string) that
         contains embedded substitution directives.  Such a directive comes in 
-        one of four forms:
+        one of the following forms:
            * a sub string within a string value of the form {...}, where the
              the contents inside the braces is a transform name or a data 
              pointer.  This braces and its contents will be replaced with a 
@@ -257,6 +257,13 @@ class Engine(object):
              an array (list).  The object containing the "$ins" property will be
              replaced by the items from the transform result and, thus, inserted
              into the containing array. 
+           * an object (dict) that contains an "$upd" property.
+             The value of this property is interpreted in the same way as "$val"
+             except that the result of applying the transform is expected to be
+             an object (dict).  The object with the "$ins" property have its 
+             "$ins" property removed, and then the properties resulting from its 
+             tranform will be added to the object (overriding any properties 
+             with the same names).  
            * an object (dict) containing a "$type" property.  The value of this
              string is a string.  This object will be interpreted as an 
              anonymous transform and will be replaced by the result of applying 

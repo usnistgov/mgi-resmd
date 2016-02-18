@@ -130,7 +130,7 @@ class JSON(Transform):
          an array (list).  The object containing the "$ins" property will be
          replaced by the items from the transform result and, thus, inserted
          into the containing array. 
-       * an object (dict) that contains an "$ins" property.
+       * an object (dict) that contains an "$upd" property.
          The value of this property is interpreted in the same way as "$val"
          except that the result of applying the transform is expected to be
          an object (dict).  The object with the "$ins" property have its "$ins"
@@ -144,6 +144,9 @@ class JSON(Transform):
     """
 
     def mkfn(self, config, engine):
+        if not self.name:
+            self.name = "json"
+
         try: 
             content = config['content']
         except KeyError:
@@ -161,11 +164,19 @@ class JSON(Transform):
             if skel.has_key("$val"):
                 # $val means replace the object with the output from the
                 # Transform given as the value to $val
-                if isinstance(skel["$val"], dict):
-                    return engine.make_transform(skel["$val"], 
-                                                 self.name+".(anon)")
-                else:
+                if isinstance(skel['$val'], dict) and '$type' in skel['$val']:
+                    # it's an anonymous transform
+                    return engine.make_transform(skel['$val'], 
+                                                 self.name+".$val(anon)")
+
+                elif isinstance(skel['$val'], str) or \
+                     isinstance(skel['$val'], unicode):
+
                     item = skel['$val']
+                    if '(' in item or ')' in item:
+                        # treat it like a function
+                        return self.engine.resolve_transform(item)
+
                     if item == '' or ':' in item or item.startswith('/'):
                         # it's a pointer
                         return Extract({ "select": item }, self.engine, 
@@ -174,6 +185,11 @@ class JSON(Transform):
                     # else see if it matches a transform or transform-function
                     # (may raise a TransformNotFound)
                     return self.engine.resolve_transform(item)
+
+                else:
+                    # treat it like a JSON template
+                    return self._resolve_skeleton(skel['$val'], engine)
+                    
             else:
                 self._resolve_json_object(skel, engine)
         elif (isinstance(skel, str) or isinstance(skel, unicode)) and \
@@ -187,7 +203,36 @@ class JSON(Transform):
     def _resolve_json_object(self, content, engine):
         # resolve the values
         for key in content:
-            content[key] = self._resolve_skeleton(content[key], engine)
+            if key == '$ins' or key == '$val' or key == '$upd':
+                # value should be a transform of some sort
+                if isinstance(content[key], dict) and '$type' in content[key]:
+                    # an anonymous transform
+                    content[key] = engine.make_transform(content[key], 
+                                                     self.name+":"+key+"(anon)")
+                elif isinstance(content[key], str) or \
+                     isinstance(content[key], unicode):
+
+                    if '(' in content[key] or ')' in content[key]:
+                        # treat it like a function
+                        content[key]= self.engine.resolve_transform(content[key])
+
+                    elif content[key] == '' or ':' in content[key] or \
+                         content[key].startswith('/'):
+                        # it's a pointer
+                        content[key] = Extract({ "select": content[key] }, 
+                                               self.engine, 
+                                               self.name+":"+key+"(select)", 
+                                               "extract")
+
+                    else:
+                        # else see if it matches a transform or 
+                        # transform-function (may raise a TransformNotFound)
+                        content[key]= self.engine.resolve_transform(content[key])
+
+                else:
+                    content[key] = self._resolve_skeleton(content[key], engine)
+            else:
+                content[key] = self._resolve_skeleton(content[key], engine)
 
         # resolve keys
         keytrans = {}
@@ -220,13 +265,13 @@ class JSON(Transform):
             return skel(input, context)
 
         if isinstance(skel, dict):
-            if skel.has_key("$val"):
-                # $val means replace the object with the output from the
-                # Transform given as the value to $val
+            # $val means replace the object with the output from the
+            # Transform given as the value to $val.  
+            if skel.has_key('$val'):
+                item = skel['$val']
                 if isinstance(skel['$val'], Transform):
-                    return skel['$val'](input, context)
-                else:
-                    return skel['$val']
+                    skel['$val'] = skel['$val'](input, context)
+                return skel['$val']
 
             return self._transform_json_object(skel, input, context)
 
@@ -237,12 +282,21 @@ class JSON(Transform):
 
     def _transform_json_object(self, skel, input, context):
         out = {}
+        upd = {}
 
         # transform the values
         for key in skel:
             if key == "\bkeytr":
                 continue
-            out[key] = self._transform_skeleton(skel[key], input, context)
+            prop = self._transform_skeleton(skel[key], input, context)
+
+            # look for use of the {$ins} directive
+            if key == '$upd':
+                if isinstance(prop, dict):
+                    upd.update(prop)
+                # ignore $upd result if it is not an object
+            else:
+                out[key] = prop
 
         # transform any keys needing transforming
         if skel.has_key("\bkeytr"):
@@ -251,6 +305,9 @@ class JSON(Transform):
             for key in skel["\bkeytr"]:
                 newkey = skel["\bkeytr"][key](input, context)
                 out[newkey] = out.pop(key)
+
+        if upd:
+            out.update(upd)
 
         return out
 
@@ -263,7 +320,16 @@ class JSON(Transform):
             if isinstance(skel[i], Transform):
                 out.append(skel[i](input, context))
             else:
-                out.append(self._transform_skeleton(skel[i], input, context))
+                item = self._transform_skeleton(skel[i], input, context)
+
+                # check for use of the {$ins} directive
+                if isinstance(item, dict) and item.has_key('$ins'):
+                    item = item['$ins']
+                    if not hasattr(item, '__iter__'):
+                        item = [ item ]
+                    out.extend(item)
+                else:
+                    out.append(item)
 
         return out
 
@@ -360,7 +426,7 @@ class ExpandableObject(Transform):
     def contains_insertable(cls, obj):
         if not isinstance(obj, collections.Mapping):
             return False
-        return "$ins" in obj
+        return "$upd" in obj
 
     def __init__(self, obj, engine, name=None):
         """
@@ -371,7 +437,7 @@ class ExpandableObject(Transform):
         particular, the value of the "$ins" property should be a Transform 
         instance.  
         """
-        type = "{$ins}"
+        type = "{$upd}"
         if not name:
             name = type
 
@@ -392,7 +458,7 @@ class ExpandableObject(Transform):
                 if isinstance(val, Transform):
                     val = val(input, context)
 
-                if prop == '$ins':
+                if prop == '$upd':
                     if isinstance(val, collections.Mapping):
                         upd.update(val)
                 else:

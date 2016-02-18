@@ -82,6 +82,32 @@ class TestJSON(object):
         assert isinstance(out['b'], list)
         assert out['b'][2] is 2
 
+    def test_ins_array(self, engine):
+        makearray = { "$type": "json", "content": [ 9, 8, 7 ] }
+        config = { "content": { "a": [True, {"$ins": makearray}, 3] }}
+        #pytest.set_trace()
+        transf = std.JSON(config, engine, "goob", "json")
+        out = transf({"numbers": range(3)}, {})
+        assert isinstance(out, dict)
+        assert isinstance(out['a'], list)
+        assert out['a'] == [ True, 9, 8, 7, 3 ]
+
+    def test_ins_object(self, engine):
+        makeobj = { "$type": "json", "content": {"foo": "bar", "gurn": "goob"} }
+        config = { "content": { "a":    [True, "[{$lb}{$rb}]", 3],
+                                "foo": "zub",
+                                "$upd": makeobj }}
+        #pytest.set_trace()
+        transf = std.JSON(config, engine, "goob", "json")
+        #pytest.set_trace()
+        out = transf({"numbers": range(3)}, {})
+        assert isinstance(out, dict)
+        assert out['a'] == [ True, "[{}]", 3 ]
+        assert "foo" in out
+        assert "gurn" in out
+        assert out['gurn'] == "goob"
+        assert out['foo'] == "bar"
+
 class TestApply(object):
 
     def test_anon(self, engine):
