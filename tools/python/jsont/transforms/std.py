@@ -697,7 +697,7 @@ class Function(Transform):
                     elif isinstance(uargs[i], list) or isinstance(uargs[i],dict):
                         uargs[i] = JSON({'content': uargs[i]}, engine, 
                                         self.name+":(arg)", "json")
-                                       
+
                 except ValueError:
                     if '(' in uargs[i] or ')' in uargs[i]:
                         # transform invoked as a function 
@@ -735,7 +735,16 @@ class Function(Transform):
                 msg = TransformConfigException.make_message(callable.name,
                         "Insufficient number of arguments provided")
                 raise TransformConfigException(msg, callable.name)
-            use.append(args[idx])
+            arg = args[idx]
+            if (arg.startswith('"') and arg.endswith('"')) or \
+               (arg.startswith("'") and arg.endswith("'")):
+                # arg intended as a literal; remove quotes
+                arg = arg[1:-1]
+            else:
+                # arg is a reference to a transform or data pointer
+                arg = { "$val": arg }
+               
+            use.append(arg)
                 
         # apply the arguments to the transform template
         transtmpl = callable.config_template

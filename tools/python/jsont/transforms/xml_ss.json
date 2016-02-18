@@ -22,7 +22,7 @@
             "transform_tmpl": {
                 "$type": "xml.attribute",
                 "name": { "$val": "/0" },
-                "value": "{/1}"
+                "value": { "$val": "/1" }
             },
             "conf_args_index": [ 0, 1 ],
             "argv_supported": [
@@ -46,7 +46,7 @@
             "transform_tmpl": {
                 "$type": "xml.textElement",
                 "name": { "$val": "/0" },
-                "value": "{/1}"
+                "value": { "$val": "/1" }
             },
             "conf_args_index": [ 0, 1 ],
             "argv_supported": [

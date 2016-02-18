@@ -182,7 +182,7 @@ class ToElementContent(Transform):
                                                        name)
 
                     elif isinstance(child, collections.Mapping):
-                        child = self._generate_element(attr, engine, 
+                        child = self._generate_element(child, engine, 
                                                        "{0} child".format(name),
                                                        ttype)
 
@@ -191,8 +191,8 @@ class ToElementContent(Transform):
             else:
                 # some reference to a transform that should result in an array.
                 # the value is interpreted just like a metaproperty directive
-                attrs = std.resolve_meta_property(config['children'], engine,
-                                                  name+':(children)')
+                children = std.resolve_meta_property(config['children'], engine,
+                                                     name+':(children)')
 
         
         def impl(input, context, *args):

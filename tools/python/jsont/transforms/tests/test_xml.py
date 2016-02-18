@@ -282,10 +282,92 @@ class TestToAttribute(object):
 
         #pytest.set_trace()
         transf = xml.ToAttribute(config, engine, type="attribute")
-        el = transf({'foo': 'bar'}, {})
+        at = transf({'foo': 'bar'}, {})
 
-        assert el['name'] == "role"
-        assert el['value'] == "report"
+        assert at['name'] == "role"
+        assert at['value'] == "report"
+
+    def test_simple_select(self, engine):
+        config = {
+            "name": "role",
+            "value": "{/foo}"
+        }
+
+        #pytest.set_trace()
+        transf = xml.ToAttribute(config, engine, type="attribute")
+        at = transf({'foo': 'bar'}, {})
+
+        assert at['name'] == "role"
+        assert at['value'] == "bar"
+
+    def test_transf_val1(self, engine):
+        config = {
+            "name": "role",
+            "value": { "$val": "/foo" }
+        }
+
+        #pytest.set_trace()
+        transf = xml.ToAttribute(config, engine, type="attribute")
+        at = transf({'foo': 'bar'}, {})
+
+        assert at['name'] == "role"
+        assert at['value'] == "bar"
+
+    def test_transf_val2(self, engine):
+        config = {
+            "name": "role",
+            "value": { "$type": "extract", "select": "/foo" }
+        }
+
+        #pytest.set_trace()
+        transf = xml.ToAttribute(config, engine, type="attribute")
+        at = transf({'foo': 'bar'}, {})
+
+        assert at['name'] == "role"
+        assert at['value'] == "bar"
+
+    def test_transf_val3(self, engine):
+        config = {
+            "name": "role",
+            "value": {"$val": { "$type": "extract", "select": "/foo" }}
+        }
+
+        #pytest.set_trace()
+        transf = xml.ToAttribute(config, engine, type="attribute")
+        at = transf({'foo': 'bar'}, {})
+
+        assert at['name'] == "role"
+        assert at['value'] == "bar"
+
+    def test_name_select(self, engine):
+        config = {
+            "name": "{/foo}",
+            "value": "{/foo}"
+        }
+
+        #pytest.set_trace()
+        transf = xml.ToAttribute(config, engine, type="attribute")
+        at = transf({'foo': 'bar'}, {})
+
+        assert at['name'] == "bar"
+        assert at['value'] == "bar"
+
+    def test_asfunc(self, engine):
+        config = {
+            "$type": "apply",
+            "transform": "xml.attribute('role', /foo)"
+        }
+
+        #pytest.set_trace()
+        transf = engine.make_transform(config)
+        at = transf({'foo': 'bar'}, {})
+
+        assert at['name'] == "role"
+        assert at['value'] == "bar"
+
+        
+
+
 
 class TestToElementContent(object):
 
@@ -298,19 +380,47 @@ class TestToElementContent(object):
                     "name": "role",
                     "value": "report"
                 },
-                {
-                    "$type": "xml.attribute",
-                    "name": "xmlns",
-                    "value": ""
-                }
+                "xml.attribute('xmlns', '')" 
             ]
         }
 
-        #pytest.set_trace()
         transf = xml.ToElementContent(config, engine, type="elementContent")
         el = transf({'foo': 'bar'}, {})
 
         assert el['children'] == [ "metals" ]
+        assert el['attrs' ][0]['name'] == "role"
+        assert el['attrs' ][1]['name'] == "xmlns"
+
+    def test_complex_content(self, engine):
+        config = {
+            "children": [ 
+                {
+                    "$type": "xml.textElement",
+                    "name": "subject",
+                    "value": "metals",
+                    "hints": { "xml.value_pad": 1 }
+                },
+                { "$val": "xml.textElement('subject', /foo)" }
+            ],
+            "attrs": [
+                {
+                    "$type": "xml.attribute",
+                    "name": "role",
+                    "value": "report"
+                },
+                "xml.attribute('xmlns', '')" 
+            ]
+        }
+
+        transf = xml.ToElementContent(config, engine, type="elementContent")
+        el = transf({'foo': 'bar'}, {})
+
+        assert len(el['children']) == 2
+        assert isinstance(el['children'][0], dict)
+        assert el['children'][0]['name'] == "subject"
+        assert isinstance(el['children'][1], dict)
+        assert el['children'][1]['name'] == "subject"
+        assert el['children'][1]['content']['children'][0] == "bar"
         assert el['attrs' ][0]['name'] == "role"
         assert el['attrs' ][1]['name'] == "xmlns"
 
