@@ -154,6 +154,23 @@ class TestExtractTransform(object):
         out = transf({"curation": { "contact": { "name": "bob" }} }, {})
         assert out == 'Call bob.'
 
+def test_metaprop(engine):
+    assert std.metaprop(engine, "gurn", {}, 'goob') == "$goob"
+    assert std.metaprop(engine, {"gurn": "goob"}, {}, 'type') == "$type"
+    assert std.metaprop(engine, {}, {}, 'val') == "$val"
+    assert std.metaprop(engine, {}, {}, 'ins') == "$ins"
+    assert std.metaprop(engine, "goob", {}) == "$goob"
+    assert std.metaprop(engine, {"gurn": "goob"}, {}) == "${'gurn': 'goob'}"
+
+    transf = engine.resolve_transform("metaprop")
+    assert transf("gurn", {}) == "$gurn"
+
+    transf = engine.resolve_transform("metaprop('goob')")
+    assert transf("gurn", {}) == "$goob"
+
+    transf = engine.resolve_transform("metaprop(/gurn)")
+    assert transf({"gurn": "goob"}, {}) == "$goob"
+
 def test_tostr(engine):
     assert std.tostr(engine, {}, {}, True) == "true"
     assert std.tostr(engine, {}, {}, [ 1, 2, 3 ]) == "[1, 2, 3]"

@@ -15,6 +15,23 @@
             "expects": ["any"],
             "returns": "string"
         },
+        "metaprop": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "$type": "native",
+            "impl": "$std.metaprop",
+            "description": "prepend a given string with a $ character",
+            "notes": [
+                "Using this function within a template allows one to produce $-prepended name without invoking its special meaning within a transform",
+                "Example: metaprop('type') produces '$type'"
+            ],
+            "argv_supported": [
+                {
+                    "name": "label",
+                    "description": "the string to prepend (default: the current input)",
+                    "type": "string"
+                }
+            ]            
+        },
         "tostr": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "$type": "native",

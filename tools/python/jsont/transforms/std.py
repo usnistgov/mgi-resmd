@@ -113,10 +113,10 @@ class JSON(Transform):
     The content config parameter provides the template for the output JSON 
     structure.  Its value is a JSON structure (dict, list, or string) that
     contains embedded substitution directives.  Such a directive comes in 
-    one of four forms:
+    one of the following forms:
        * a sub string within a string value of the form {...}, where the
          the contents inside the braces is a transform name or a data 
-         pointer.  This braces and its contents will be replaced with a 
+         pointer.  The braces and its contents will be replaced with a 
          string value resulting from the application of the transform or 
          pointer to the input data.  This can appear in either property
          names or in string values.
@@ -130,6 +130,13 @@ class JSON(Transform):
          an array (list).  The object containing the "$ins" property will be
          replaced by the items from the transform result and, thus, inserted
          into the containing array. 
+       * an object (dict) that contains an "$ins" property.
+         The value of this property is interpreted in the same way as "$val"
+         except that the result of applying the transform is expected to be
+         an object (dict).  The object with the "$ins" property have its "$ins"
+         property removed, and then the properties resulting from its tranform
+         will be added to the object (overriding any properties with the same 
+         names).  
        * an object (dict) containing a "$type" property.  The value of this
          string is a string.  This object will be interpreted as an 
          anonymous transform and will be replaced by the result of applying 
@@ -617,8 +624,18 @@ class Function(Transform):
                                         self.name+":(arg)", "json")
                                        
                 except ValueError:
-                    # It should be interpreted as a transform directive
-                    uargs[i] = engine.resolve_transform(uargs[i])
+                    if '(' in uargs[i] or ')' in uargs[i]:
+                        # transform invoked as a function 
+                        uargs[i] = engine.resolve_transform(uargs[i])
+
+                    elif ':' in uargs[i] or uargs[i].startswith('/'):
+                        # it's a data pointer
+                        uargs[i] = Extract({"select": uargs[i]}, engine, 
+                                           (self.name or "extract")+":(select)",
+                                           "extract")
+                    else:
+                        # It should be interpreted as a transform directive
+                        uargs[i] = engine.resolve_transform(uargs[i])
 
 
         def impl(input, context, *eargs, **keys):
@@ -915,6 +932,20 @@ def prop_names(engine, input, context, *args):
         return input.keys()
 
     return []
+
+def metaprop(engine, input, context, *args):
+    """
+    return the given string with prepended with a $ symbol.  This allows one 
+    to produce a meta property name without invoking its special meeting within
+    a transform.  The input and context data are ignored if an argument is 
+    provided. 
+    """
+    out = "$"
+    if len(args) > 0:
+        out += str(args[0])
+    else:
+        out += str(input)
+    return out
 
 # load in stylesheet-based definitions 
 
