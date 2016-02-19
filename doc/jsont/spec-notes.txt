@@ -1,0 +1,180 @@
+JSON Transformations Specification
+
+Spec defines structured document formats that describe the
+transformation of JSON data and how the documents should be
+interpreted to carry out the transformation.  
+
+Terms to define up front:
+  JSON
+  JSON document
+  JSON data
+  JSON Pointer
+  JSON Schema
+  transformation
+  transform
+  stylesheet
+
+Conceptual Model
+
+JSON data is transformed by applying a transformation stylesheet.
+During the transformation, the actors are:
+
+  1) Input JSON data (from the input JSON document)
+  2) Context data -- a merger of data from the stylesheet, from 
+         the application, and from the user (via the application);
+         these can affect how the transform is applied to the data.  
+         This data is in the form of a JSON object.
+  3) The current Transform -- directives that effect the
+         transformation (from the stylesheet or the available library
+         of defined transforms).  T
+  4) Output JSON data -- resulting from application of the transform 
+         to the input data (modulated by the context data).  
+
+The transformation output is always compliant JSON.  This can include
+a simple string.  This effectively allows conversion to other
+text-based format, such as XML, HTML, and plain text.
+
+A Transform is described via a set of parameters which can be realized
+into a software function that applied to input data to produce the
+output.  Any transform can select a sub-portion of the input data that
+should be presented to the transform.  One way this can be done is
+through a Data Pointer.
+
+A Data Pointer has 2 parts:
+  1) a target -- either the Input Data or the Context Data.
+  2) a JSON pointer -- a string-formatted directive compliant with
+     JSON Pointer
+Data is selected with a Data Pointer by resolving the JSON pointer
+against the data refered to by the target.
+
+Core stylesheet format captures the basic Transformation data model.
+All other formats can be converted into an equivalent in the core
+format.  
+
+Stylesheet contains a Transform Definition that is to be applied to
+the input JSON data.  
+
+A Transform Definition contains:
+   * a parameterized description of the current transform.  
+   * a library of named transforms, each providing its transform definition
+   * a set of prefix definitions which can be used to encode data pointers
+   * context data to be merged with and that override the context data 
+     provided by the application.
+
+The parameterized description of a transform can invoke other transforms to 
+convert different subsets of the input data.  Another transform can be
+invoked in one of the following forms:
+   * named transform -- a name unsed in a context expecting a transform will 
+         be matched the merged set from available natively to the
+         application and from those defined by name by the stylesheet.
+   * named transform in function form -- some transforms support
+         being invoked in the form of a function with arguments (e.g.
+         "indent(4)").  
+   * anonymous transform -- a transform definition in-lined as part of 
+         another transform definition
+   * a data pointer -- a data pointer string, p, will be interpreted
+         as a short-cut for "extract(p)"
+
+The Transformation application makes available a number of named
+transforms which are available by default.  A compliant application
+must provide those from the standard ("std") module defined here.
+Other modules of transforms may be available as well.  
+
+A transform description can define new named transforms that are
+merged with the set provided by the application.  If a user-defined
+transform has the same name as one provided by the application, the
+user-defined one hides the application's version, unless the name
+begins with a '$'.  The merged set of named transforms is available
+for invocation in the current transform and all transforms that it
+invokes.  With the invocation of a transform, new named transforms can
+become available, overriding previous ones with the same name.
+
+The core stylesheet format encodes a transform in JSON format.  It can
+reference other stylesheets from which transforms can be imported.  
+
+Data Pointer Syntax
+
+  data-pointer := (prefix ':')? json-pointer
+  json-pointer:  a JSON Pointer compliant string
+  prefix := (target | alias)
+  target := '$' ('in' | 'context')
+  alias := name_chars+ 
+  resolved-data-pointer := target ':' json-pointer
+
+Any data-pointer should be convertable into a resolved-data pointer.
+This is done by:
+
+  1) If the data pointer does not include a prefix, '$in:' is prepended
+     to the data-pointer
+  2) If the prefix matches target, it is a resolved-data-pointer; otherwise:
+  3) The alias is matched to a mapping of aliases to data-pointers
+  4) the (alias ':') is replaced with the matched data-pointer
+  5) The sequence is repeated beginning with Step 2 until the
+     data-pointer matches a resolved-data-pointer.
+
+Data is selected with a Data Pointer by resolving the JSON pointer
+against the data refered to by the target.  The "$in" target refers
+to the current input data.  The "$context" target refers to the
+current context data.  
+
+Core Stylesheet Format Syntax and Sematics
+
+A Transform description is represented as a JSON object with the
+following properties:
+
+[Copied from the JSON Schema]
+
+[Describe each type:
+   Transform
+   Prefixes
+   Context
+ Each actioning Transform property:
+   $type
+   transforms
+   context
+   prefixes
+   status
+ Documentation properties:
+   description
+   notes
+   expects
+   returns
+]
+
+Substitution directives
+
+  * {...} (used in StringTemplate and JSON)
+  * { "$val": ... }
+  * [ ... { "$ins": ... } ]
+  * { ... "$upd":  ...  }
+
+Transform Types
+
+   Literal
+   [Extract]
+   [Apply]
+   [Callable]
+   ForEach
+   Map
+   JSON
+   StringTemplate
+
+Named Transforms
+   $lb
+   $rb
+   tostr
+   apply
+   extract
+   map
+   indent
+   wrap
+   fill
+   concat
+   delimit
+   newline
+   doubleNewline
+   propNames
+   metaprop
+
+
+
