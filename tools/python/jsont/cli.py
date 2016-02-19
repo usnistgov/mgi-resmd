@@ -135,80 +135,28 @@ class JSONT(Runner):
 
         Command line arguments are parsed from sys.argv.  
         """
-        if self.opts.quiet or self.opts.silent:
-            self.opts.verbose = False
 
-        context = { }
-        if self.opts.pretty:
-            context['json.indent'] = 4
-        if self.opts.context:
-            try:
-                context.update(_parse_ctx_args(self.opts.context))
-            except ValueError, ex:
-                return self.fail(INVALID_PARAM, "bad parameter syntax: "+str(ex))
-        if 'json.indent' in context and context['json.indent'] is not None:
-            if not isinstance(context['json.indent'], int):
-                try:
-                    context['json.indent'] = int(context['json.indent'])
-                except ValueError, ex:
-                    return self.fail(INVALID_PARAM, 
-                                     "json.indent: bad parameter type: "+
-                                     context['json.indent'])
-
-        system = { }
-        if self.opts.system:
-            try:
-                context.update(_parse_ctx_args(self.opts.system))
-            except ValueError, ex:
-                return self.fail(INVALID_PARAM, "bad parameter syntax: "+str(ex))
-
-        if not os.path.exists(self.opts.ssheet):
-            return self.fail(FILENOTFOUND, self.opts.ssheet + ": file not found")
-        if self.opts.doc and not os.path.exists(self.opts.doc):
-            return self.fail(FILENOTFOUND, self.opts.doc + ": file not found")
-
-        # load the stylesheet file
-        try:
-            with open(self.opts.ssheet) as fd:
-                ss = json.load(fd)
-        except ValueError, ex:
-            return self.fail(BADJSON_SS, 
-                             "JSON syntax error in stylesheet: " + str(ex))
+        doc = self.opts.doc
+        if not doc:
+            doc = sys.stdin
+        out = self.out
+        if self.opts.silent:
+            out = None
 
         try:
-            eng = DocEngine(ss, context, system)
-        except TransformConfigException, ex:
-            return self.fail(INVALIDTRANS, "Stylesheet configuration error: " +
-                             str(ex))
+            transform(self.opts.ssheet, doc, self.opts, out)
+        except CLIException, ex:
+            if self.verbose:
+                if isinstance(ex.cause, TransformApplicationException) and \
+                   hasattr(ex.cause, 'input'):
+                    self.complain("Problem transforming input: ")
+                    try:
+                        json.dump(self.err, ex.input)
+                    except (TypeError, ValueError), je:
+                        self.complain("input does not look like JSON: " +
+                                      str(ex.input))
 
-        # read the input document
-        try:
-            if self.opts.doc:
-                with open(self.opts.doc) as fd:
-                    doc = json.load(fd)
-            else:
-                doc = json.load(sys.stdin)
-        except ValueError, ex:
-            return self.fail(BADJSON_DOC, 
-                             "JSON syntax error in input document: " + str(ex))
-
-        try:
-            if not self.opts.silent:
-                eng.write(self.out, doc, self.opts.forcejson)
-            else:
-                eng.transform(doc)
-        except TransformConfigException, ex:
-            return self.fail(INVALIDTRANS, "Stylesheet configuration error: " +
-                             str(ex))
-        except TransformApplicationException, ex:
-            if self.opts.verbose and ex.input:
-                self.complain("Problem transforming input: ")
-                try:
-                    json.dump(sys.stderr, ex.input)
-                except (TypeError, ValueError), je:
-                  self.complain("input does not look like JSON: "+str(ex.input))
-
-            return self.fail(TRANSFORMERROR, "Transformation failed: " + str(ex))
+            return self.fail(ex.exitcode, ex.message)
 
         return 0
 
@@ -248,7 +196,7 @@ def _create_system(options, defsystem=None):
         try:
             system.update(_parse_ctx_args(options.system))
         except ValueError, ex:
-            return self.fail(INVALID_PARAM, "bad parameter syntax: "+str(ex))
+            raise CLIException("bad parameter syntax: "+str(ex), INVALID_PARAM)
 
     return system
 
@@ -284,6 +232,9 @@ def transform(stylesheet, document, options=None, out=None):
         parser = define_opts("jsont-python")
         options.append(stylesheet)
         options = parser.parse_args(options)
+
+    if options.quiet or options.silent:
+        options.verbose = False
 
     context = _create_context(options)
     system = _create_system(options)
