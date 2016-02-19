@@ -181,5 +181,39 @@ def test_force_json(tstsys):
     assert json.loads(tstsys.stdout.getvalue()) == \
         "a substitution token looks like this: {texpr}"
 
+def test_transform(tstsys):
+
+    args = map(lambda f: os.path.join(exdir, f), 
+               "testtemplate4.json testdoc4.json".split())
+    result = cli.transform(args[0], args[1])
+
+    assert isinstance(result, dict)
+    assert result['contacts'][0].keys()[0] == "Bob"
+    assert result['contacts'][0]["Bob"] == "Bob <bob@gmail.com>"
+
+    out = StringIO()
+    result = cli.transform(args[0], args[1], out=out)
+
+    assert result is None
+    result = out.getvalue()
+    assert result[-1] == '\n'
+
+def test_transform_pretty(tstsys):
+
+    args = map(lambda f: os.path.join(exdir, f), 
+               "testtemplate4.json testdoc4.json".split())
+    out = StringIO()
+    cli.transform(args[0], args[1], "-p", out)
+
+    result = json.loads(out.getvalue())
+    assert isinstance(result, dict)
+    assert result['contacts'][0].keys()[0] == "Bob"
+    assert result['contacts'][0]["Bob"] == "Bob <bob@gmail.com>"
+
+    lines = out.getvalue().split('\n')
+    assert len(lines) == 8
+
+    line = filter(lambda l: "contacts" in l, lines)[0]
+    assert line.startswith('    "')
 
 

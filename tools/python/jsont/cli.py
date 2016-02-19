@@ -36,6 +36,10 @@ def define_opts(progname):
     parser.add_argument('-s', '--silent', action='store_true', 
                         help="suppress all output; the exit code indicates "
                             +"if any of the files are invalid.")
+    parser.add_argument('-v', '--verbose', action='store_true', 
+                     help="print extra error messages (overridden by -q or -s).")
+    parser.add_argument('-g', '--debug', action='store_true', 
+                       help="print debugging messages (unaffected by -q or -s).")
 
     return parser
 
@@ -67,6 +71,11 @@ class Runner(object):
         except Exception, ex:
             tb = sys.exc_info()[2]
             origin = traceback.extract_tb(tb)[-1]
+
+            if hasattr(self.opts,'debug') and self.opts.debug:
+                self.complain("Unexpected error: traceback:")
+                traceback.print_tb(tb)
+
             return self.fail(UNEXPECTED, "Unexpected exception at {0}, line {1}: {2}".format(origin[0], origin[1], repr(ex)))
 
     def run(self):
@@ -126,6 +135,8 @@ class JSONT(Runner):
 
         Command line arguments are parsed from sys.argv.  
         """
+        if self.opts.quiet or self.opts.silent:
+            self.opts.verbose = False
 
         context = { }
         if self.opts.pretty:
@@ -186,10 +197,119 @@ class JSONT(Runner):
                 eng.write(self.out, doc, self.opts.forcejson)
             else:
                 eng.transform(doc)
+        except TransformConfigException, ex:
+            return self.fail(INVALIDTRANS, "Stylesheet configuration error: " +
+                             str(ex))
         except TransformApplicationException, ex:
+            if self.opts.verbose and ex.input:
+                self.complain("Problem transforming input: ")
+                try:
+                    json.dump(sys.stderr, ex.input)
+                except (TypeError, ValueError), je:
+                  self.complain("input does not look like JSON: "+str(ex.input))
+
             return self.fail(TRANSFORMERROR, "Transformation failed: " + str(ex))
 
         return 0
+
+def create_context(options, defcontext=None):
+    if not defcontext:
+        defcontext = {}
+
+    context = dict(defcontext)
+    if options.pretty:
+        context['json.indent'] = 4
+
+    if options.context:
+        try:
+            context.update(_parse_ctx_args(options.context))
+        except ValueError, ex:
+            raise CLIException("bad parameter syntax: "+str(ex),INVALID_PARAM,ex)
+
+    if 'json.indent' in context and context['json.indent'] is not None:
+        if not isinstance(context['json.indent'], int):
+            try:
+                context['json.indent'] = int(context['json.indent'])
+            except ValueError, ex:
+                raise CLIException("json.indent: bad parameter type: "+
+                                   context['json.indent'], INVALID_PARAM, ex)
+
+    return context
+
+def create_system(options, defsystem=None):
+    if not defsystem:
+        defsystem = {}
+
+    system = dict(defsystem)
+    if options.system:
+        try:
+            context.update(_parse_ctx_args(options.system))
+        except ValueError, ex:
+            return self.fail(INVALID_PARAM, "bad parameter syntax: "+str(ex))
+
+    if not os.path.exists(options.ssheet):
+        return self.fail(FILENOTFOUND, options.ssheet + ": file not found")
+    if options.doc and not os.path.exists(options.doc):
+        return self.fail(FILENOTFOUND, options.doc + ": file not found")
+
+
+
+def transform(stylesheet, document, options=None, out=None):
+    if options is None:
+        options = ""
+    if not hasattr(options, 'pretty'):
+        if isinstance(options, str) or isinstance(options, unicode):
+            options = options.split()
+
+        parser = define_opts("jsont-python")
+        options.append(stylesheet)
+        options = parser.parse_args(options)
+
+    context = create_context(options)
+    system = create_system(options)
+
+    if not os.path.exists(stylesheet):
+        raise CLIException(stylesheet + ": file not found", FILENOTFOUND)
+    if isinstance(document,str) and not os.path.exists(document):
+        raise CLIException(document + ": file not found", FILENOTFOUND)
+
+    # load the stylesheet file
+    try:
+        with open(stylesheet) as fd:
+            ss = json.load(fd)
+    except ValueError, ex:
+        raise CLIException("JSON syntax error in stylesheet: " + str(ex),
+                           BADJSON_SS, ex)
+
+    try:
+        eng = DocEngine(ss, context, system)
+    except TransformConfigException, ex:
+        raise CLIException("Stylesheet configuration error: " + str(ex),
+                           INVALIDTRANS, ex)
+
+    # read the input document
+    try:
+        if isinstance(document, str):
+            with open(document) as fd:
+                doc = json.load(fd)
+        else:
+            doc = json.load(document)
+    except ValueError, ex:
+        raise CLIException("JSON syntax error in input document: " + str(ex),
+                           BADJSON_DOC, ex)
+
+    try:
+        if out:
+            eng.write(out, doc, options.forcejson)
+        else:
+            return eng.transform(doc)
+    except TransformConfigException, ex:
+        raise CLIException("Stylesheet configuration error: " + str(ex),
+                           INVALIDTRANS, ex)
+
+    except TransformApplicationException, ex:
+        raise CLIException("Transformation failed: " + str(ex),
+                           TRANSFORMERROR, ex)
 
 
 def _parse_ctx_args(ctxargs):
@@ -201,3 +321,20 @@ def _parse_ctx_args(ctxargs):
         if not key:
             raise ValueError("empty parammeter name")
         yield (key, val)
+
+class CLIException(JSONTransformException):
+    """
+    An exception indicating a failure captured at the command-line interface 
+    level.  It includes an appropriate exit code to fail with.
+    """
+
+    def __init__(self, message, code=1, cause=None):
+        """
+        construct the exception
+        :argument str message: the message to provide the CLI user
+        :argument int code:    the recommended CLI exit code
+        :argument Exception cause:  the underlying cause for the failure
+        """
+        super(CLIException, self).__init__(message, cause)
+        self.exitcode = code
+
