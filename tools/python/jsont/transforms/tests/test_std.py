@@ -176,6 +176,7 @@ class TestExtractTransform(object):
 
     def test_function(self, engine):
         config = { "content": "Call {extract(/curation/contact/name)}." }
+        #pytest.set_trace()
         transf = std.StringTemplate(config, engine, "goob", "stringtemplate")
         out = transf({"curation": { "contact": { "name": "bob" }} }, {})
         assert out == 'Call bob.'

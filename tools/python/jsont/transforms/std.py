@@ -486,6 +486,18 @@ class Extract(Transform):
 
     def mkfn(self, config, engine):
         select = config.get("select", '')
+
+        if isinstance(select, dict) and '$val' in select:
+            # It's a bit ugly, but we need to catch a restricted use of 
+            # {$val} employed by Function/Callable
+            dp = select['$val']
+            if dp == '' or ':' in dp or dp.startswith('/'):
+                # it's a data pointer
+                select = dp
+            else: 
+                raise TransformConfigParamError("select", self.name, 
+                                 "select param value is not a data pointer:"+dp)
+            
         def impl(input, context, *args, **keys):
             return engine.extract(input, context, select)
         return impl
@@ -536,13 +548,23 @@ class Map(Transform):
     array.  
     """
     def mkfn(self, config, engine):
-
+        name = (self.name or "(map)")
         itemmap = config.get('itemmap', 'tostr')
-        if isinstance(itemmap, dict):
-            # it's an anonymous transform configuration
-            itemmap = engine.make_transform(itemmap)
+
+        if has_metaproperty(itemmap):
+            if '$val' in itemmap:
+                itemmap = resolve_meta_directive(itemmap['$val'], engine, name)
+            elif '$upd' in itemmap:
+                itemmap['$upd'] = resolve_meta_directive(itemmap['$upd'], 
+                                                         engine, name) 
+                itemmap = ExpandableObject(itemmap, engine, name+"($upd)")
+            else:
+                itemmap = { '$ins': resolve_meta_directive(itemmap['$val'], 
+                                                           engine, name) }
+                itemmap = ExpandableArray([itemmap], engine, name+"($ins)")
+
         else:
-            itemmap = engine.resolve_transform(itemmap)
+            itemmap = resolve_meta_directive(itemmap, engine, name)
 
         strict = config.get('strict', False)
 
