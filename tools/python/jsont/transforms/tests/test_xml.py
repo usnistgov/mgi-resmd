@@ -73,9 +73,9 @@ def test_determine_prefix():
 def test_format_text():
 
     context = {
-        'xml.indent_step': 4,
+        'xml.indent': 4,
         'xml.text_packing': 'pretty',
-        'xml.indent': 8,
+        'xml.base_indent': 8,
         'xml.min_line_length': 30,
         'xml.max_line_length': 70
     }
@@ -90,7 +90,7 @@ def test_format_text():
     assert max(map(lambda l: len(l), map(lambda n: n.strip(), lines))) <= 62
 
     ctxt = dict(context)
-    ctxt['xml.indent_step'] = -1
+    ctxt['xml.indent'] = -1
     text = xml.format_text(longtext, ctxt)
     lines = text.split('\n')
     assert len(lines) == 1
@@ -106,7 +106,7 @@ def test_format_text():
     assert len(lines[0]) > 70
 
     ctxt = dict(context)
-    ctxt['xml.indent'] = 56
+    ctxt['xml.base_indent'] = 56
     text = xml.format_text(longtext, ctxt)
     lines = text.split('\n')
     assert len(lines) > 1
@@ -116,9 +116,9 @@ def test_format_text():
 def test_format_atts():
 
     context = {
-        'xml.indent_step': 4,
+        'xml.indent': 4,
         'xml.text_packing': 'pretty',
-        'xml.indent': 8,
+        'xml.base_indent': 8,
         'xml.min_line_length': 30,
         'xml.max_line_length': 50
     }
@@ -163,7 +163,7 @@ def test_format_element_simple():
         }
     }
     context = {
-        "xml.indent": 4,
+        "xml.base_indent": 4,
         "xml.style": 'pretty'
     }
     prefixes = { xsiuri: "xsi",
@@ -198,7 +198,7 @@ def test_format_element_wrap():
         }
     }
     context = {
-        "xml.indent": 5,
+        "xml.base_indent": 5,
         "xml.style": 'pretty'
     }
     prefixes = { xsiuri: "xsi",
@@ -256,7 +256,7 @@ def test_format_text_hier():
     }
 
     context = {
-        "xml.indent": 0,
+        "xml.base_indent": 0,
         "xml.style": 'pretty',
         "xml.value_pad": 1
     }
