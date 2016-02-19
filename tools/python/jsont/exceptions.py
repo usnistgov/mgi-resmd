@@ -60,7 +60,7 @@ class TransformConfigException(JSONTransformException):
                                 from the underlying cause.  
         """
         msg = ""
-        if name: msg += name + " "
+        if name: msg += '"{0}" '.format(name)
         msg += "transform config error"
         if why: msg += ": " + why
         return msg

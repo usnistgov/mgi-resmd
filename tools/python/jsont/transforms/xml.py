@@ -394,11 +394,30 @@ types = {
     "xml.textElement": ToTextElement
 }
 
+class InvalidXMLError(TransformInputTypeError):
+    """
+    XML cannot be properly formatted because the input XML data is invalid.
+    """
+    def __init__(self, got=None, input=None, context=None, message=None):
+                 
+        if not got:
+            got = str(type(input))
+        if not message:
+            msg = "Invalid XML data: need an object"
+            if got:
+                msg += ", got " + got + "."
+            message = msg
+
+        super(InvalidXMLError, self).__init__("object", got, None,
+                                              input, context, message)
+
 def format_element(el, context, prefixes=None, transname=None):
     """
     format the data in an element data object into XML according to preferences
     from the context.  
     """
+    if not isinstance(el, dict):
+        raise InvalidXMLError(input=el, context=context)
 
     if prefixes is None:
         prefixes = ScopedDict()
@@ -441,7 +460,7 @@ def format_element(el, context, prefixes=None, transname=None):
         if pfxdefs:
             atts.extend(pfxdefs)
         if el.get('prefixes'):
-            for p, ns in el['prefixes']:
+            for p, ns in el['prefixes'].items():
                 if ns not in prefixes or prefixes[ns] != p:
                     prefixes[ns] = p
                     atts.append('xmlns:{0}="{1}"'.format(p, ns))
@@ -520,6 +539,9 @@ def format_text(text, context=None):
     """
     format the given text for inclusion as the content for an element
     """
+    if not isinstance(text, str) and not isinstance(text, unicode):
+        raise InvalidXMLError(input=text, context=context, 
+            message="Invalid XML: expected text, got "+str(type(text))+": "+text)
 
     if context is None:
         context = Context()
@@ -581,6 +603,11 @@ def format_atts(atts, indent, context, prefixes):
     format the attributes for insertion into an opening element tag.
     When many attributes are present, these can be wrapped onto separate lines.
     """
+    if not isinstance(atts, list) and not isinstance(atts, tuple):
+        raise InvalidXMLError(input=atts, context=context, 
+           message="Invalid XML: expected array, got "+str(type(atts))+": "+atts)
+
+
     style = context.get('xml.style', 'pretty')
     maxlen = context.get('xml.max_line_length', 78)
     minlen = context.get('xml.min_line_length', 30)

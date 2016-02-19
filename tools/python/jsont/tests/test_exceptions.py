@@ -72,7 +72,7 @@ def test_TransformConfigParamError():
         raise TransformConfigParamError("pretty", "toxml")
         pytest.fail("failed to raise")
     except JSONTransformException, ex:
-        assert ex.message == "toxml transform config error: problem with pretty parameter"
+        assert ex.message == '"toxml" transform config error: problem with pretty parameter'
         assert ex.cause is None
         assert ex.transform == "toxml"
         assert ex.param == "pretty"
@@ -101,7 +101,7 @@ def test_MissingTransformData():
         raise MissingTransformData("t", "json")
         pytest.fail("failed to raise")
     except JSONTransformException, ex:
-        assert ex.message == "json transform config error: missing parameter: t"
+        assert ex.message== '"json" transform config error: missing parameter: t'
         assert ex.cause is None
         assert ex.param == "t"
         assert ex.transform == "json"
