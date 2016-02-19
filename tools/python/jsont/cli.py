@@ -212,7 +212,7 @@ class JSONT(Runner):
 
         return 0
 
-def create_context(options, defcontext=None):
+def _create_context(options, defcontext=None, defsystem=None):
     if not defcontext:
         defcontext = {}
 
@@ -226,35 +226,55 @@ def create_context(options, defcontext=None):
         except ValueError, ex:
             raise CLIException("bad parameter syntax: "+str(ex),INVALID_PARAM,ex)
 
-    if 'json.indent' in context and context['json.indent'] is not None:
-        if not isinstance(context['json.indent'], int):
-            try:
-                context['json.indent'] = int(context['json.indent'])
-            except ValueError, ex:
-                raise CLIException("json.indent: bad parameter type: "+
-                                   context['json.indent'], INVALID_PARAM, ex)
+    intparams = "json.indent xml.indent xml.base_indent".split()
+    intparams.extend("xml.max_line_width xml.min_line_width".split())
+    for key in intparams:
+        if key in context and context[key] is not None:
+            if not isinstance(context[key], int):
+                try:
+                    context[key] = int(context[key])
+                except ValueError, ex:
+                    raise CLIException(key+": bad parameter type: "+
+                                       context['json.indent'], INVALID_PARAM, ex)
 
     return context
 
-def create_system(options, defsystem=None):
+def _create_system(options, defsystem=None):
     if not defsystem:
         defsystem = {}
 
     system = dict(defsystem)
     if options.system:
         try:
-            context.update(_parse_ctx_args(options.system))
+            system.update(_parse_ctx_args(options.system))
         except ValueError, ex:
             return self.fail(INVALID_PARAM, "bad parameter syntax: "+str(ex))
 
-    if not os.path.exists(options.ssheet):
-        return self.fail(FILENOTFOUND, options.ssheet + ": file not found")
-    if options.doc and not os.path.exists(options.doc):
-        return self.fail(FILENOTFOUND, options.doc + ": file not found")
-
+    return system
 
 
 def transform(stylesheet, document, options=None, out=None):
+    """
+    transform a JSON file into XML using a stylesheet file.
+
+    This function provides a convenient means for accessing the command line
+    functionality--namely, providing simple options and transparently opening 
+    and reading files--from within Python.  
+
+    :argument str stylesheet:  the stylesheet file to use to transform the data
+    :argument str or file stylesheet:  the JSON document to transform, either 
+                               as a filename or an open file stream object.
+    :argument options:   the command line options to use, in the form of either
+                           a list of arguments, a string of arguments (to be 
+                           split), or as an argparse options object.  If not 
+                           provided, an options object will be created assuming
+                           no options.
+    :argument file out:  the output stream to write results to.  If not provided,
+                           the transform output data will be returned.
+    :raises CLIException: if any errors are encountered.  This exception will 
+                           have a "exitcode" attribute providing the recommended
+                           program exit code for this error.  
+    """
     if options is None:
         options = ""
     if not hasattr(options, 'pretty'):
@@ -265,8 +285,8 @@ def transform(stylesheet, document, options=None, out=None):
         options.append(stylesheet)
         options = parser.parse_args(options)
 
-    context = create_context(options)
-    system = create_system(options)
+    context = _create_context(options)
+    system = _create_system(options)
 
     if not os.path.exists(stylesheet):
         raise CLIException(stylesheet + ": file not found", FILENOTFOUND)

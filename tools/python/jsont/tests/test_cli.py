@@ -1,4 +1,4 @@
-import pytest, os, sys, json, argparse
+import pytest, os, sys, json, argparse, collections
 from cStringIO import StringIO
 
 from jsont import cli
@@ -181,7 +181,7 @@ def test_force_json(tstsys):
     assert json.loads(tstsys.stdout.getvalue()) == \
         "a substitution token looks like this: {texpr}"
 
-def test_transform(tstsys):
+def test_transform():
 
     args = map(lambda f: os.path.join(exdir, f), 
                "testtemplate4.json testdoc4.json".split())
@@ -198,7 +198,7 @@ def test_transform(tstsys):
     result = out.getvalue()
     assert result[-1] == '\n'
 
-def test_transform_pretty(tstsys):
+def test_transform_pretty():
 
     args = map(lambda f: os.path.join(exdir, f), 
                "testtemplate4.json testdoc4.json".split())
@@ -215,5 +215,56 @@ def test_transform_pretty(tstsys):
 
     line = filter(lambda l: "contacts" in l, lines)[0]
     assert line.startswith('    "')
+
+def test_create_context():
+    parser = cli.define_opts("goob")
+
+    opts = parser.parse_args("stylesheet.json".split())
+    context = cli._create_context(opts)
+    assert isinstance(context, collections.Mapping)
+    assert len(context) == 0
+
+    opts = parser.parse_args("-p stylesheet.json".split())
+    context = cli._create_context(opts)
+    assert isinstance(context, collections.Mapping)
+    assert len(context) > 0
+    assert context['json.indent'] == 4
+
+    opts = parser.parse_args("stylesheet.json".split())
+    context = cli._create_context(opts, {"json.indent": "2", "xml.indent": "4"})
+    assert isinstance(context, collections.Mapping)
+    assert len(context) > 0
+    assert context['json.indent'] == 2
+    assert context['xml.indent'] == 4
+
+    opts = parser.parse_args("-Djson.indent=2 -Dxml.indent=4 stylesheet.json".split())
+    context = cli._create_context(opts)
+    assert isinstance(context, collections.Mapping)
+    assert len(context) > 0
+    assert context['json.indent'] == 2
+    assert context['xml.indent'] == 4
+
+def test_create_system():
+    parser = cli.define_opts("goob")
+
+    opts = parser.parse_args("stylesheet.json".split())
+    system = cli._create_system(opts)
+    assert isinstance(system, collections.Mapping)
+    assert len(system) == 0
+
+    opts = parser.parse_args("stylesheet.json".split())
+    system = cli._create_system(opts, {"sys.goob": "f"})
+    assert isinstance(system, collections.Mapping)
+    assert len(system) > 0
+    assert system['sys.goob'] == 'f'
+
+    opts = parser.parse_args("-Ssys.goob=t stylesheet.json".split())
+    system = cli._create_system(opts)
+    assert isinstance(system, collections.Mapping)
+    assert len(system) > 0
+    assert system['sys.goob'] == 't'
+
+
+
 
 
