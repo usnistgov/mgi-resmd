@@ -1,0 +1,70 @@
+{
+    "$schema": "http://mgi.nist.gov/mgi-json-trans/v0.1",
+    "transforms": {
+        "xml.xsiuri": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/LiteralTransform" ],
+            "$type": "literal",
+            "value": "http://www.w3.org/2001/XMLSchema-instance",
+            "expects": ["any"],
+            "returns": "string"
+        }, 
+        "xml.define_xsi": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/jsont-xml-transf/v0.1#/definitions/ToAttributeTransform" ],
+            "$type": "xml.attribute",
+            "name": "xmlns:xsi",
+            "value": "{xml.xsiuri}",
+            "expects": ["any"],
+            "returns": "string"
+        },
+        "xml.attribute": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/CallableTransform" ],
+            "$type": "callable",
+            "transform_tmpl": {
+                "$type": "xml.attribute",
+                "name": { "$val": "/0" },
+                "value": { "$val": "/1" }
+            },
+            "conf_args_index": [ 0, 1 ],
+            "argv_supported": [
+                {
+                    "required": true,
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "required": true,
+                    "name": "value",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "object"
+        },
+        "xml.textElement": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/CallableTransform" ],
+            "$type": "callable",
+            "transform_tmpl": {
+                "$type": "xml.textElement",
+                "name": { "$val": "/0" },
+                "value": { "$val": "/1" }
+            },
+            "conf_args_index": [ 0, 1 ],
+            "argv_supported": [
+                {
+                    "required": true,
+                    "name": "name",
+                    "description": "the element name to create",
+                    "type": "string"
+                },
+                {
+                    "required": true,
+                    "name": "value",
+                    "description": "the string contents to give the element",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "object"
+        }
+    }
+}

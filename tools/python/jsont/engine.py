@@ -7,45 +7,12 @@ import jsonspec.pointer as jsonptr
 
 from .exceptions import *
 from .base import *
-from .transforms import std
+from .transforms import std, xml
 from . import parse
 
 defaultContext = {
     "$secure": True,
 }
-
-class Context(ScopedDict):
-    """
-    a special dictionary for containing context data.  Keys that begin with
-    "$" cannot be overridden.
-    """
-    CONST_PREFIX = '$'
-
-    def __init__(self, defaults=None):
-        super(Context, self).__init__(defaults)
-
-    def __setitem__(self, key, value):
-        if key.startswith(self.CONST_PREFIX):
-            raise KeyError(key + ": cannot be updated")
-        ScopedDict.__setitem__(self, key, value)
-
-    def __delitem__(self, key):
-        if key.startswith(self.CONST_PREFIX):
-            raise KeyError(key + ": cannot be deleted")
-        ScopedDict.__delitem__(self, key)
-
-    def __set(self, key, value):
-        try:
-            self.__setitem__(key, value)
-        except KeyError:
-            pass
-
-    def update(self, other=None, **keys):
-        if other is not None:
-            for key in other:
-                self.__set(key, other[key])
-        for key in keys:
-            self.__set(key, keys[key])
 
 class DataPointer(object):
     """
@@ -149,10 +116,19 @@ class Engine(object):
             self._system = base._system
 
         self.load_transform_defs(currtrans)
+        self.update_context(currtrans)
 
         # wrap default transform classes for the different types
         if base:
             self._transCls = ScopedDict(base._transCls)
+
+    def update_context(self, trans):
+        """
+        update the context data from the new definitions in the given
+        transform configuration
+        """
+        if trans.has_key('context') and isinstance(trans['context'], dict):
+            self.context.update(trans['context'])
 
     def load_transform_defs(self, config):
         """
@@ -230,19 +206,19 @@ class Engine(object):
         create a Transform instance from its configuration
 
         :argument dict config:  the JSON object that defines the transform.  
-                                This must have a 'type' property if the type
+                                This must have a '$type' property if the type
                                 is not given as an argument.
         :argument name str:     the name associated with this transform.  If 
                                 None, the transform is anonymous.  
         :argument type str:     the type of transform to assume for this 
-                                request.  Any 'type' property in the config
+                                request.  Any '$type' property in the config
                                 is ignored.  
         :argument ignorecontext boolean:  ignore any changes to the context 
                                 (i.e. new transforms, prefixes, and context 
                                 data) included in the transform configuration.
         """
         if not type:
-            type = config.get('type')
+            type = config.get('$type')
         if not type:
             return Transform(config, self, name, type="identity")
 
@@ -258,6 +234,48 @@ class Engine(object):
             raise TransformNotFound(name, msg)
 
         return tcls(config, self, name, type, ignorecontext)
+
+    def make_JSON_transform(self, template, input=None):
+        """
+        convert the given JSON data template into a JSON Transform instance.
+        A JSON data template is a JSON structure (dict, list, or string) that
+        contains embedded substitution directives.  Such a directive comes in 
+        one of the following forms:
+           * a sub string within a string value of the form {...}, where the
+             the contents inside the braces is a transform name or a data 
+             pointer.  This braces and its contents will be replaced with a 
+             string value resulting from the application of the transform or 
+             pointer to the input data.  This can appear in either property
+             names or in string values.
+           * an object (dict) containing a "$val" property.  The value of this
+             property can be an anonymous or named transform or data poitner. 
+             This object containg "$val" will be replaced by the result of 
+             applying the transform/pointer to the input data.
+           * an array (list) item that is an object containing a "$ins" property.
+             The value of this property is interpreted in the same way as "$val"
+             except that the result of applying the transform is expected to be
+             an array (list).  The object containing the "$ins" property will be
+             replaced by the items from the transform result and, thus, inserted
+             into the containing array. 
+           * an object (dict) that contains an "$upd" property.
+             The value of this property is interpreted in the same way as "$val"
+             except that the result of applying the transform is expected to be
+             an object (dict).  The object with the "$ins" property have its 
+             "$ins" property removed, and then the properties resulting from its 
+             tranform will be added to the object (overriding any properties 
+             with the same names).  
+           * an object (dict) containing a "$type" property.  The value of this
+             string is a string.  This object will be interpreted as an 
+             anonymous transform and will be replaced by the result of applying 
+             it to the input data
+           
+        :argument template: the JSON structure containing {} directives
+        :argument input:  a reference to a transform to apply to select data
+                          from the input data to apply to the template.  
+        :returns JSON: a JSON Tranform instance
+        """
+        return std.JSON({"content": template, "input": input},
+                        name="(anon)", type="json")
 
     def resolve_all_transforms(self):
         """
@@ -319,7 +337,8 @@ class Engine(object):
             elif use.target == "$context":
                 return jsonptr.extract(context, use.path)
         except jsonptr.ExtractError, ex:
-            raise DataExtractionError.due_to(ex, input, context)
+            # CONSIDER: return None?
+            raise DataExtractionError.due_to(ex, use.path, input, context)
         except Exception, ex:
             raise DataPointerError.due_to(ex, use, select)
 
@@ -347,8 +366,11 @@ class StdEngine(Engine):
 
     def __init__(self, context=None):
         super(StdEngine, self).__init__()
-        self.context = ScopedDict(context)
         self.load_plugin(std)
+        self.load_plugin(xml)
+        if context: 
+            self.context = ScopedDict(self.context)
+            self.context.update(context)
 
     def load_plugin(self, mod):
         """

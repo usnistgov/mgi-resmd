@@ -1,0 +1,49 @@
+{
+    "$schema":  "http://mgi.nist.gov/mgi-json-trans/v0.1",
+
+    "$type": "apply",
+    "transform": {
+        "$type": "xml.print",
+        "element": "content"
+    },
+    "input": "/content",
+
+    "context": {
+        "xml.value_pad": 1
+    },
+
+    "transforms": {
+        "content": {
+            "$type": "xml.element",
+            "name": "content",
+            "content": "subjects"
+        },
+        "subject": {
+            "$type": "xml.element",
+            "name": "subject",
+            "content": {
+                "children": [ "{$in:}" ]
+            }
+        },
+        "subjects": {
+            "$type": "apply",
+            "transform": {
+                "$type": "xml.elementContent",
+                "children": {
+                    "$type": "map",
+                    "itemmap": {
+                        "$type": "apply",
+                        "transform": "subject"
+                    }
+                },
+                "attrs": [ "xml.attribute(xmlns:xsi,{xml.xsiuri})" ]
+            },
+            "input": "/subject"
+        },
+        "element": {
+            "$type": "stringtemplate",
+            "content": "<{/name}> {/content/children} </{/name}>"
+        }
+    }
+
+}

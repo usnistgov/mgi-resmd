@@ -21,7 +21,7 @@
             "description": "a configuration of a transform that can be applied to JSON data structures",
             "type": "object",
             "properties": {
-                "type": {
+                "$type": {
                     "description": "the name of the type of template this is.  This determines the other properties used to configure the transform.",
                     "type": "string",
                     "pattern": "^([a-zA-Z0-9_!@#$.])+$"
@@ -190,7 +190,7 @@
                 { "$ref": "#/definitions/Transform" },
                 {
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": [ "literal" ] 
                         },
                         "value": {
@@ -198,7 +198,7 @@
                             "$ref": "#/definitions/AnyType" 
                         }
                     },
-                    "required": [ "type", "value" ]
+                    "required": [ "$type", "value" ]
                 }
             ]
         },
@@ -208,7 +208,7 @@
                 { "$ref": "#/definitions/Transform" },
                 {
                     "properties": {
-                        "type": {
+                        "$type": {
                             "enum": [ "native" ] 
                         },
                         "impl": {
@@ -235,7 +235,7 @@
                             "items": { "$ref": "#/definitions/FunctionArg" }
                         }
                     },
-                    "required": [ "type", "impl" ]
+                    "required": [ "$type", "impl" ]
                 }
             ]
         },
@@ -245,7 +245,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "$type": {
                             "enum": ["extract"]
                         },
                         "select": {
@@ -258,7 +258,7 @@
                             "type": "string"
                         }
                     },
-                    "required": [ "type", "select" ]
+                    "required": [ "$type", "select" ]
                 }
             ]
         },
@@ -268,6 +268,9 @@
                 { "$ref": "#/definitons/Transform" },
                 {
                     "properties": {
+                        "$type": {
+                            "enum": ["apply"]
+                        },
                         "transform": {
                             "description": "the name of the transform to apply to the specified input data"
                         },
@@ -298,7 +301,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "$type": {
                             "enum": ["callable"]
                         },
                         "transform_tmpl": {
@@ -329,7 +332,41 @@
                             "items": { "$ref": "#/definitions/FunctionArg" }
                         }
                     },
-                    "required": [ "transform_tmpl", "conf_args_index" ]
+                    "required": [ "$type", "transform_tmpl", "conf_args_index" ]
+                }
+            ]
+        },
+        "ForEachTransform": {
+            "description": "a transform that will apply a specified transform to each property in the input object.",
+            "notes": [
+                "The data delivered to the transform will be a two-item array containing the property name and the value."
+            ],
+            "allOf": [
+                { "$ref": "#/definitions/Transform" },
+                { 
+                    "properties": {
+                        "$type": {
+                            "enum": ["callable"]
+                        },
+                        "propmap": {
+                            "description": "the transform to apply to each name-value array pair representing each property in the target object",
+                            "oneOf": [
+                                { 
+                                    "description": "a text-based reference to a transform",
+                                    "type": "string" 
+                                },
+                                {
+                                    "description": "a transform description object",
+                                    "$ref": "#/definitions/Transform"
+                                }
+                            ]
+                        },
+                        "strict": {
+                            "description": "if true, fail if the input data is not an object",
+                            "type": "boolean",
+                            "default": "false"
+                        }
+                    }
                 }
             ]
         },
@@ -339,7 +376,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "$type": {
                             "enum": ["map"]
                         },
                         "itemmap": {
@@ -354,6 +391,11 @@
                                     "$ref": "#/definitions/Transform"
                                 }
                             ]
+                        },
+                        "strict": {
+                            "description": "if true, fail if the input data is not an array",
+                            "type": "boolean",
+                            "default": "false"
                         }
                     }
                 }
@@ -365,7 +407,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "$type": {
                             "enum": ["json"]
                         },
                         "content": {
@@ -373,7 +415,7 @@
                             "$ref": "#/definitions/AnyType"
                         }
                     },
-                    "required": [ "type", "content" ]
+                    "required": [ "$type", "content" ]
                 }
             ]
         },
@@ -383,7 +425,7 @@
                 { "$ref": "#/definitions/Transform" },
                 { 
                     "properties": {
-                        "item": {
+                        "$type": {
                             "enum": ["stringtemplate"]
                         },
                         "content": {
@@ -391,7 +433,7 @@
                             "type": "string"
                         }
                     },
-                    "required": [ "type", "content" ]
+                    "required": [ "$type", "content" ]
                 }
             ]
         },

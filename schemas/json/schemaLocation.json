@@ -3,5 +3,7 @@
     "http://mgi.nist.gov/json/registry-resource/v0.1": "registry-resource_schema.json",
     "http://mgi.nist.gov/mgi-json-schema/v0.1": "mgi-json-schema.json",
     "http://mgi.nist.gov/json/res-md/v1.0wd": "res-md_schema.json",
-    "http://mgi.nist.gov/mgi-json-trans/v0.1": "mgi-json-trans.json"
+    "http://mgi.nist.gov/mgi-json-trans/v0.1": "mgi-json-trans.json",
+    "http://mgi.nist.gov/jsont-xml-transf/v0.1": "jsont-xml-transf.json",
+    "http://mgi.nist.gov/jsont-xml-schema/v0.1": "jsont-xml-schema.json"
 }

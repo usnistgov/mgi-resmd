@@ -284,7 +284,7 @@ class TestDirectorySchemaCache(object):
         cache = loader.DirectorySchemaCache(schemadir)
 
         locs = cache.locations()
-        assert len(locs) == 5
+        assert len(locs) == 7
 
         locs = cache.locations(recursive=False)
-        assert len(locs) == 4
+        assert len(locs) == 6

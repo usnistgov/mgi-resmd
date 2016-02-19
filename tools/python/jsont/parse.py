@@ -4,7 +4,7 @@ Various functions for parsing strings and transform directives.
 import re
 from .exceptions import TransformConfigException
 
-FUNC_PAT = re.compile(r'^(\w+)\((.*)\)$')
+FUNC_PAT = re.compile(r'^([\w\.]+)\((.*)\)$')
 
 class ConfigSyntaxError(TransformConfigException):
     """

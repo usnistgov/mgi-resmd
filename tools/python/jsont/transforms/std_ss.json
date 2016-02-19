@@ -3,21 +3,38 @@
     "transforms": {
         "$lb": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/LiteralTransform" ],
-            "type": "literal",
+            "$type": "literal",
             "value": "{",
             "expects": ["any"],
             "returns": "string"
         },
         "$rb": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/LiteralTransform" ],
-            "type": "literal",
+            "$type": "literal",
             "value": "}",
             "expects": ["any"],
             "returns": "string"
         },
+        "metaprop": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "$type": "native",
+            "impl": "$std.metaprop",
+            "description": "prepend a given string with a $ character",
+            "notes": [
+                "Using this function within a template allows one to produce $-prepended name without invoking its special meaning within a transform",
+                "Example: metaprop('type') produces '$type'"
+            ],
+            "argv_supported": [
+                {
+                    "name": "label",
+                    "description": "the string to prepend (default: the current input)",
+                    "type": "string"
+                }
+            ]            
+        },
         "tostr": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "native",
+            "$type": "native",
             "impl": "$std.tostr",
             "description": "convert input data to a string",
             "argv_supported": [
@@ -32,7 +49,7 @@
         },
         "indent": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "native",
+            "$type": "native",
             "impl": "$std.indent",
             "description": "prepend a specified number of spaces in front of the input text.",
             "argv_supported": [
@@ -51,12 +68,12 @@
             "returns": "string"
         },
         "fill": {
-            "type": "apply",
+            "$type": "apply",
             "transform": "newline",
             "input": {
-                "type": "apply",
+                "$type": "apply",
                 "transform": {
-                    "type": "map",
+                    "$type": "map",
                     "itemmap": "indent(5)"
                 },
                 "input": "wrap(70)"
@@ -64,7 +81,7 @@
         },
         "apply": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "native",
+            "$type": "native",
             "impl": "$std.applytransform",
             "argv_supported": [
                 {
@@ -88,9 +105,9 @@
         },
         "extract": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/CallableTransform" ],
-            "type": "callable",
+            "$type": "callable",
             "transform_tmpl": {
-                "type": "extract",
+                "$type": "extract",
                 "select": { "$val": "/0" }
             },
             "conf_args_index": [ 0 ],
@@ -106,9 +123,9 @@
         },
         "map": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/CallableTransform" ],
-            "type": "callable",
+            "$type": "callable",
             "transform_tmpl": {
-                "type": "map",
+                "$type": "map",
                 "itemmap": { "$val": "/0" }
             },
             "conf_args_index": [ 0 ],
@@ -123,7 +140,7 @@
         },
         "wrap": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "native",
+            "$type": "native",
             "impl": "$std.wrap",
             "description": "break text into an array of lines of limited length",
             "argv_supported": [
@@ -143,7 +160,7 @@
         },
         "concat": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "native",
+            "$type": "native",
             "impl": "$std.delimit",
             "args": [""],
             "expects": ["array"],
@@ -151,7 +168,7 @@
         },
         "delimit": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "native",
+            "$type": "native",
             "impl": "$std.delimit",
             "argv_supported": [
                 {
@@ -165,7 +182,7 @@
         },
         "newline": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "native",
+            "$type": "native",
             "impl": "$std.delimit",
             "description": "places each item on a different line",
             "args": [ "\n" ],
@@ -174,12 +191,20 @@
         },
         "doubleNewline": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
-            "type": "native",
+            "$type": "native",
             "impl": "$std.delimit",
             "description": "places a blank line between each item",
             "args": [ "\n\n" ],
             "expects": ["array"],
             "returns": "string"
+        },
+        "propNames": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "$type": "native",
+            "impl": "$std.prop_names",
+            "description": "places a blank line between each item",
+            "expects": ["object"],
+            "returns": "array"
         }
     }
 }

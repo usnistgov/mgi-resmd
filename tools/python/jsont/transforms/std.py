@@ -1,7 +1,7 @@
 """
 transformers from the standard module
 """
-import os, json, copy, re, importlib, textwrap
+import os, json, copy, re, importlib, textwrap, collections
 import types as tps
 import json as jsp
 
@@ -14,6 +14,64 @@ MODULE_NAME = __name__
 TRANSFORMS_PKG = __name__.rsplit('.', 1)[0]
 DEF_CONTRIB_PKG = TRANSFORMS_PKG
 
+METAPROPNAMES = ["$val", "$ins", "$upd"]
+
+def is_metaproperty(propname):
+    """
+    return true if the given property name represents a metaproperty for 
+    a metapropety transform directive.  True is returned if it matches
+    one of "$val", "$ins", or "$upd".
+    """
+    return propname in METAPROPNAMES
+
+def has_metaproperty(obj):
+    """
+    return true if the given object includes a metaproperty directive name
+    """
+    if not isinstance(obj, collections.Mapping):
+        return False
+    for name in METAPROPNAMES:
+        if name in obj:
+            return True
+    return False
+
+def resolve_meta_directive(dval, engine, name, defTransCls=None):
+    """
+    resolve the value to a meta-property directive--i.e. a property with 
+    the name "$val", "$ins", or "$upd"
+
+    :argument dval:           the value of the directive
+    :argument Engine engine:  the current Engine to use to resolve transforms
+    :argument str name:       the name to associate with the generated transform
+    :argument Transform.class defTransCls: the Transform class to interpret a 
+                              the directive object value with if it is not an
+                              anonymous transform.
+    """
+    if isinstance(dval, dict):
+        if '$type' in dval:
+            # it's an anonymous transform
+            return engine.make_transform(dval, name+"(anon)")
+        elif defTransCls:
+            return defTransCls(dval, engine, name)
+
+    if isinstance(dval, str) or isinstance(dval, unicode):
+        if '(' in dval or ')' in dval:
+            # treat like a function.  This could raise a syntax error
+            return engine.resolve_transform(dval)
+
+        if dval == '' or ':' in dval or dval.startswith('/'):
+            # it's a data pointer
+            return Extract({ "select": dval }, engine, name+"(select)","extract")
+
+        # else see if it matches a transform or transform-function
+        # (may raise a TransformNotFound)
+        return engine.resolve_transform(dval)
+
+    # Otherwise, treat it as a JSON template:
+    return JSON({"content": dval}, engine, name+"(json)", "json")
+        
+    
+
 # Transform types:
 
 class Literal(Transform):
@@ -23,7 +81,6 @@ class Literal(Transform):
     def mkfn(self, config, engine):
         val = config.get("value", "")
         def impl(input, context, *args):  
-            assert self.engine
             return val
         return impl
 
@@ -44,7 +101,7 @@ class StringTemplate(Transform):
             raise TransformConfigTypeError("content", "str", type(content), 
                                            self.name)
 
-        parsed = self.parse_template_str(content)
+        parsed = self.parse_template_str(content, engine)
 
         def impl(input, context, *args, **keys):
             out = []
@@ -61,7 +118,7 @@ class StringTemplate(Transform):
             return "".join(out)
         return impl
 
-    def parse_template_str(self, content):
+    def parse_template_str(self, content, engine):
 
         parsed = []
         while len(content) > 0:
@@ -95,13 +152,13 @@ class StringTemplate(Transform):
                     item = item[1:-1]
                     if item == '' or ':' in item or item.startswith('/'):
                         # it's a pointer
-                        item = Extract({ "select": item }, self.engine, 
+                        item = Extract({ "select": item }, engine, 
                                        (self.name or "extract")+":(select)", 
                                        "extract")
                     else:
                         # see if it matches a transform or transform-function
                         # (may raise a TransformNotFound)
-                        item = self.engine.resolve_transform(item)
+                        item = engine.resolve_transform(item)
 
                     parsed[i] = item
 
@@ -110,9 +167,44 @@ class StringTemplate(Transform):
 class JSON(Transform):
     """
     a Transform that converts the input data to a new JSON structure.
+
+    The content config parameter provides the template for the output JSON 
+    structure.  Its value is a JSON structure (dict, list, or string) that
+    contains embedded substitution directives.  Such a directive comes in 
+    one of the following forms:
+       * a sub string within a string value of the form {...}, where the
+         the contents inside the braces is a transform name or a data 
+         pointer.  The braces and its contents will be replaced with a 
+         string value resulting from the application of the transform or 
+         pointer to the input data.  This can appear in either property
+         names or in string values.
+       * an object (dict) containing a "$val" property.  The value of this
+         property can be an anonymous or named transform or data poitner. 
+         This object containg "$val" will be replaced by the result of 
+         applying the transform/pointer to the input data.
+       * an array (list) item that is an object containing a "$ins" property.
+         The value of this property is interpreted in the same way as "$val"
+         except that the result of applying the transform is expected to be
+         an array (list).  The object containing the "$ins" property will be
+         replaced by the items from the transform result and, thus, inserted
+         into the containing array. 
+       * an object (dict) that contains an "$upd" property.
+         The value of this property is interpreted in the same way as "$val"
+         except that the result of applying the transform is expected to be
+         an object (dict).  The object with the "$ins" property have its "$ins"
+         property removed, and then the properties resulting from its tranform
+         will be added to the object (overriding any properties with the same 
+         names).  
+       * an object (dict) containing a "$type" property.  The value of this
+         string is a string.  This object will be interpreted as an 
+         anonymous transform and will be replaced by the result of applying 
+         it to the input data
     """
 
     def mkfn(self, config, engine):
+        if not self.name:
+            self.name = "json"
+
         try: 
             content = config['content']
         except KeyError:
@@ -130,19 +222,8 @@ class JSON(Transform):
             if skel.has_key("$val"):
                 # $val means replace the object with the output from the
                 # Transform given as the value to $val
-                if isinstance(skel["$val"], dict):
-                    return engine.make_transform(skel["$val"], 
-                                                 self.name+".(anon)")
-                else:
-                    item = skel['$val']
-                    if item == '' or ':' in item or item.startswith('/'):
-                        # it's a pointer
-                        return Extract({ "select": item }, self.engine, 
-                                       self.name+":(select)", "extract")
-
-                    # else see if it matches a transform or transform-function
-                    # (may raise a TransformNotFound)
-                    return self.engine.resolve_transform(item)
+                return resolve_meta_directive(skel['$val'], engine, 
+                                              self.name+":$val")
             else:
                 self._resolve_json_object(skel, engine)
         elif (isinstance(skel, str) or isinstance(skel, unicode)) and \
@@ -156,7 +237,11 @@ class JSON(Transform):
     def _resolve_json_object(self, content, engine):
         # resolve the values
         for key in content:
-            content[key] = self._resolve_skeleton(content[key], engine)
+            if key == '$ins' or key == '$val' or key == '$upd':
+                content[key] = resolve_meta_directive(content[key], engine,
+                                                      self.name+':'+key)
+            else:
+                content[key] = self._resolve_skeleton(content[key], engine)
 
         # resolve keys
         keytrans = {}
@@ -189,13 +274,13 @@ class JSON(Transform):
             return skel(input, context)
 
         if isinstance(skel, dict):
-            if skel.has_key("$val"):
-                # $val means replace the object with the output from the
-                # Transform given as the value to $val
+            # $val means replace the object with the output from the
+            # Transform given as the value to $val.  
+            if skel.has_key('$val'):
+                item = skel['$val']
                 if isinstance(skel['$val'], Transform):
-                    return skel['$val'](input, context)
-                else:
-                    return skel['$val']
+                    skel['$val'] = skel['$val'](input, context)
+                return skel['$val']
 
             return self._transform_json_object(skel, input, context)
 
@@ -206,12 +291,21 @@ class JSON(Transform):
 
     def _transform_json_object(self, skel, input, context):
         out = {}
+        upd = {}
 
         # transform the values
         for key in skel:
             if key == "\bkeytr":
                 continue
-            out[key] = self._transform_skeleton(skel[key], input, context)
+            prop = self._transform_skeleton(skel[key], input, context)
+
+            # look for use of the {$ins} directive
+            if key == '$upd':
+                if isinstance(prop, dict):
+                    upd.update(prop)
+                # ignore $upd result if it is not an object
+            else:
+                out[key] = prop
 
         # transform any keys needing transforming
         if skel.has_key("\bkeytr"):
@@ -220,6 +314,9 @@ class JSON(Transform):
             for key in skel["\bkeytr"]:
                 newkey = skel["\bkeytr"][key](input, context)
                 out[newkey] = out.pop(key)
+
+        if upd:
+            out.update(upd)
 
         return out
 
@@ -232,9 +329,155 @@ class JSON(Transform):
             if isinstance(skel[i], Transform):
                 out.append(skel[i](input, context))
             else:
-                out.append(self._transform_skeleton(skel[i], input, context))
+                item = self._transform_skeleton(skel[i], input, context)
+
+                # check for use of the {$ins} directive
+                if isinstance(item, dict) and item.has_key('$ins'):
+                    item = item['$ins']
+                    if not hasattr(item, '__iter__'):
+                        item = [ item ]
+                    out.extend(item)
+                else:
+                    out.append(item)
 
         return out
+
+class ExpandableArray(Transform):
+    """
+    a transform that implements the {"$ins": } directive within an array.  
+    This cannot be invoke directly by the user; rather, it is invoked 
+    transparently via the use of the {$ins} directive as part of another 
+    transform.
+
+    The use of the {$ins} directive controls the handling of an array (list) 
+    of data.  If an item of an array is an object with a "$ins" property, then
+    the value of the "$ins" property is taken to be a transform (or a reference
+    to one) that results in an array.  The items in the resulting array are to 
+    be inserted in the enclosing array, replacing the object containing the 
+    "$ins" property.  That is, the enclosing array is expanded with the items
+    resulting from the the "$ins" transform.  If the transform produces an empty 
+    array, the enclosing array effectively shrinks by one item.  If the transform
+    produces a scalor result, that result will replace the "$ins" object as a 
+    single item, resulting in no change in the number of items in the enclosing
+    array.  
+    """
+
+    @classmethod
+    def contains_insertable(cls, array):
+        if not hasattr(array, '__iter__'):
+            return False
+        return bool(len(filter(lambda i: isinstance(i, dict) and "$ins" in i, 
+                               array)))
+
+    def __init__(self, array, engine, name=None):
+        """
+        create the transform.  This class is intended to be instantiated only 
+        within another transform (e.g. JSON) when processing an array with 
+        embedded transforms.  The items in the input array are expected to be 
+        already resolved into Transform instances where applicable.  In 
+        particular, each item that is an invocation of the {$ins} directive 
+        should be an object with an "$ins" property whose value is a
+        Transform instance.  
+        """
+        type = "{$ins}"
+        if not name:
+            name = type
+
+        if not hasattr(array, '__iter__'):
+            array = [array]
+        self.array = array
+
+        super(ExpandableArray, self).__init__({}, engine, name, type, True)
+
+    def mkfn(self, config, engine):
+
+        def impl(input, context):
+            out = []
+            for item in self.array:
+                if isinstance(item, Transform):
+                    item = item(input, config) 
+                elif isinstance(item, dict) and item.has_key('$ins'):
+                    if isinstance(item['$ins'], Transform):
+                        item = item['$ins'](input, config)
+                    else:
+                        item = item['$ins']
+
+                if not hasattr(item, '__iter__'):
+                    item = [ item ] 
+
+                out.extend(item)
+
+            return out
+        
+        return impl
+
+class ExpandableObject(Transform):
+    """
+    a transform that implements the {"$ins": } directive within an object.  
+    This cannot be invoke directly by the user; rather, it is invoked 
+    transparently via the use of the {$ins} directive as part of another 
+    transform.
+
+    The use of the {$ins} directive controls the handling of an object (dict) 
+    of data.  If an object contains an "$ins" property, then the value of the 
+    "$ins" property is taken to be a transform (or a reference to one) that 
+    results in another object.  The properties in the resulting object are to 
+    be inserted in the enclosing object, replacing the object containing the 
+    "$ins" property as well as an other properties with the same names.  That 
+    is, the enclosing object is typically expanded with properties resulting 
+    from the the "$ins" transform.  If the transform produces an empty object, 
+    the enclosing object effectively shrinks by one property (the "$ins" 
+    property).  If the transform produces a scalor result, that result is 
+    ignored and treated as if an empty object was returned.  
+    """
+
+    @classmethod
+    def contains_insertable(cls, obj):
+        if not isinstance(obj, collections.Mapping):
+            return False
+        return "$upd" in obj
+
+    def __init__(self, obj, engine, name=None):
+        """
+        create the transform.  This class is intended to be instantiated only 
+        within another transform (e.g. JSON) when processing an object with 
+        embedded transforms.  The properties in the input object are expected to 
+        be already resolved into Transform instances where applicable.  In 
+        particular, the value of the "$ins" property should be a Transform 
+        instance.  
+        """
+        type = "{$upd}"
+        if not name:
+            name = type
+
+        if not isinstance(obj, collections.Mapping):
+            raise TypeError("ExpandableObject invoked on non-dictionary: "+
+                            str(obj))
+        self.obj = obj
+
+        super(ExpandableObject, self).__init__({}, engine, name, type, True)
+
+    def mkfn(self, config, engine):
+
+        def impl(input, context):
+            out = {}
+            upd = {}
+            for prop in self.obj:
+                val = self.obj[prop]
+                if isinstance(val, Transform):
+                    val = val(input, context)
+
+                if prop == '$upd':
+                    if isinstance(val, collections.Mapping):
+                        upd.update(val)
+                else:
+                    out[prop] = val
+
+            out.update(upd)
+            return out
+        
+        return impl
+
 
 class Extract(Transform):
     """
@@ -243,8 +486,60 @@ class Extract(Transform):
 
     def mkfn(self, config, engine):
         select = config.get("select", '')
+
+        if isinstance(select, dict) and '$val' in select:
+            # It's a bit ugly, but we need to catch a restricted use of 
+            # {$val} employed by Function/Callable
+            dp = select['$val']
+            if dp == '' or ':' in dp or dp.startswith('/'):
+                # it's a data pointer
+                select = dp
+            else: 
+                raise TransformConfigParamError("select", self.name, 
+                                 "select param value is not a data pointer:"+dp)
+            
         def impl(input, context, *args, **keys):
             return engine.extract(input, context, select)
+        return impl
+
+class ForEach(Transform):
+    """
+    a transform that applies a specified transform to each property in the input
+    object.  The data delivered to the transform will be a two-item array 
+    containing the property name and the value.  
+    """
+    def mkfn(self, config, engine):
+
+        itemmap = config.get('propmap', 'tostr')
+        if isinstance(itemmap, dict):
+            # it's an anonymous transform configuration
+            itemmap = engine.make_transform(itemmap)
+        else:
+            itemmap = engine.resolve_transform(itemmap)
+
+        strict = config.get('strict', False)
+
+        def impl(input, context, *args, **keys):
+            data = input
+            if not isinstance(data, object) and isinstance(data, list):
+                if not strict:
+                    data = [data]
+                else:
+                    raise TransformInputTypeError('object', type(data), 
+                                                  (self.name or "foreach"), data,
+                                                  context)
+            if isinstance(data, list):
+                if strict:
+                    raise TransformInputTypeError('object', type(data), 
+                                                  (self.name or "foreach"), data,
+                                                  context)
+
+                return map(lambda i: itemmap(i, context), data)
+
+            data = list[data.items()]
+            return map(lambda i: itemmap(i, context), data)
+
+
         return impl
 
 class Map(Transform):
@@ -253,13 +548,23 @@ class Map(Transform):
     array.  
     """
     def mkfn(self, config, engine):
-
+        name = (self.name or "(map)")
         itemmap = config.get('itemmap', 'tostr')
-        if isinstance(itemmap, dict):
-            # it's an anonymous transform configuration
-            itemmap = engine.make_transform(itemmap)
+
+        if has_metaproperty(itemmap):
+            if '$val' in itemmap:
+                itemmap = resolve_meta_directive(itemmap['$val'], engine, name)
+            elif '$upd' in itemmap:
+                itemmap['$upd'] = resolve_meta_directive(itemmap['$upd'], 
+                                                         engine, name) 
+                itemmap = ExpandableObject(itemmap, engine, name+"($upd)")
+            else:
+                itemmap = { '$ins': resolve_meta_directive(itemmap['$val'], 
+                                                           engine, name) }
+                itemmap = ExpandableArray([itemmap], engine, name+"($ins)")
+
         else:
-            itemmap = engine.resolve_transform(itemmap)
+            itemmap = resolve_meta_directive(itemmap, engine, name)
 
         strict = config.get('strict', False)
 
@@ -281,7 +586,11 @@ class Apply(Transform):
     A transform that applies another transform with different data set as the 
     current input data.  
     """
-    def mkfn(self, config, engine):
+    def _mkfn(self, config, engine):
+        # Note that we are overriding _mkfn rather than mkfn; this is because
+        # we need to handle input slightly differently.  We want to make new
+        # transforms defined in the 'transform' parameter available to input.
+
         try:
             transf = config['transform']
         except KeyError:
@@ -294,42 +603,21 @@ class Apply(Transform):
             raise TransformConfigTypeError('transform', 'dict or str', 
                                            type(transf))
 
-        newin = self._resolve_input(config.get('input', ''), transf.engine)
+        input_transf = None
+        if "input" in config:
+            input_transf = self._resolve_input(config['input'], transf.engine)
 
         targs = config.get('args', [])
 
         def impl(input, context, *args, **keys):
             
-            usein = newin
-            if isinstance(newin, Transform):
-                usein = newin(input, context)
-            
-            useargs = targs + list(args)
+            if input_transf:
+                input = input_transf(input, context)
 
-            return transf(usein, context, *useargs)
+            useargs = targs + list(args)
+            return transf(input, context, *useargs)
 
         return impl
-
-    def _resolve_input(self, input, engine):
-
-        if isinstance(input, dict):
-            # this is a transform configuration object
-            return engine.make_transform(input, "(anon)")
-
-        if not isinstance(input, str) and not isinstance(input, unicode):
-            raise TransformConfigTypeError('input', 'dict or str', type(input))
-
-        if '(' in input or ')' in input:
-            return engine.resolve_transform(input)
-
-        if input == '' or ':' in input or input.startswith('/'):
-            # it's a pointer
-            return Extract({ "select": input }, engine, 
-                           (self.name or "extract")+":(select)", "extract")
-
-        # see if it matches a transform or transform-function
-        # (may raise a TransformNotFound)
-        return engine.resolve_transform(input)
 
 
 class Native(Transform):
@@ -431,10 +719,20 @@ class Function(Transform):
                     elif isinstance(uargs[i], list) or isinstance(uargs[i],dict):
                         uargs[i] = JSON({'content': uargs[i]}, engine, 
                                         self.name+":(arg)", "json")
-                                       
+
                 except ValueError:
-                    # It should be interpreted as a transform directive
-                    uargs[i] = engine.resolve_transform(uargs[i])
+                    if '(' in uargs[i] or ')' in uargs[i]:
+                        # transform invoked as a function 
+                        uargs[i] = engine.resolve_transform(uargs[i])
+
+                    elif ':' in uargs[i] or uargs[i].startswith('/'):
+                        # it's a data pointer
+                        uargs[i] = Extract({"select": uargs[i]}, engine, 
+                                           (self.name or "extract")+":(select)",
+                                           "extract")
+                    else:
+                        # It should be interpreted as a transform directive
+                        uargs[i] = engine.resolve_transform(uargs[i])
 
 
         def impl(input, context, *eargs, **keys):
@@ -459,7 +757,16 @@ class Function(Transform):
                 msg = TransformConfigException.make_message(callable.name,
                         "Insufficient number of arguments provided")
                 raise TransformConfigException(msg, callable.name)
-            use.append(args[idx])
+            arg = args[idx]
+            if (arg.startswith('"') and arg.endswith('"')) or \
+               (arg.startswith("'") and arg.endswith("'")):
+                # arg intended as a literal; remove quotes
+                arg = arg[1:-1]
+            else:
+                # arg is a reference to a transform or data pointer
+                arg = { "$val": arg }
+               
+            use.append(arg)
                 
         # apply the arguments to the transform template
         transtmpl = callable.config_template
@@ -486,11 +793,6 @@ class Function(Transform):
             use.append(args[idx])
 
         return use
-
-
-        
-                
-
 
     @classmethod
     def matches(cls, invoc):
@@ -609,6 +911,7 @@ types = { "literal": Literal,
           "stringtemplate": StringTemplate, 
           "native": Native,
           "map": Map,
+          "foreach": ForEach,
           "json": JSON,
           "extract": Extract,
           "apply": Apply,
@@ -725,6 +1028,30 @@ def _prep_array_for_join(data):
         return [json.dumps(data)]
 
     return [str(data)]
+
+def prop_names(engine, input, context, *args):
+    """
+    return an array containing the names of the properties in the input
+    object.
+    """
+    if isinstance(input, dict):
+        return input.keys()
+
+    return []
+
+def metaprop(engine, input, context, *args):
+    """
+    return the given string with prepended with a $ symbol.  This allows one 
+    to produce a meta property name without invoking its special meeting within
+    a transform.  The input and context data are ignored if an argument is 
+    provided. 
+    """
+    out = "$"
+    if len(args) > 0:
+        out += str(args[0])
+    else:
+        out += str(input)
+    return out
 
 # load in stylesheet-based definitions 
 

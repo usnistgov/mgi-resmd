@@ -11,7 +11,7 @@ from jsont.exceptions import *
 
 def test_literal():
 
-    t = std.Literal({'value': '{', "type": "literal"}, engine, "ptr")
+    t = std.Literal({'value': '{', "$type": "literal"}, engine, "ptr")
     assert t(input, context) == '{'
 
 @pytest.fixture(scope="module")
@@ -82,20 +82,46 @@ class TestJSON(object):
         assert isinstance(out['b'], list)
         assert out['b'][2] is 2
 
+    def test_ins_array(self, engine):
+        makearray = { "$type": "json", "content": [ 9, 8, 7 ] }
+        config = { "content": { "a": [True, {"$ins": makearray}, 3] }}
+        #pytest.set_trace()
+        transf = std.JSON(config, engine, "goob", "json")
+        out = transf({"numbers": range(3)}, {})
+        assert isinstance(out, dict)
+        assert isinstance(out['a'], list)
+        assert out['a'] == [ True, 9, 8, 7, 3 ]
+
+    def test_ins_object(self, engine):
+        makeobj = { "$type": "json", "content": {"foo": "bar", "gurn": "goob"} }
+        config = { "content": { "a":    [True, "[{$lb}{$rb}]", 3],
+                                "foo": "zub",
+                                "$upd": makeobj }}
+        #pytest.set_trace()
+        transf = std.JSON(config, engine, "goob", "json")
+        #pytest.set_trace()
+        out = transf({"numbers": range(3)}, {})
+        assert isinstance(out, dict)
+        assert out['a'] == [ True, "[{}]", 3 ]
+        assert "foo" in out
+        assert "gurn" in out
+        assert out['gurn'] == "goob"
+        assert out['foo'] == "bar"
+
 class TestApply(object):
 
     def test_anon(self, engine):
-        config = { "transform": { "type": "extract", "select": "/contact/name" },
-                   "input": { "type": "json", 
+        config = { "transform": { "$type": "extract", "select": "/contact/name"},
+                   "input": { "$type": "json", 
                               "content": { "contact": { "name": "bob" } }} }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf({}, {})
         assert out == "bob"
 
     def test_tname(self, engine):
-        config = { "transform": { "type": "extract", "select": "/contact/name",
+        config = { "transform": { "$type": "extract", "select": "/contact/name",
                                   "transforms": {
-                                     "contactname": {"type": "json", 
+                                     "contactname": {"$type": "json", 
                               "content": { "contact": { "name": "bob" } }} }
                                   },
                    "input": "contactname" }
@@ -105,21 +131,21 @@ class TestApply(object):
         assert out == "bob"
 
     def test_datapointer(self, engine):
-        config = { "transform": { "type": "extract", "select": "/name" },
+        config = { "transform": { "$type": "extract", "select": "/name" },
                    "input": "/curation/contact" }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf({"curation": { "contact": { "name": "bob" }} }, {})
         assert out == "bob"
 
     def test_datapointer2(self, engine):
-        config = { "transform": { "type": "extract", "select": "/contact/name" },
+        config = { "transform": { "$type": "extract", "select": "/contact/name"},
                    "input": "/curation" }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf({"curation": { "contact": { "name": "bob" }} }, {})
         assert out == "bob"
 
     def test_function(self, engine):
-        config = { "transform": { "type": "extract", "select": "" },
+        config = { "transform": { "$type": "extract", "select": "" },
                    "input": "delimit(' and ')" }
         transf = std.Apply(config, engine, "goob", "apply")
         out = transf(["neil", "jack", "me"], {})
@@ -150,9 +176,27 @@ class TestExtractTransform(object):
 
     def test_function(self, engine):
         config = { "content": "Call {extract(/curation/contact/name)}." }
+        #pytest.set_trace()
         transf = std.StringTemplate(config, engine, "goob", "stringtemplate")
         out = transf({"curation": { "contact": { "name": "bob" }} }, {})
         assert out == 'Call bob.'
+
+def test_metaprop(engine):
+    assert std.metaprop(engine, "gurn", {}, 'goob') == "$goob"
+    assert std.metaprop(engine, {"gurn": "goob"}, {}, 'type') == "$type"
+    assert std.metaprop(engine, {}, {}, 'val') == "$val"
+    assert std.metaprop(engine, {}, {}, 'ins') == "$ins"
+    assert std.metaprop(engine, "goob", {}) == "$goob"
+    assert std.metaprop(engine, {"gurn": "goob"}, {}) == "${'gurn': 'goob'}"
+
+    transf = engine.resolve_transform("metaprop")
+    assert transf("gurn", {}) == "$gurn"
+
+    transf = engine.resolve_transform("metaprop('goob')")
+    assert transf("gurn", {}) == "$goob"
+
+    transf = engine.resolve_transform("metaprop(/gurn)")
+    assert transf({"gurn": "goob"}, {}) == "$goob"
 
 def test_tostr(engine):
     assert std.tostr(engine, {}, {}, True) == "true"
@@ -218,7 +262,7 @@ def test_wrap(engine):
     assert len(split) == 1
     assert split[0] == "Yeah, man!"
 
-    config = { "type": "apply",
+    config = { "$type": "apply",
                "transform": "wrap",
                "args": [ 45 ] }
     transf = engine.make_transform(config)
@@ -272,7 +316,7 @@ class TestMap(object):
 def test_fill(engine):
 
     text = "convert a paragraph of text into an array of strings broken at word boundarys that are less than a given maximum in length.  "
-    config = { "type": "apply", "transform": "fill" }
+    config = { "$type": "apply", "transform": "fill" }
     transf = engine.make_transform(config)
     out = transf(text, None)
     assert out == "     convert a paragraph of text into an array of strings broken at word\n     boundarys that are less than a given maximum in length."
