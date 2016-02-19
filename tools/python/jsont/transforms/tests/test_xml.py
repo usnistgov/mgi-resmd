@@ -4,6 +4,7 @@ import jsont.transforms.xml as xml
 from xjs.validate import ExtValidator
 from jsont.engine import StdEngine, DocEngine
 from jsont.exceptions import *
+from jsont import cli
 
 @pytest.fixture(scope="module")
 def engine(request):
@@ -475,6 +476,8 @@ class TestToTextElement(object):
 
     
 schemadir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "schemas", "json")
+exampdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "examples", "jsont")
+docsdir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "examples", "json")
 moddir = os.path.dirname(os.path.dirname(__file__))
 
 @pytest.fixture(scope="module")
@@ -495,3 +498,10 @@ def test_transf_schema(validator):
 def test_int_schema(validator):
     ss = os.path.join(schemadir, "jsont-xml-schema.json")
     validate(validator, ss)
+
+def test_exampletrans_ipr1():
+    ss = os.path.join(exampdir, "toxml-ipr1.json")
+    doc = os.path.join(docsdir, "ipr.json")
+    xml = cli.transform(ss, doc)
+
+    assert xml.startswith("<content ")
