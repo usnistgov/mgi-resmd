@@ -437,14 +437,14 @@ def format_element(el, context, prefixes=None, transname=None):
         context.update(hints)
 
     if context.get('xml.style','pretty') == 'compact':
-        context['xml.indent'] = 0
-        context['xml.indent_step'] = -1
+        context['xml.base_indent'] = 0
+        context['xml.indent'] = -1
         context['xml.text_packing'] = 'compact'
     elif context.get('xml.value_pad', 0) > 0:
         context['xml.text_packing'] = 'pretty'
 
-    indent = context.get('xml.indent', 0)
-    step = context.get('xml.indent_step', 2)
+    indent = context.get('xml.base_indent', 0)
+    step = context.get('xml.indent', 2)
 
     try: 
         # determine if we need a prefix
@@ -514,10 +514,10 @@ def format_element(el, context, prefixes=None, transname=None):
             subcontext = Context(context)
             if step < 0:
                 # don't insert newlines
-                subcontext['xml.indent'] = 0
-                subcontext['xml.indent_step'] = -1
+                subcontext['xml.base_indent'] = 0
+                subcontext['xml.indent'] = -1
             else:
-                subcontext['xml.indent'] = indent + step
+                subcontext['xml.base_indent'] = indent + step
                 
             for child in el['content']['children']:
                 if isinstance(child, str) or isinstance(child, unicode):
@@ -546,12 +546,12 @@ def format_text(text, context=None):
     if context is None:
         context = Context()
 
-    step = context.get('xml.indent_step', 2)
+    step = context.get('xml.indent', 2)
     pack = context.get('xml.text_packing', 'compact')
     if pack == 'compact' or step < 0:
         return text
 
-    indent = context.get('xml.indent', 0)
+    indent = context.get('xml.base_indent', 0)
     if pack == 'loose':
         return (indent * ' ') + text
 
@@ -709,7 +709,14 @@ def_context = {
 
     # The number of spaces to add to indentation with each step into the 
     # XML hierarchy
-    p+"ident_step": 2
+    p+"indent": 2,
+
+    # The number of spaces to indent the current element.  When printing 
+    # an entire XML document, the current element is the root element; thus,
+    # the whole document will be indented by this much (plus what is added
+    # by xml.indent for the root's children).  This parameter is updated 
+    # automatically by xml.indent amounts as the document is printed.  
+    p+"base_indent": 0
 }
 del p
 
