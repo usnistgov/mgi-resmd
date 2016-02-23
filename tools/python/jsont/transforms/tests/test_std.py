@@ -321,6 +321,204 @@ def test_fill(engine):
     out = transf(text, None)
     assert out == "     convert a paragraph of text into an array of strings broken at word\n     boundarys that are less than a given maximum in length."
 
+def test_isdefined(engine):
+    config = { "$type": "apply",
+               "transform": "isdefined",
+               "args": [ "/a" ] }
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": 2 }, None)
+    assert not transf({ "d": 1, "b": 2 }, None)
+    assert not transf([ "d", 1, "b", 2 ], None)
+    assert not transf(5, None)
+    
+def test_istype(engine):
+    config = { "$type": "apply",
+               "transform": "istype",
+               "args": [ "object" ] }
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": 2 }, None)
+    assert not transf([ "d", 1, "b", 2 ], None)
+    assert not transf(5, None)
+    assert not transf(None, None)
+    assert not transf("goob", None)
+    assert transf({ "d": 1, "b": 2 }, None)
+
+    config['args'] = [ "object", "/d" ]
+    transf = engine.make_transform(config)
+    assert not transf({ "d": 1, "b": 2 }, None)
+
+    config['args'] = [ "number", "/a" ]
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": 2 }, None)
+
+    config['args'] = [ "integer", "/a" ]
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": 2 }, None)
+
+    config['args'] = [ "array" ]
+    transf = engine.make_transform(config)
+    assert transf([ "d", 1, "b", 2 ], None)
+    assert not transf({ "a": 1, "b": 2 }, None)
+
+    config['args'] = [ "string", "/b" ]
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": "h" }, None)
+
+    config['args'] = [ "boolean", "/b" ]
+    transf = engine.make_transform(config)
+    assert not transf({ "a": 1, "b": "h" }, None)
+    assert transf({ "a": 1, "b": False }, None)
+
+    config['args'] = [ "null", "$context:" ]
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": 2 }, None)
+
+    config = { "$type": "apply",
+               "transform": "istype('number','/b')" }
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": 2 }, None)
+
+def test_isobject(engine):
+    config = { "$type": "apply",
+               "transform": "isobject" }
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": 2 }, None)
+    assert not transf(3, None)
+    assert not transf(None, None)
+    assert not transf("a", None)
+    assert not transf([ "d", 1, "b", 2 ], None)
+    
+    config = { "$type": "apply",
+               "transform": "isobject", "args": ["/a"] }
+    transf = engine.make_transform(config)
+    assert not transf({ "a": 1, "b": 2 }, None)
+    config = { "$type": "apply",
+               "transform": "isobject('$context:')" }
+    transf = engine.make_transform(config)
+    assert transf(None, { "a": 1, "b": 2 })
+
+def test_isarray(engine):
+    config = { "$type": "apply",
+               "transform": "isarray" }
+    transf = engine.make_transform(config)
+    assert transf([ "d", 1, "b", 2 ], None)
+    assert not transf({ "a": 1, "b": 2 }, None)
+    assert not transf(3, None)
+    assert not transf(None, None)
+    assert not transf("a", None)
+    
+    config = { "$type": "apply",
+               "transform": "isarray", "args": ["/a"] }
+    transf = engine.make_transform(config)
+    assert not transf({ "a": 1, "b": 2 }, None)
+    config = { "$type": "apply",
+               "transform": "isarray('$context:')" }
+    transf = engine.make_transform(config)
+    assert not transf([ "d", 1, "b", 2 ], None)
+    assert transf(None, [ "d", 1, "b", 2 ])
+
+def test_isstring(engine):
+    config = { "$type": "apply",
+               "transform": "isstring" }
+    transf = engine.make_transform(config)
+    assert transf("a", None)
+    assert not transf({ "a": 1, "b": 2 }, None)
+    assert not transf(3, None)
+    assert not transf(None, None)
+    assert not transf([ "d", 1, "b", 2 ], None)
+    
+    config = { "$type": "apply",
+               "transform": "isstring", "args": ["/a"] }
+    transf = engine.make_transform(config)
+    assert transf({ "a": 'b', "b": 2 }, None)
+    config = { "$type": "apply",
+               "transform": "isstring('$context:/b')" }
+    transf = engine.make_transform(config)
+    assert transf(None, { "a": 1, "b": 'g' })
+
+def test_isnumber(engine):
+    config = { "$type": "apply",
+               "transform": "isnumber" }
+    transf = engine.make_transform(config)
+    assert transf(3, None)
+    assert transf(-3.14159, None)
+    assert not transf({ "a": 1, "b": 2.3 }, None)
+    assert not transf(None, None)
+    assert not transf("a", None)
+    assert not transf([ "d", 1, "b", 2 ], None)
+    
+    config = { "$type": "apply",
+               "transform": "isnumber", "args": ["/a"] }
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": 2 }, None)
+    config = { "$type": "apply",
+               "transform": "isnumber('$context:/b')" }
+    transf = engine.make_transform(config)
+    assert transf(None, { "a": 1, "b": 2 })
+    assert not transf(None, { "a": 1, "b": 'g' })
+
+def test_isinteger(engine):
+    config = { "$type": "apply",
+               "transform": "isinteger" }
+    transf = engine.make_transform(config)
+    assert transf(3, None)
+    assert not transf(-3.14159, None)
+    assert not transf({ "a": 1, "b": 2.3 }, None)
+    assert not transf(None, None)
+    assert not transf("a", None)
+    assert not transf([ "d", 1, "b", 2 ], None)
+    
+    config = { "$type": "apply",
+               "transform": "isinteger", "args": ["/a"] }
+    transf = engine.make_transform(config)
+    assert transf({ "a": 1, "b": 2 }, None)
+    config = { "$type": "apply",
+               "transform": "isinteger('$context:/b')" }
+    transf = engine.make_transform(config)
+    assert transf(None, { "a": 1, "b": 2 })
+
+def test_isboolean(engine):
+    config = { "$type": "apply",
+               "transform": "isboolean" }
+    transf = engine.make_transform(config)
+    assert transf(False, None)
+    assert not transf({ "a": 1, "b": 2 }, None)
+    assert not transf(3, None)
+    assert not transf(None, None)
+    assert not transf("a", None)
+    assert not transf([ "d", 1, "b", 2 ], None)
+    
+    config = { "$type": "apply",
+               "transform": "isboolean", "args": ["/a"] }
+    transf = engine.make_transform(config)
+    assert transf({ "a": True, "b": 2 }, None)
+    config = { "$type": "apply",
+               "transform": "isboolean('$context:/b')" }
+    transf = engine.make_transform(config)
+    assert transf(None, { "a": 1, "b": False })
+
+def test_isobject(engine):
+    config = { "$type": "apply",
+               "transform": "isnull" }
+    transf = engine.make_transform(config)
+    assert transf(None, None)
+    assert not transf({ "a": 1, "b": 2 }, None)
+    assert not transf(3, None)
+    assert not transf("a", None)
+    assert not transf([ "d", 1, "b", 2 ], None)
+    
+    config = { "$type": "apply",
+               "transform": "isnull", "args": ["/a"] }
+    transf = engine.make_transform(config)
+    assert not transf({ "a": 1, "b": 2 }, None)
+    config = { "$type": "apply",
+               "transform": "isnull('$context:/b')" }
+    transf = engine.make_transform(config)
+    assert transf(None, { "a": 1, "b": None })
+
+
+
+
     
 
 class TestFunctionTransform(object):

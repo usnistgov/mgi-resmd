@@ -705,14 +705,14 @@ class Function(Transform):
             wrapped = self._wrap_callable(wrapped, targs, engine)
 
         for i in range(len(uargs)):
-            if isinstance(uargs[i], str) or isinstance(uargs[i], unicode):
+            if isinstance(uargs[i], (str, unicode)):
                 try:
                     # try assuming the argument is JSON data
                     if uargs[i][0] == "'" and uargs[i][-1] == "'":
                         uargs[i] = '"'+uargs[i][1:-1]+'"'
 
                     uargs[i] = json.loads(uargs[i])
-                    if isinstance(uargs[i], str) and "{" in uargs[i]:
+                    if isinstance(uargs[i], (str, unicode)) and "{" in uargs[i]:
                         uargs[i] = StringTemplate({'content': uargs[i]}, engine, 
                                                   self.name+":(arg)", 
                                                   "stringtemplate")
@@ -744,6 +744,7 @@ class Function(Transform):
                 if isinstance(item, Transform):
                     item = item(input, context)
                 use.append(item)
+            use.extend(eargs)
 
             return wrapped(input, context, *use)
 
@@ -1041,7 +1042,7 @@ def prop_names(engine, input, context, *args):
 
 def metaprop(engine, input, context, *args):
     """
-    return the given string with prepended with a $ symbol.  This allows one 
+    return the given string prepended with a $ symbol.  This allows one 
     to produce a meta property name without invoking its special meeting within
     a transform.  The input and context data are ignored if an argument is 
     provided. 
@@ -1052,6 +1053,58 @@ def metaprop(engine, input, context, *args):
     else:
         out += str(input)
     return out
+
+def isdefined(engine, input, context, select=None, *args):
+    """
+    return True if the data pointed to by a selection is defined.
+
+    :argument str select:  a data pointer refering to a specific node into 
+                           either the input or context data whose type is of
+                           interest.  If not provided, the input data as a 
+                           whole ($in:) is assumed.
+    """
+    if select:
+        try:
+            input = engine.extract(input, context, select)
+        except DataExtractionError:
+            return False
+    return True
+
+def istype(engine, input, context, type, select=None, *args):
+    """
+    return True if the data pointed to by a selection is a JSON data 
+    structure of a given type.
+    If data pointed to by the selection does not exist, False is returned.
+
+    :argument str type:  the name of the JSON type being tested against.  It 
+                           must be one of 'object', 'array', 'string', 'boolean',
+                           'number', 'integer', or 'null'; otherwise, False is 
+                           returned.
+    :argument str select:  a data pointer refering to a specific node into 
+                           either the input or context data whose type is of
+                           interest.  If not provided, the input data as a 
+                           whole ($in:) is assumed.
+    """
+    if select:
+        try:
+            input = engine.extract(input, context, select)
+        except DataExtractionError:
+            return False
+    if type == "object":
+        return isinstance(input, dict)
+    if type == "array":
+        return isinstance(input, (list, tuple))
+    if type == "string":
+        return isinstance(input, (str, unicode))
+    if type == "number":
+        return isinstance(input, (int, long, float))
+    if type == "integer":
+        return isinstance(input, int)
+    if type == "boolean":
+        return isinstance(input, bool)
+    if type == "null":
+        return input is None
+    return False
 
 # load in stylesheet-based definitions 
 

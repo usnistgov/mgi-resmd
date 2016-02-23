@@ -205,6 +205,186 @@
             "description": "places a blank line between each item",
             "expects": ["object"],
             "returns": "array"
+        },
+        "metaprop": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "$type": "native",
+            "impl": "$std.metaprop",
+            "description": "return the given string prepended with a $ symbol.",
+            "expects": ["string"],
+            "returns": "string"
+        },
+        "isdefined": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "$type": "native",
+            "impl": "$std.isdefined",
+            "description": "return True if the data pointed to by a selection is defined.",
+            "notes": [
+                "This transform would normally be invoked in function form so that a selection can be provided.  Without a selection, this transform always returns True as there is always a current input data defined."
+            ],
+            "argv_supported": [
+                {
+                    "name": "select",
+                    "description": "a data pointer to the data one wants to if exists",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"
+        },
+        "istype": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "$type": "native",
+            "impl": "$std.istype",
+            "description": "return True if the data pointed to by a selection is of a particular JSON type.",
+            "argv_supported": [
+                {
+                    "name": "type",
+                    "description": "the name of the JSON type (object, array, string, number, integer, or null) to test for",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "select",
+                    "description": "a data pointer to the data one wants to if exists",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"
+        },
+        "isobject": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/ApplyTransform" ],
+            "$type": "apply",
+            "transform": "istype",
+            "args": [ "object" ],
+            "description": "return True if the data pointed to by a selection is a JSON object.",
+            "notes": [
+                "This transform would normally be invoked in function form so that a selection can be provided.  Without a selection, this transform always returns True as there is always a current input data defined."
+            ],
+            "argv_supported": [
+                {
+                    "name": "select",
+                    "description": "a data pointer to the data one wants to if exists",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"
+        },
+        "isarray": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/ApplyTransform" ],
+            "$type": "apply",
+            "transform": "istype",
+            "args": [ "array" ],
+            "description": "return True if the data pointed to by a selection is a JSON array.",
+            "notes": [
+                "This transform would normally be invoked in function form so that a selection can be provided.  Without a selection, this transform always returns True as there is always a current input data defined."
+            ],
+            "argv_supported": [
+                {
+                    "name": "select",
+                    "description": "a data pointer to the data one wants to if exists",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"
+        },
+        "isstring": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/ApplyTransform" ],
+            "$type": "apply",
+            "transform": "istype",
+            "args": [ "string" ],
+            "description": "return True if the data pointed to by a selection is a JSON string.",
+            "notes": [
+                "This transform would normally be invoked in function form so that a selection can be provided.  Without a selection, this transform always returns True as there is always a current input data defined."
+            ],
+            "argv_supported": [
+                {
+                    "name": "select",
+                    "description": "a data pointer to the data one wants to if exists",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"
+        },
+        "isnumber": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/ApplyTransform" ],
+            "$type": "apply",
+            "transform": "istype",
+            "args": [ "number" ],
+            "description": "return True if the data pointed to by a selection is a JSON number.",
+            "notes": [
+                "This transform would normally be invoked in function form so that a selection can be provided.  Without a selection, this transform always returns True as there is always a current input data defined."
+            ],
+            "argv_supported": [
+                {
+                    "name": "select",
+                    "description": "a data pointer to the data one wants to if exists",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"
+        },
+        "isinteger": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/ApplyTransform" ],
+            "$type": "apply",
+            "transform": "istype",
+            "args": [ "integer" ],
+            "description": "return True if the data pointed to by a selection is a JSON integer.",
+            "notes": [
+                "This transform would normally be invoked in function form so that a selection can be provided.  Without a selection, this transform always returns True as there is always a current input data defined."
+            ],
+            "argv_supported": [
+                {
+                    "name": "select",
+                    "description": "a data pointer to the data one wants to if exists",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"
+        },
+        "isnull": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/ApplyTransform" ],
+            "$type": "apply",
+            "transform": "istype",
+            "args": [ "null" ],
+            "description": "return True if the data pointed to by a selection is a JSON null.",
+            "notes": [
+                "This transform would normally be invoked in function form so that a selection can be provided.  Without a selection, this transform always returns True as there is always a current input data defined."
+            ],
+            "argv_supported": [
+                {
+                    "name": "select",
+                    "description": "a data pointer to the data one wants to if exists",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"
+        },
+        "isboolean": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/ApplyTransform" ],
+            "$type": "apply",
+            "transform": "istype",
+            "args": [ "boolean" ],
+            "description": "return True if the data pointed to by a selection is a JSON boolean.",
+            "notes": [
+                "This transform would normally be invoked in function form so that a selection can be provided.  Without a selection, this transform always returns True as there is always a current input data defined."
+            ],
+            "argv_supported": [
+                {
+                    "name": "select",
+                    "description": "a data pointer to the data one wants to if exists",
+                    "type": "string"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"
         }
     }
 }
