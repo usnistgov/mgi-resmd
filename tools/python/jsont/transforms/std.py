@@ -941,6 +941,24 @@ def tostr(engine, input, context, data=None, *args, **keys):
     return jsp.dumps(data)
 
 
+def tobool(engine, input, context, data=complex(1,1), *args, **keys):
+    """
+    convert the input data into a JSON boolean.
+    :return str:
+    """
+    if isinstance(data, complex):
+        data = input
+
+    if isinstance(data, bool):
+        return data
+
+    if isinstance(data, (str, dict, tuple, list)):
+        return len(data) > 0
+    if isinstance(data, (int, long, float)):
+        return data != 0
+    return data is not None
+
+
 def applytransform(engine, input, context, transform, select, *args, **keys):
     """
     apply the given transform to selected data from the input.

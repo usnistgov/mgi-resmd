@@ -217,6 +217,28 @@ def test_tostr(engine):
 
     # note: can't convert True, False, or None.
 
+def test_tobool(engine):
+    assert std.tobool(engine, {}, {}, True) is True
+    assert std.tobool(engine, {}, {}, False) is False
+    assert std.tobool(engine, {}, {}, [ 1, 2, 3 ]) is True
+    assert std.tobool(engine, {}, {}, [ ]) is False
+    assert std.tobool(engine, {}, {}, "glub") is True
+    assert std.tobool(engine, True, {}, "") is False
+    assert std.tobool(engine, {"a": 1}, {}) is True
+    assert std.tobool(engine, {}, {}) is False
+    assert std.tobool(engine, True, {}) is True
+    assert std.tobool(engine, [ 1, 2, 3 ], {}) is True
+
+    transf = engine.resolve_transform("tobool")
+    assert transf(False, {}) is False
+    assert transf([ 1, 2, 3 ], {}) is True
+    assert transf(False, {}, True) is True
+
+    transf = engine.resolve_transform("tobool()")
+    assert transf(True, {}) is True
+    transf = engine.resolve_transform("tobool([ ])")
+    assert transf(True, {}) is False
+
 def test_wrap(engine):
 
     text = "convert a paragraph of text into an array of strings broken at word boundarys that are less than a given maximum in length.  "

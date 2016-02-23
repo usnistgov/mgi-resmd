@@ -437,6 +437,75 @@
                 }
             ]
         },
+        "ChooseTransform": {
+            "description": "",
+            "allOf": [
+                { "$ref": "#/definitions/Transform" },
+                { 
+                    "properties": {
+                        "$type": {
+                            "enum": ["choose"]
+                        },
+                        "cases": {
+                            "type": "array",
+                            "description": "an ordered array of tests and transform pairs representing the different possible transforms to apply; the first test that produces a true result determines the transform to apply",
+                            "items": {
+                                "type": "object",
+                                "description": "a test-transform pair: if the the test transform returns a true result, the transform should be applied",
+                                "properties": {
+                                    "test": {
+                                        "description": "a transform to apply to determine if this case should apply; if this returns a true result, the transform given in the transform property should be applied and its result returned as the overall result of this choose transform.",
+                                        "notes": [
+                                            "If the test transform returns a result other than a boolean, it will be converted to one as if sent through the tobool() transform"
+                                        ],
+                                        "oneOf": [
+                                            { 
+                                                "type": "object",
+                                                "description": "an anonymous transform configuration or a {$val} directive"
+                                            },
+                                            {
+                                                "type": "string",
+                                                "description": "a named transform (possibly in function form) or a data pointer"
+                                            }
+                                        ]
+                                    },
+                                    "transform": {
+                                        "description": "the transform to apply if the test returns a true result.",
+                                        "notes": [
+                                            "If not provided, a value of '$in:' is assumed; that is, the input data will be passed unchanged"
+                                        ],
+                                        "oneOf": [
+                                            { 
+                                                "type": "object",
+                                                "description": "an anonymous transform configuration or a {$val} directive"
+                                            },
+                                            {
+                                                "type": "string",
+                                                "description": "a named transform (possibly in function form) or a data pointer"
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "default": {
+                            "description": "the transform to apply if none of the tests return a true result",
+                            "oneOf": [
+                                { 
+                                    "type": "object",
+                                    "description": "an anonymous transform configuration or a {$val} directive"
+                                },
+                                {
+                                    "type": "string",
+                                    "description": "a named transform (possibly in function form) or a data pointer"
+                                }
+                            ]
+                        }
+                    },
+                    "required": [ "$type", "test" ]
+                }
+            ]
+        },
         "AnyType": {
             "description": "a type representing a union of all primitive types",
             "type": [ "array", "boolean", "integer", "number", 

@@ -47,6 +47,21 @@
             "expects": ["any"],
             "returns": "string"
         },
+        "tobool": {
+            "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
+            "$type": "native",
+            "impl": "$std.tobool",
+            "description": "convert input data to a boolean: a boolean value is unchanged; a null, an empty string, an empty object, an empty array, or a 0 will be converted to false; all others will be converted to True",
+            "argv_supported": [
+                {
+                    "name": "data",
+                    "description": "the data to convert (default: the current input data)",
+                    "type": "any"
+                }
+            ],
+            "expects": ["any"],
+            "returns": "boolean"            
+        },
         "indent": {
             "$extensionSchemas": [ "http://mgi.nist.gov/mgi-json-trans/v0.1#/definitions/NativeTransform" ],
             "$type": "native",
