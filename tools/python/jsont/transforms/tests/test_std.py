@@ -551,7 +551,7 @@ class TestFunctionTransform(object):
 
 
 schemadir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))), "schemas", "json")
-moddir = os.path.dirname(os.path.dirname(__file__))
+moddir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "std")
 
 @pytest.fixture(scope="module")
 def validator(request):
@@ -561,5 +561,5 @@ def validate(validator, filename):
     validator.validate_file(os.path.join(schemadir, filename), False, True)
 
 def test_ss(validator):
-    ss = os.path.join(moddir, "std_ss.json")
+    ss = os.path.join(moddir, "ss.json")
     validate(validator, ss)
