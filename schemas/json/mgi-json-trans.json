@@ -438,7 +438,7 @@
             ]
         },
         "ChooseTransform": {
-            "description": "",
+            "description": "a transform that supports an if-elseif-else control structure for applying a choice of transforms depending on conditions.",
             "allOf": [
                 { "$ref": "#/definitions/Transform" },
                 { 
@@ -486,7 +486,8 @@
                                         ]
                                     }
                                 }
-                            }
+                            },
+                            "required": [ "test" ]
                         },
                         "default": {
                             "description": "the transform to apply if none of the tests return a true result",
@@ -502,7 +503,7 @@
                             ]
                         }
                     },
-                    "required": [ "$type", "test" ]
+                    "required": [ "$type", "default" ]
                 }
             ]
         },

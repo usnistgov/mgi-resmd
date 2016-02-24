@@ -538,6 +538,55 @@ def test_isobject(engine):
     transf = engine.make_transform(config)
     assert transf(None, { "a": 1, "b": None })
 
+class  TestChooseTransform(object):
+
+    config = { "$type": "choose",
+               "cases": [
+                  {
+                    "test": "isarray",
+                    "transform": "$context:/answers/0"
+                  },
+                  {
+                    "test": "isstring",
+                    "transform": "$context:/answers/1"
+                  },
+                  {
+                    "test": "isinteger",
+                    "transform": "$context:/answers/2"
+                  },
+                  {
+                    "test": "isobject",
+                    "transform": "$context:/answers/3"
+                  }
+               ],
+               "default": "$in:"
+             }
+
+    context = {
+        "answers": map(lambda c: "choice "+str(c), range(4))
+    }
+
+    def test_c0(self, engine):
+        transf = engine.make_transform(self.config)
+        out = transf([], self.context)
+        assert out == "choice 0"
+
+    def test_c1(self, engine):
+        transf = engine.make_transform(self.config)
+        out = transf("goob", self.context)
+        assert out == "choice 1"
+
+    def test_c3(self, engine):
+        transf = engine.make_transform(self.config)
+        out = transf({}, self.context)
+        assert out == "choice 3"
+
+    def test_default(self, engine):
+        transf = engine.make_transform(self.config)
+        out = transf(4.1, self.context)
+        assert out == 4.1
+        
+
 
 
 

@@ -8,6 +8,7 @@ import json as jsp
 from ...exceptions import *
 from ...base import Transform, ScopedDict
 from ... import parse
+from .native import tobool
 
 TRANSFORMS_PKG = __name__.rsplit('.', 2)[0]  # the package containing "std"
 METAPROPNAMES = ["$val", "$ins", "$upd"]
@@ -66,8 +67,6 @@ def resolve_meta_directive(dval, engine, name, defTransCls=None):
     # Otherwise, treat it as a JSON template:
     return JSON({"content": dval}, engine, name+"(json)", "json")
         
-    
-
 class Literal(Transform):
     """
     a transform type that returns a constant value.
@@ -898,4 +897,48 @@ class Callable(Transform):
 
         return impl
 
-            
+class Choose(Transform):
+    """
+    a transform that supports an if-elseif-else control structure for 
+    applying a choice of transforms depending on conditions.
+    """
+
+    def mkfn(self, config, engine):
+        name = self.name or "choose"
+
+        choices = config.get("cases", [])
+        for choice in choices:
+
+            try:
+                choice['test'] = resolve_meta_directive(choice['test'], engine, 
+                                                        name+" choice test")
+            except KeyError, ex:
+                raise MissingTranformData("test", name+" choice", cause=ex)
+
+            if "transform" not in choice:
+                choice['transform'] = None
+            if choice['transform']:
+                choice['transform'] = resolve_meta_directive(choice['transform'],
+                                                             engine, 
+                                                       name+" choice transform")
+        try:
+            deftransf = resolve_meta_directive(config['default'], engine, 
+                                               name+" default")
+        except KeyError, ex:
+            raise MissingTranformData("default", name+" default", cause=ex)
+
+        def impl(input, context):
+            for case in choices:
+                if tobool(engine, {}, {}, data=case['test'](input, context)):
+                    if not case['transform']:
+                        return input
+                        
+                    return case['transform'](input, context)
+
+            return deftransf(input, context)
+
+        return impl
+
+        
+
+                
