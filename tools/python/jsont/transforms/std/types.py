@@ -1,19 +1,16 @@
 """
-transformers from the standard module
+transform types from the standard module.  This module includes that functions
+that handle meta-property directives ($val, $ins, and $upd).
 """
-import os, json, copy, re, importlib, textwrap, collections
-import types as tps
+import json, copy, re, importlib, collections
 import json as jsp
 
-from ..exceptions import *
-from ..base import Transform, ScopedDict
-from .. import parse
+from ...exceptions import *
+from ...base import Transform, ScopedDict
+from ... import parse
+from .native import tobool
 
-MODULE_NAME = __name__
-
-TRANSFORMS_PKG = __name__.rsplit('.', 1)[0]
-DEF_CONTRIB_PKG = TRANSFORMS_PKG
-
+TRANSFORMS_PKG = __name__.rsplit('.', 2)[0]  # the package containing "std"
 METAPROPNAMES = ["$val", "$ins", "$upd"]
 
 def is_metaproperty(propname):
@@ -70,10 +67,6 @@ def resolve_meta_directive(dval, engine, name, defTransCls=None):
     # Otherwise, treat it as a JSON template:
     return JSON({"content": dval}, engine, name+"(json)", "json")
         
-    
-
-# Transform types:
-
 class Literal(Transform):
     """
     a transform type that returns a constant value.
@@ -505,8 +498,9 @@ class Extract(Transform):
 class ForEach(Transform):
     """
     a transform that applies a specified transform to each property in the input
-    object.  The data delivered to the transform will be a two-item array 
-    containing the property name and the value.  
+    object, returning the results as an array.  The data delivered to the 
+    transform will be a two-item array containing the property name and the 
+    value.  
     """
     def mkfn(self, config, engine):
 
@@ -705,14 +699,14 @@ class Function(Transform):
             wrapped = self._wrap_callable(wrapped, targs, engine)
 
         for i in range(len(uargs)):
-            if isinstance(uargs[i], str) or isinstance(uargs[i], unicode):
+            if isinstance(uargs[i], (str, unicode)):
                 try:
                     # try assuming the argument is JSON data
                     if uargs[i][0] == "'" and uargs[i][-1] == "'":
                         uargs[i] = '"'+uargs[i][1:-1]+'"'
 
                     uargs[i] = json.loads(uargs[i])
-                    if isinstance(uargs[i], str) and "{" in uargs[i]:
+                    if isinstance(uargs[i], (str, unicode)) and "{" in uargs[i]:
                         uargs[i] = StringTemplate({'content': uargs[i]}, engine, 
                                                   self.name+":(arg)", 
                                                   "stringtemplate")
@@ -744,6 +738,7 @@ class Function(Transform):
                 if isinstance(item, Transform):
                     item = item(input, context)
                 use.append(item)
+            use.extend(eargs)
 
             return wrapped(input, context, *use)
 
@@ -903,187 +898,48 @@ class Callable(Transform):
 
         return impl
 
-            
-            
-
-
-types = { "literal": Literal, 
-          "stringtemplate": StringTemplate, 
-          "native": Native,
-          "map": Map,
-          "foreach": ForEach,
-          "json": JSON,
-          "extract": Extract,
-          "apply": Apply,
-          "callable": Callable
-          }
-
-# function type implementations
-
-def identity_func(engine, input, context, *args, **keys):
+class Choose(Transform):
     """
-    return the input data structure unchanged
-    :returns JSON data:
+    a transform that supports an if-elseif-else control structure for 
+    applying a choice of transforms depending on conditions.
     """
-    return input
 
-def tostr(engine, input, context, data=None, *args, **keys):
-    """
-    convert the input data into a JSON string
-    :return str:
-    """
-    if not data:
-        data = input
+    def mkfn(self, config, engine):
+        name = self.name or "choose"
 
-    if isinstance(data, str):
-        return data
-    return jsp.dumps(data)
+        choices = config.get("cases", [])
+        for choice in choices:
 
+            try:
+                choice['test'] = resolve_meta_directive(choice['test'], engine, 
+                                                        name+" choice test")
+            except KeyError, ex:
+                raise MissingTranformData("test", name+" choice", cause=ex)
 
-def applytransform(engine, input, context, transform, select, *args, **keys):
-    """
-    apply the given transform to selected data from the input.
+            if "transform" not in choice:
+                choice['transform'] = None
+            if choice['transform']:
+                choice['transform'] = resolve_meta_directive(choice['transform'],
+                                                             engine, 
+                                                       name+" choice transform")
+        try:
+            deftransf = resolve_meta_directive(config['default'], engine, 
+                                               name+" default")
+        except KeyError, ex:
+            raise MissingTranformData("default", name+" default", cause=ex)
 
-    :argument transform: the description of the transform to apply as either 
-                         a dictionary or a string.  If a string, 
-    :argument str select:  a data-pointer string
-    """
-    newin = engine.extract(input, context, select)
-    transfunc = engine.resolve_transform(transform)
-    if keys:
-        context = context.default_to(keys)
+        def impl(input, context):
+            for case in choices:
+                if tobool(engine, {}, {}, data=case['test'](input, context)):
+                    if not case['transform']:
+                        return input
+                        
+                    return case['transform'](input, context)
 
-    return transfunc(engine, newin, context)
+            return deftransf(input, context)
 
-def wrap(engine, input, context, maxlen=75, text=None, *args, **keys):
-    """
-    convert a paragraph of text into an array of strings broken at word 
-    boundarys that are less than a given maximum in length.  
-    """
-    if not text:
-        text = input
+        return impl
 
-    if not isinstance(text, str) and not isinstance(text, unicode):
-        raise TransformInputTypeError("string", str(type(text)), "wrap", 
-                                      input, context)
-    if not isinstance(maxlen, int):
-        raise TransformInputTypeError("integer", str(type(maxlen)), "wrap", 
-                                      maxlen, context)
+        
 
-    return textwrap.wrap(text, maxlen)
-
-def indent(engine, input, context, indlen=4, text=None, *args, **keys):
-    """
-    prepend a specified number of spaces in front of the input text.
-    """
-    if not text:
-        text = input
-
-    if not isinstance(text, str) and not isinstance(text, unicode):
-        raise TransformInputTypeError("string", str(type(text)), "indent", 
-                                      input, context)
-    if not isinstance(indlen, int):
-        raise TransformInputTypeError("integer", str(type(indlen)), "indent", 
-                                      indlen, context)
-    return (indlen * ' ') + text
-
-
-
-
-## join transforms
-
-def _prep_array_for_join(ary, name, input, context):
-    if not isinstance(input, list):
-        raise TransformInputTypeError("array", str(type(input)), name, 
-                                      input, context)
-    use = []
-    for item in input:
-        if not isinstance(item, str) and not isinstance(item, unicode):
-            item = jsp.dumps(item)
-        use.append(item)
-
-    return use
-
-def delimit(engine, input, context, delim=", ", *args, **keys):
-    """
-    join the input array with a delimiter
-    """
-    use = _prep_array_for_join(input)
-    return delim.join(use)
-
-def _prep_array_for_join(data):
-    if isinstance(data, str) or isinstance(data, unicode):
-        return [data]
-
-    if isinstance(data, list):
-        out = []
-        for item in data:
-            if not isinstance(item, str) and not isinstance(item, unicode):
-                item = json.dumps(item)
-            out.append(item)
-
-        return out
-
-    if isinstance(data, dict):
-        return [json.dumps(data)]
-
-    return [str(data)]
-
-def prop_names(engine, input, context, *args):
-    """
-    return an array containing the names of the properties in the input
-    object.
-    """
-    if isinstance(input, dict):
-        return input.keys()
-
-    return []
-
-def metaprop(engine, input, context, *args):
-    """
-    return the given string with prepended with a $ symbol.  This allows one 
-    to produce a meta property name without invoking its special meeting within
-    a transform.  The input and context data are ignored if an argument is 
-    provided. 
-    """
-    out = "$"
-    if len(args) > 0:
-        out += str(args[0])
-    else:
-        out += str(input)
-    return out
-
-# load in stylesheet-based definitions 
-
-MOD_STYLESHEET_FILE = "std_ss.json"
-
-ssfile = os.path.join(os.path.dirname(__file__), MOD_STYLESHEET_FILE)
-with open(ssfile) as fd:
-    MOD_STYLESHEET = jsp.load(fd)
-del ssfile
-
-# load the module's initial context data.  The defaults are specified here 
-# for documentation purposes; however, values set wihtin the stylesheet file 
-# will take precedence.
-
-p = "std."
-
-def_context = {
-
-    # The prefered line width to use when filling data into paragraphs by 
-    # the fill transform
-    #
-    p+"fill.width": 75,
-
-    # The prefered indentation amount to use when filling data into 
-    # paragraphs by the fill transform
-    # 
-    p+"fill.indent": 0,
-}
-del p
-
-# the module's default context data
-MOD_CONTEXT = ScopedDict(def_context)
-MOD_CONTEXT.update(MOD_STYLESHEET.get('context',{}))
-MOD_STYLESHEET['context'] = MOD_CONTEXT
-
+                
