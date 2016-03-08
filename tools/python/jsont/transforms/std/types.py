@@ -498,8 +498,9 @@ class Extract(Transform):
 class ForEach(Transform):
     """
     a transform that applies a specified transform to each property in the input
-    object.  The data delivered to the transform will be a two-item array 
-    containing the property name and the value.  
+    object, returning the results as an array.  The data delivered to the 
+    transform will be a two-item array containing the property name and the 
+    value.  
     """
     def mkfn(self, config, engine):
 
