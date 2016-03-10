@@ -8,15 +8,15 @@ def context: {
 #
     # the number of spaces to add before and after an element's single text
     # child; used when text_packing is not 'compact' and style=pretty
-    "pad":    (($config|.xml.pad) // 0)|tonumber,
+    "value_pad":    (($config|.xml.pad) // 0)|tonumber,
 #
     # the maximum width of a line of output XML when style=pretty
-    "max_line_width":  (($config|.xml.max_line_width) // 75)|tonumber,
+    "max_line_length":  (($config|.xml.max_line_length) // 75)|tonumber,
 #
     # the minimum width of text in a line of output XML when style=pretty; 
     # lines text (not counting preceding indentation) will not be wrapped 
     # to smaller than this amount
-    "min_line_width":  (($config|.xml.max_line_width) // 30)|tonumber,
+    "min_line_length":  (($config|.xml.max_line_length) // 30)|tonumber,
 #
     # the style to use for packing text as an element's content
     "text_packing":  (($config|.xml.text_packing) // "compact"),
@@ -141,7 +141,7 @@ def isstring: textwrap::isstring;
 
 # format the given text for inclusion as the content for an element.  This 
 # will fill the text to a minimum line width (controlled by the config 
-# parameter xml.min_line_width) unless the config parameter text_packing is 
+# parameter xml.min_line_length) unless the config parameter text_packing is 
 # set to "compact"; if compact packing is set, then the text is unchanged.  
 #
 # @arg indent integer:  the number of characters to indent the formatted text
@@ -151,7 +151,7 @@ def format_text(indent; cntxt):
        else . end |
 #    context as $context |
     if (cntxt|.text_packing) == "compact" then 
-     textwrap::fill(cntxt|.max_line_width; indent; cntxt|.min_line_width)
+     textwrap::fill(cntxt|.max_line_length; indent; cntxt|.min_line_length)
     else . end;
 def format_text(indent): format_text(0; context);
 def format_text: format_text(0);
@@ -221,8 +221,8 @@ def format_attributes(indent; cntxt; prefixes):
 #    context as $context | 
     map(format_attribute(prefixes)) | 
     if (cntxt|.style) == "pretty" then
-        (cntxt|.max_line_width) as $usewidth |
-        (cntxt|.min_line_width) as $minwidth |
+        (cntxt|.max_line_length) as $usewidth |
+        (cntxt|.min_line_length) as $minwidth |
         ($usewidth - indent) as $usewidth |
         (if $usewidth < $minwidth then $minwidth else $usewidth end) 
             as $usewidth |
@@ -280,6 +280,14 @@ def format_element(indent; cntxt; prefixes):
     (if .|has("hints") then
         (cntxt + .hints) 
      else cntxt end) as $context |
+    (if ($context|.style) == "compact" then
+        $context|(.indent = -1)
+                 |(.text_packing = "compact")
+     elif ($context|.value_pad) > 0 then
+        $context|.text_packing = "pretty"
+     else
+        $context
+     end) as $context |
 
     # determine what new namespaces we'll need to declare
     . as $el |
@@ -327,7 +335,7 @@ def format_element(indent; cntxt; prefixes):
                     ($context|.value_pad) * " "
                  else 
                     ""
-                 end) as $pad |
+                 end) as $pad | 
 
                 # return as a single line
                 $opentag + $pad + .[0] + $pad + $closetag

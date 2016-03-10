@@ -23,15 +23,20 @@ include "xml";
 #[] | map(select(test("^ns\\d+$"))) | map(.[2:]|tonumber) | max+1
 
 
-{ "name": "role", "value": "updated",
-  "ns": { "namespace": "urn:goob" }}  as $attr |
+#{ "name": "role", "value": "updated",
+#  "ns": { "namespace": "urn:goob" }}  as $attr |
+#
+#{
+#      "name": "date", "content": { "children": [ "2016" ] },
+#      "ns": { "namespace": "urn:gurn" }
+#} | 
+#
+#add_attr2element($attr) |
+#
+#format_element(0; {})
 
-{
-      "name": "date", "content": { "children": [ "2016" ] },
-      "ns": { "namespace": "urn:gurn" }
-} | 
-
-add_attr2element($attr) |
-
+{ "name": "date", "content": { "children": [ "2016" ] }, "ns": { "namespace": "urn:gurn" }, "hints": { "value_pad": 2, "style": "pretty", "max_line_length": 75 }} |
 format_element(0; {})
+
+
 
