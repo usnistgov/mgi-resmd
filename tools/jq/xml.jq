@@ -1,11 +1,28 @@
 import "textwrap" as textwrap;
 
 def context: {
+    # the number of spaces to add to the indentation when descending into 
+    # the output XML hierarchy; used when style=pretty.  If less than zero
+    # lines will not be indented.
     "indent": (($config|.xml.indent) // 2)|tonumber,
+#
+    # the number of spaces to add before and after an element's single text
+    # child; used when text_packing is not 'compact' and style=pretty
     "pad":    (($config|.xml.pad) // 0)|tonumber,
+#
+    # the maximum width of a line of output XML when style=pretty
     "max_line_width":  (($config|.xml.max_line_width) // 75)|tonumber,
+#
+    # the minimum width of text in a line of output XML when style=pretty; 
+    # lines text (not counting preceding indentation) will not be wrapped 
+    # to smaller than this amount
     "min_line_width":  (($config|.xml.max_line_width) // 30)|tonumber,
+#
+    # the style to use for packing text as an element's content
     "text_packing":  (($config|.xml.text_packing) // "compact"),
+#
+    # the style for formatting XML output.  style=pretty inserts indentation 
+    # and newlines to a readable format.  
     "style":  (($config|.xml.style) // "pretty")
 };
 
@@ -129,13 +146,14 @@ def isstring: textwrap::isstring;
 #
 # @arg indent integer:  the number of characters to indent the formatted text
 #                         (if compact text packing is not in force).
-def format_text(indent): 
+def format_text(indent; cntxt): 
     if (isstring|not) then error("filter format_text requires text input")
        else . end |
-    context as $context |
-    if ($context|.text_packing) == "compact" then 
-     textwrap::fill($context|.max_line_width; indent; $context|.min_line_width)
+#    context as $context |
+    if (cntxt|.text_packing) == "compact" then 
+     textwrap::fill(cntxt|.max_line_width; indent; cntxt|.min_line_width)
     else . end;
+def format_text(indent): format_text(0; context);
 def format_text: format_text(0);
 
 def newprefix: 
@@ -199,12 +217,12 @@ def format_attribute(prefixes):
 # @return string    the attributes formatted into a string to be inserted into
 #                   an opening tag.  It may contain embedded new lines for 
 #                   pretty printing.
-def format_attributes(indent; prefixes):
-    context as $context | 
+def format_attributes(indent; cntxt; prefixes):
+#    context as $context | 
     map(format_attribute(prefixes)) | 
-    if ($context|.style) == "pretty" then
-        ($context|.max_line_width) as $usewidth |
-        ($context|.min_line_width) as $minwidth |
+    if (cntxt|.style) == "pretty" then
+        (cntxt|.max_line_width) as $usewidth |
+        (cntxt|.min_line_width) as $minwidth |
         ($usewidth - indent) as $usewidth |
         (if $usewidth < $minwidth then $minwidth else $usewidth end) 
             as $usewidth |
@@ -257,11 +275,11 @@ def new_namespaces(prefixes):
 
 
 
-def format_element(indent; prefixes):
-    context as $context | 
-    if .|has("hints") then
-        ($context + .hints) as $context | .
-    else . end |
+def format_element(indent; cntxt; prefixes):
+#    context as $context | 
+    (if .|has("hints") then
+        (cntxt + .hints) 
+     else cntxt end) as $context |
 
     # determine what new namespaces we'll need to declare
     . as $el |
@@ -287,8 +305,9 @@ def format_element(indent; prefixes):
     (if (.content.attrs|length) > 0 then ($opentag + " ") else $opentag end)
         as $opentag |
     (if (.content.attrs|length) > 0 then
-        (.content.attrs | format_attributes(($opentag|length)+1; $prefixes)) 
-    else "" end) as $atts | 
+        (.content.attrs | format_attributes(($opentag|length)+1; $context; 
+                                            $prefixes)) 
+     else "" end) as $atts | 
 
     if (.content.children|length) > 0 then
         ($opentag + $atts + ">") as $opentag |
@@ -328,9 +347,9 @@ def format_element(indent; prefixes):
              end) as $subindent |
 
             [ $opentag ] + map(if (.|isstring) then
-                                   format_text($subindent)
+                                 format_text($subindent; $context)
                                else 
-                                   format_element($subindent; $prefixes)
+                                 format_element($subindent; $context; $prefixes)
                                end)
                          + [ $closetag ] | 
 
@@ -343,6 +362,11 @@ def format_element(indent; prefixes):
     else 
         $opentag + $atts + "/>"
     end;
+
+def format_element(indent; cntxt): format_element(indent; cntxt; {});
+def format_element(indent): format_element(indent; context; {});
+def format_element:  format_element(0);
+
 
 
     

@@ -96,5 +96,5 @@ include "xml"; add_child2element({"name": "subject", "content": { "children": ["
 
 include "xml"; format_element(0; {})
 { "name": "date", "content": { "children": [ "2016" ] }, "ns": { "namespace": "urn:gurn" }}
-"<ns1:date>2016</ns:date>"
+"<ns1:date xmlns:ns1=\"urn:gurn\">2016</ns1:date>"
 
