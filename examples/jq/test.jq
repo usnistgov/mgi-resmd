@@ -35,8 +35,9 @@ include "xml";
 #
 #format_element(0; {})
 
-{ "name": "date", "content": { "children": [ "2016" ] }, "ns": { "namespace": "urn:gurn" }, "hints": { "value_pad": 2, "style": "pretty", "max_line_length": 75 }} |
-format_element(0; {})
+{ "name": "date", "content": { "children": [{"name": "today"}, {"name": "tomorrow", "content": { "children": ["never knows"] }}, {"name": "never", "content": { "children": ["in a million years, when hell freezes over, and the land tumbles into the sea"] }}] }, "ns": { "namespace": "urn:gurn" }} |
+
+format_element(0; {"style": "pretty", "max_line_length": 75, "indent": 2, "value_pad": 1})
 
 
 

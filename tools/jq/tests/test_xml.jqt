@@ -118,3 +118,7 @@ include "xml"; format_element(0; { "style": "pretty", "max_line_length": 75, "in
 { "name": "date", "content": { "children": [{"name": "today"}] }, "ns": { "namespace": "urn:gurn" }}
 "<ns1:date xmlns:ns1=\"urn:gurn\">\n  <today/>\n</ns1:date>"
 
+include "xml"; format_element(0; { "style": "pretty", "max_line_length": 75, "indent": 2, "value_pad": 1 })
+{ "name": "date", "content": { "children": [{"name": "today"}, {"name": "tomorrow", "content": { "children": ["never knows"] }}, {"name": "never", "content": { "children": ["in a million years, when hell freezes over, and the land tumbles into the sea"] }}] }, "ns": { "namespace": "urn:gurn" }}
+"<ns1:date xmlns:ns1=\"urn:gurn\">\n  <today/>\n  <tomorrow> never knows </tomorrow>\n  <never>\n    in a million years, when hell freezes over, and the land tumbles into\n    the sea\n  </never>\n</ns1:date>"
+

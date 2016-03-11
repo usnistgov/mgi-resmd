@@ -148,12 +148,12 @@ def isstring: textwrap::isstring;
 #                         (if compact text packing is not in force).
 def format_text(indent; cntxt): 
     if (isstring|not) then error("filter format_text requires text input")
-       else . end |
+       else . end | 
 #    context as $context |
-    if (cntxt|.text_packing) == "compact" then 
-     textwrap::fill(cntxt|.max_line_length; indent; cntxt|.min_line_length)
+    if (cntxt|.text_packing) != "compact" then
+       textwrap::fill(cntxt|.max_line_length; indent; cntxt|.min_line_length)
     else . end;
-def format_text(indent): format_text(0; context);
+def format_text(indent): format_text(indent; context);
 def format_text: format_text(0);
 
 def newprefix: 
@@ -328,7 +328,7 @@ def format_element(indent; cntxt; prefixes):
             # single text value
             if ($context|.value_pad) <= 0 or 
                (($context|.text_packing)=="pretty" and 
-                (.[0]|length) < $maxlen-($opentag|length)-($closetag|length))
+                (.[0]|length) < ($maxlen-($opentag|length)-($closetag|length)))
             then
                 # short enough to fit in one line
                 (if ($context|.value_pad) > 0 then
@@ -353,8 +353,13 @@ def format_element(indent; cntxt; prefixes):
              else
                 (indent + $step)
              end) as $subindent |
+            (if $step < 0 then
+                $closetag
+             else
+                (" " * indent) + $closetag
+             end) as $closetag |
 
-            [ $opentag ] + map(if (.|isstring) then
+            [ $opentag ] + map(if (.|isstring) then 
                                  format_text($subindent; $context)
                                else 
                                  format_element($subindent; $context; $prefixes)
@@ -364,7 +369,7 @@ def format_element(indent; cntxt; prefixes):
             if $step < 0 then
                 join("")
             else 
-                join("\n" + (indent * " "))
+                join("\n")
             end
         else . end
     else 
