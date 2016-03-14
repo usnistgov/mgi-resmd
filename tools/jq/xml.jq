@@ -52,22 +52,28 @@ def _tons:
 def attribute(name; value): _attribute(name; value; {});
 def attribute(name; value; ns): _attribute(name; value; ns|_tons);
 
-def _element_content(children; attrs): {children: children, attrs: attrs};
-
-def element_content(children): children |
-    (strings | { "children": [.] }),
-    (arrays | { "children": . }),
-    (objects | { "children": .children?, "attrs": .attrs? });
-def element_content(children; attrs): {
-    "children": children | (
-       (strings | [.]),
-       (arrays | .),
-       (objects | if .name? then [.] else [] end)),
-    "attrs": attrs | (
+def element_content(children): 
+    # note: use of reduce allows for children to be null or empty and still
+    # produce an (empty) object
+    [children |
+       (strings | { "children": [.] }),
+       (arrays | { "children": . }),
+       (objects | { "children": .children?, "attrs": .attrs? })] |
+    reduce .[] as $item ({}; . + $item)
+;
+def element_content(children; attrs): 
+    [{"children": children | (
        (strings | [.]),
        (arrays | .),
        (objects | if .name? then [.] else [] end))
-};
+    },
+    {"attrs": attrs | (
+       (strings | [.]),
+       (arrays | .),
+       (objects | if .name? then [.] else [] end))
+    }] |
+    reduce .[] as $item ({}; . + $item)
+;
 
 
 # Create an XML element object
@@ -111,6 +117,17 @@ def nselement(name; nsinfo; content): _element(name; nsinfo|_tons; content);
 def text_element(name; value): element(name; element_content(value));
 def text_element(name; value; nsinfo): 
     element(name; element_content(value); nsinfo);
+
+def text_element_if(name; value):
+    if (value//null) then text_element(name; value) else empty end;
+def text_element_if(name; value; nsinfo):
+    if (value//null) then text_element(name; value; nsinfo) else empty end;
+
+# convert an array of strings to an array of elements containing the strings
+#
+# @arg name string:   the name to give the containing output elements
+def textarray2elements(name):
+    (arrays//[]) | map(element(name; element_content(.)));
 
 # add an attribute to the input element and return the element
 #
