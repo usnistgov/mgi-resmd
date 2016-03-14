@@ -322,7 +322,7 @@ def format_element(indent; cntxt; prefixes):
     (if (.content.attrs|length) > 0 then ($opentag + " ") else $opentag end)
         as $opentag |
     (if (.content.attrs|length) > 0 then
-        (.content.attrs | format_attributes(($opentag|length)+1; $context; 
+        (.content.attrs | format_attributes(($opentag|length); $context; 
                                             $prefixes)) 
      else "" end) as $atts | 
 
@@ -395,9 +395,17 @@ def add_xsidef2element:
     attribute("xmlns:xsi"; xsiuri) as $xsiatt | 
     add_attr2element($xsiatt);
 
-def print(cntxt): 
+def xmlproc(encoding): "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>";
+def xmlproc: xmlproc("UTF-8");
+
+
+def print(cntxt; enc): 
     (context + cntxt) as $c |
-    format_element(0; $c);
+    xmlproc(enc)
+    + (if ($c|.style) == "pretty" then "\n" else "" end)
+    + format_element(0; $c);
+def print(cntxt):
+    print(cntxt; "UTF-8");
 def print: 
     print({});
 
