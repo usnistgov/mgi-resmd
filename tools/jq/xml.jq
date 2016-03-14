@@ -57,16 +57,16 @@ def _element_content(children; attrs): {children: children, attrs: attrs};
 def element_content(children): children |
     (strings | { "children": [.] }),
     (arrays | { "children": . }),
-    (objects | { "children": .children, "attrs": .attrs });
+    (objects | { "children": .children?, "attrs": .attrs? });
 def element_content(children; attrs): {
     "children": children | (
        (strings | [.]),
        (arrays | .),
-       (objects | if .name then [.] else [] end)),
+       (objects | if .name? then [.] else [] end)),
     "attrs": attrs | (
        (strings | [.]),
        (arrays | .),
-       (objects | if .name then [.] else [] end)),
+       (objects | if .name? then [.] else [] end))
 };
 
 
@@ -81,15 +81,19 @@ def element_content(children; attrs): {
 #                     either property is optional.  If an array, the first
 #                     item is assumed to be the prefix and the second, the
 #                     namespace
-def _element(name; nsinfo; content): { 
+def _element(name; content; nsinfo): { 
     "name": name,
     "ns": nsinfo,
     "content": content
 };
-def element(name): { "name": name, "content": { }};
-def element(name; nsinfo): _element(name; nsinfo|_tons; {});
-def element(name; nsinfo; content): 
-    _element(name; nsinfo|_tons; content);
+def element(name; content): 
+    { "name": name, "content": content };
+def element(name): element(name; {});
+def element(name; content; nsinfo): 
+    _element(name; content; nsinfo|_tons);
+
+def nselement(name; nsinfo): _element(name; nsinfo|_tons; {});
+def nselement(name; nsinfo; content): _element(name; nsinfo|_tons; content);
 
 # Create an XML element object containing a single text element
 # @arg name string:   the local name of the element; this can include
@@ -104,9 +108,9 @@ def element(name; nsinfo; content):
 #                     either property is optional.  If an array, the first
 #                     item is assumed to be the prefix and the second, the
 #                     namespace
-def text_element(name; value): element(name) + element_content(value);
+def text_element(name; value): element(name; element_content(value));
 def text_element(name; value; nsinfo): 
-    element(name, nsinfo) + element_content(value);
+    element(name; element_content(value); nsinfo);
 
 # add an attribute to the input element and return the element
 #
@@ -135,7 +139,12 @@ def add_child2element(child):
     else . end |
     .content.children += [child];
 
-
+def add_content2element(content):
+    .|.content += content;
+def add_ascontent2element(children; attributes):
+    add_content2element(element_content(children; attributes));
+def add_ascontent2element(children):
+    add_content2element(element_content(children));
 
 def isstring: textwrap::isstring;
 
@@ -279,7 +288,7 @@ def format_element(indent; cntxt; prefixes):
 #    context as $context | 
     (if .|has("hints") then
         (cntxt + .hints) 
-     else cntxt end) as $context |
+     else cntxt end) as $context | 
     (if ($context|.style) == "compact" then
         $context|(.indent = -1)
                  |(.text_packing = "compact")
@@ -287,7 +296,7 @@ def format_element(indent; cntxt; prefixes):
         $context|.text_packing = "pretty"
      else
         $context
-     end) as $context |
+     end) as $context | 
 
     # determine what new namespaces we'll need to declare
     . as $el |
@@ -297,7 +306,7 @@ def format_element(indent; cntxt; prefixes):
     # add any new namespace declarations as attributes
     reduce ($new|.[]) as $attr 
            (.; add_attr2element("xmlns:"+($attr|.[0]) + "=\"" +
-                                ($attr|.[1])+"\"") ) |
+                                ($attr|.[1])+"\"") ) | 
 
     # determine the fully qualified element name
     (if (.name|contains(":")) then
@@ -380,9 +389,15 @@ def format_element(indent; cntxt): format_element(indent; cntxt; {});
 def format_element(indent): format_element(indent; context; {});
 def format_element:  format_element(0);
 
+def xsiuri: "http://www.w3.org/2001/XMLSchema-instance";
 
+def add_xsidef2element: 
+    attribute("xmlns:xsi"; xsiuri) as $xsiatt | 
+    add_attr2element($xsiatt);
 
-    
+def print(cntxt): 
+    (context + cntxt) as $c |
+    format_element(0; $c);
+def print: 
+    print({});
 
-
-             
