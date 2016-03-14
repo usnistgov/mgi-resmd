@@ -2,12 +2,18 @@ import "xml" as xml;
 
 def subjects: .subject | xml::textarray2elements("subject");
 
+def IdentifierInfo:
+    (strings | [xml::attribute("pid")]),
+    (objects | [.id | xml::attribute("pid"), .scheme |xml::attribute("scheme")]);
+
+def NameID:
+    (strings | xml::element_content([.])),
+    (arrays  | xml::element_content([.[0]]; .[1] | IdentifierInfo));
+                             
+
 def idable_text_element(name):
-    (strings | xml::text_element(name)),
-    (arrays  |
-       .[1] as $pid |
-       .[0] | xml::text_element(name) |
-       xml::add_attr2element($pid|xml::attribute("pid")));
+    NameID | xml::element(name);
+
 def refcits: .referenceCitation | (arrays//[]) |
     map(idable_text_element("referenceCitation"));
 
@@ -30,6 +36,7 @@ def Identity: xml::element_content([]
 
 def Curation: xml::element_content([]
     + [.publisher | idable_text_element("publisher")]
+    + (.creator//[] | map(idable_text_element("creator")))
 );
 
 def Resource: xml::element_content([]
