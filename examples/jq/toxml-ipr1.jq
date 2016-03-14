@@ -2,12 +2,21 @@ import "xml" as xml;
 
 def subjects: .subject | xml::textarray2elements("subject");
 
+def idable_text_element(name):
+    (strings | xml::text_element(name; .)),
+    (arrays  |
+       .[1] as $pid |
+       xml::text_element(name; .[0]) |
+       xml::add_attr2element(xml::attribute("pid"; $pid)));
+def refcits: .referenceCitation | (arrays//[]) |
+    map(idable_text_element("referenceCitation"));
+
 def Content: xml::element_content([]
     + [xml::text_element("type"; .type)]
     + (.description |  xml::textarray2elements("description"))
     + subjects
     + [xml::text_element("referenceURL"; .referenceURL)]
-    + (.referenceCitation | xml::textarray2elements("referenceCitation"))
+    + refcits
     + (.primaryAudience | xml::textarray2elements("primaryAudience"))
 );
 
@@ -20,11 +29,12 @@ def Identity: xml::element_content([]
 );
 
 def Curation: xml::element_content([]
-    + [xml::text_element("publisher"; .publisher)]
+    + [.publisher | idable_text_element("publisher")]
 );
 
 def Resource: xml::element_content([]
     + [.identity|xml::element("identity"; Identity)]
+    + [.curation|xml::element("curation"; Curation)]
     + [.content|xml::element("content"; Content)];
     
     [xml::attribute("xmlns";""), xml::attribute("xsi:type"; "rsm:Resource"),
