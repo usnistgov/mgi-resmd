@@ -3,29 +3,29 @@ import "xml" as xml;
 def subjects: .subject | xml::textarray2elements("subject");
 
 def idable_text_element(name):
-    (strings | xml::text_element(name; .)),
+    (strings | xml::text_element(name)),
     (arrays  |
        .[1] as $pid |
-       xml::text_element(name; .[0]) |
-       xml::add_attr2element(xml::attribute("pid"; $pid)));
+       .[0] | xml::text_element(name) |
+       xml::add_attr2element($pid|xml::attribute("pid")));
 def refcits: .referenceCitation | (arrays//[]) |
     map(idable_text_element("referenceCitation"));
 
 def Content: xml::element_content([]
-    + [xml::text_element("type"; .type)]
+    + [(.type//"") | xml::text_element("type")]
     + (.description |  xml::textarray2elements("description"))
     + subjects
-    + [xml::text_element("referenceURL"; .referenceURL)]
+    + [(.referenceURL/"") | xml::text_element("referenceURL")]
     + refcits
     + (.primaryAudience | xml::textarray2elements("primaryAudience"))
 );
 
 def Identity: xml::element_content([]
-    + [xml::text_element("title"; .title)]
-    + [xml::text_element_if("shortName"; .shortName)]
-    + [xml::text_element_if("version"; .version)]
+    + [(.title//"") | xml::text_element("title")]
+    + [.shortName | xml::text_element("shortName")]
+    + [.version | xml::text_element("version")]
     + (.identifier | xml::textarray2elements("identifier"))
-    + [xml::text_element_if("logo"; .logo)]
+    + [.logo | xml::text_element("logo")]
 );
 
 def Curation: xml::element_content([]
@@ -33,17 +33,19 @@ def Curation: xml::element_content([]
 );
 
 def Resource: xml::element_content([]
-    + [.identity|xml::element("identity"; Identity)]
-    + [.curation|xml::element("curation"; Curation)]
-    + [.content|xml::element("content"; Content)];
+    + [.identity | Identity | xml::element("identity")]
+    + [.curation | Curation | xml::element("curation")]
+    + [.content | Content | xml::element("content")];
     
-    [xml::attribute("xmlns";""), xml::attribute("xsi:type"; "rsm:Resource"),
-     xml::attribute("xmlns:rms"; "urn:nist.gov/schema/res-md/1.0wd"),
-     xml::attribute("xmlns:ms"; "urn:nist.gov/schema/mat-sci_res-md/1.0wd")]);
+    [(""|xml::attribute("xmlns")),
+     ("rsm:Resource" | xml::attribute("xsi:type")),
+     ("urn:nist.gov/schema/res-md/1.0wd" | xml::attribute("xmlns:rms")),
+     ("urn:nist.gov/schema/mat-sci_res-md/1.0wd" | xml::attribute("xmlns:ms"))])
+;
 
-def resource: xml::element("Resource"; Resource) | xml::add_xsidef2element;
+def resource: Resource | xml::element("Resource") | xml::add_xsidef2element;
 
-def content: xml::element("content"; Content);
+def content: Content | xml::element("content");
 
 . | resource | xml::print({"value_pad": 1})
 

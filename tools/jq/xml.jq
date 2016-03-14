@@ -26,9 +26,9 @@ def context: {
     "style":  (($config|.xml.style) // "pretty")
 };
 
-def _attribute(name; value; nsinfo): 
+def _attribute(name; nsinfo): 
    { "name": name,
-     "value": value,
+     "value": .,
      "ns": nsinfo };
 def _tons: 
    (objects | { prefix, namespace }),
@@ -37,11 +37,10 @@ def _tons:
 
 
 # Create an XML attribute object
+# @in string:         the attribute's value
 # @arg name string:   the local name of the element; this can include
 #                     a prefix which will override the prefix given
 #                     via the namespace argument
-# @arg value any:     the value to give to the element; this will be 
-#                     converted to a string when printed via print
 # @arg ns (string,object,array):  namespace information: if a string, it is 
 #                     taken to be the namespace URI for the attribute; 
 #                     If an object, the "prefix" property is the prefix to 
@@ -49,8 +48,8 @@ def _tons:
 #                     either property is optional.  If an array, the first
 #                     item is assumed to be the prefix and the second, the
 #                     namespace
-def attribute(name; value): _attribute(name; value; {});
-def attribute(name; value; ns): _attribute(name; value; ns|_tons);
+def attribute(name): _attribute(name; {});
+def attribute(name; ns): _attribute(name; ns|_tons);
 
 def element_content(children): 
     # note: use of reduce allows for children to be null or empty and still
@@ -77,6 +76,7 @@ def element_content(children; attrs):
 
 
 # Create an XML element object
+# @in (object,array):  an element_content object or an array of children
 # @arg name string:   the local name of the element; this can include
 #                     a prefix which will override the prefix given
 #                     via the namespace argument
@@ -87,26 +87,23 @@ def element_content(children; attrs):
 #                     either property is optional.  If an array, the first
 #                     item is assumed to be the prefix and the second, the
 #                     namespace
-def _element(name; content; nsinfo): { 
+def _element(name; nsinfo): {
     "name": name,
     "ns": nsinfo,
-    "content": content
+    "content": .
 };
-def element(name; content): 
-    { "name": name, "content": content };
-def element(name): element(name; {});
-def element(name; content; nsinfo): 
-    _element(name; content; nsinfo|_tons);
-
-def nselement(name; nsinfo): _element(name; nsinfo|_tons; {});
-def nselement(name; nsinfo; content): _element(name; nsinfo|_tons; content);
+def element(name): 
+    { "name": name, "content": . };
+def element(name; nsinfo):
+    (objects | _element(name; nsinfo|_tons)),
+    (arrays | element_content(.) | _element(name; nsinfo|_tons)),
+    (strings | element_content(.) | _element(name; nsinfo|_tons));
 
 # Create an XML element object containing a single text element
+# @in string:         the text element value
 # @arg name string:   the local name of the element; this can include
 #                     a prefix which will override the prefix given
 #                     via the namespace argument
-# @arg value any:     the value to give to the element; this will be 
-#                     converted to a string when printed via print
 # @arg ns (string,object,array):  namespace information: if a string, it is 
 #                     taken to be the namespace URI for the attribute; 
 #                     If an object, the "prefix" property is the prefix to 
@@ -114,14 +111,9 @@ def nselement(name; nsinfo; content): _element(name; nsinfo|_tons; content);
 #                     either property is optional.  If an array, the first
 #                     item is assumed to be the prefix and the second, the
 #                     namespace
-def text_element(name; value): element(name; element_content(value));
-def text_element(name; value; nsinfo): 
-    element(name; element_content(value); nsinfo);
-
-def text_element_if(name; value):
-    if (value//null) then text_element(name; value) else empty end;
-def text_element_if(name; value; nsinfo):
-    if (value//null) then text_element(name; value; nsinfo) else empty end;
+def text_element(name): strings | element_content(.) | element(name);
+def text_element(name; nsinfo): 
+    strings | element_content(.) | element(name; nsinfo);
 
 # convert an array of strings to an array of elements containing the strings
 #
@@ -409,7 +401,7 @@ def format_element:  format_element(0);
 def xsiuri: "http://www.w3.org/2001/XMLSchema-instance";
 
 def add_xsidef2element: 
-    attribute("xmlns:xsi"; xsiuri) as $xsiatt | 
+    (xsiuri | attribute("xmlns:xsi")) as $xsiatt | 
     add_attr2element($xsiatt);
 
 def xmlproc(encoding): "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>";
