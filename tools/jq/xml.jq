@@ -51,15 +51,20 @@ def _tons:
 def attribute(name): _attribute(name; {});
 def attribute(name; ns): _attribute(name; ns|_tons);
 
-def element_content(children): 
-    # note: use of reduce allows for children to be null or empty and still
-    # produce an (empty) object
-    [children |
-       (strings | { "children": [.] }),
-       (arrays | { "children": . }),
-       (objects | { "children": .children?, "attrs": .attrs? })] |
-    reduce .[] as $item ({}; . + $item)
-;
+# Create an element's content--i.e. its sequence of child elements and its
+# attributes.  The order that the children and the attributes appear are the 
+# order that they appear in the output XML.  No attempt is made to ensure 
+# uniqueness of the attribute names; caller is responsible for this.  Note 
+# that if undeclared namespaces are referenced in the children or attributes,
+# namespace declarations may be added as atributes at formatting time.
+#
+# @in  ignored
+# @arg children array:  the sequence of child nodes; an element can be either 
+#                       a string (for a text child node) or an element object
+# @arg attrs    array:  the sequence of attributes to include, provided as 
+#                       attribute objects.  If none are provided or an empty
+#                       array is given, no attributes will be added. 
+#
 def element_content(children; attrs): 
     [{"children": children | (
        (strings | [.]),
@@ -71,6 +76,15 @@ def element_content(children; attrs):
        (arrays | .),
        (objects | if .name? then [.] else [] end))
     }] |
+    reduce .[] as $item ({}; . + $item)
+;
+def element_content(children): 
+    # note: use of reduce allows for children to be null or empty and still
+    # produce an (empty) object
+    [children |
+       (strings | { "children": [.] }),
+       (arrays | { "children": . }),
+       (objects | { "children": .children?, "attrs": .attrs? })] |
     reduce .[] as $item ({}; . + $item)
 ;
 
@@ -148,6 +162,7 @@ def add_child2element(child):
     else . end |
     .content.children += [child];
 
+
 def add_content2element(content):
     .|.content += content;
 def add_ascontent2element(children; attributes):
@@ -155,6 +170,8 @@ def add_ascontent2element(children; attributes):
 def add_ascontent2element(children):
     add_content2element(element_content(children));
 
+# output true if the input data is a string
+# @in any
 def isstring: textwrap::isstring;
 
 # format the given text for inclusion as the content for an element.  This 
@@ -162,6 +179,7 @@ def isstring: textwrap::isstring;
 # parameter xml.min_line_length) unless the config parameter text_packing is 
 # set to "compact"; if compact packing is set, then the text is unchanged.  
 #
+# @in string:   the input string to format
 # @arg indent integer:  the number of characters to indent the formatted text
 #                         (if compact text packing is not in force).
 def format_text(indent; cntxt): 
@@ -174,6 +192,8 @@ def format_text(indent; cntxt):
 def format_text(indent): format_text(indent; context);
 def format_text: format_text(0);
 
+# given a namespace-to-prefix map, create a new prefix not currently in use
+#
 def newprefix: 
     "ns"+ (values | map(select(test("^ns\\d+$"))) | 
                     map(.[2:]|tonumber) | max+1 | tostring);
@@ -210,6 +230,17 @@ def _pack_recurse(width):
 def _pack(width):
     [ .[0:1], .[1:] ] | _pack_recurse(width) | .[0];
 
+# format an attribute into attribute syntax.  The input prefixes map must 
+# provide a prefix for namespace associated with the attribute, if applicable.
+#
+# @in  (object,string):  the attribute to format.  If it's a string, it is 
+#                        assumed that the attribute is already properly 
+#                        formatted, and it is passed unchanged.  It otherwise
+#                        should be an attribute object
+# @arg prefixes object:  the namespace-to-prefix map for all namespace currently
+#                        in scope, including any associated with the attribute.
+# @out string            the formatted attribute (of the form, name=value).
+#
 def format_attribute(prefixes):
     if isstring then
         .
@@ -223,6 +254,9 @@ def format_attribute(prefixes):
 # format the attributes for insertion into an opening element tag.
 # When many attributes are present, these can be wrapped onto separate lines.
 # 
+# @in  array:   the sequence of attributes to format; each should either be 
+#               a string (representing a pre-formatted attribute) or an 
+#               attribute object.
 # @arg indent integer:    The indentation to use when wrapping the attributes
 #                         onto multiple lines: all but the first line will be
 #                         prepended by this number of spaces.  Normally, this 
@@ -232,7 +266,7 @@ def format_attribute(prefixes):
 # @arg prefixes object:   an object where the keys are namespace URIs and 
 #                         the values are namespace prefixes in currently in 
 #                         use.
-# @return string    the attributes formatted into a string to be inserted into
+# @out string       the attributes formatted into a string to be inserted into
 #                   an opening tag.  It may contain embedded new lines for 
 #                   pretty printing.
 def format_attributes(indent; cntxt; prefixes):
@@ -280,21 +314,39 @@ def _gather_new_namespaces:
          .
      end;
 
-# return an prefixes object that is the given set of prefixes updated for 
+# return a prefixes object that is the given set of prefixes updated for 
 # namespaces introduced by the input XML node.  The input can either be 
 # an attribute node or an element node.
 #
+# @in object:   either an element or attribute node object
 # @arg prefixes object:  the mapping of namespace URIs (i.e. the keys) to 
 #                          associated prefixes (values). 
+# @out object:  the updated prefixes map
 #
 def new_namespaces(prefixes): 
     { "prefixes": prefixes, "node": ., "new": [] } |
     _gather_new_namespaces | .new;
 
-
-
+# format the input element into proper XML syntax.
+#
+# @in object:  the element node object to format
+# @arg indent integer:  the number of spaces to prepend to each line of XML.  
+#                       This is ignored unless the context/hint parameter style
+#                       is set to "pretty".  Any child elements will have 
+#                       additional spaces prepended if the context/hint 
+#                       parameter indent is positive.  If not provided, 
+#                       0 is taken as the default.
+# @arg cntxt object:    the context parameter data that should be used to 
+#                       control the formatting.  Context parameters will be 
+#                       overridden by any hint parameters included
+#                       with the input element or its children.  If not provided,
+#                       a set of system defaults are assumed (see xml::context).
+# @arg prefixes object: an object where the keys are namespace URIs and 
+#                       the values are namespace prefixes in currently in 
+#                       use.  If not provided, an empty map is assumed.
+# @out string           the formatted element, including all its children
+#                       and attributes.
 def format_element(indent; cntxt; prefixes):
-#    context as $context | 
     (if .|has("hints") then
         (cntxt + .hints) 
      else cntxt end) as $context | 
@@ -398,16 +450,36 @@ def format_element(indent; cntxt): format_element(indent; cntxt; {});
 def format_element(indent): format_element(indent; context; {});
 def format_element:  format_element(0);
 
+# output the xsi URI 
+# @in ignored
+# @out string:  the URI
 def xsiuri: "http://www.w3.org/2001/XMLSchema-instance";
 
+# add an attribute to the given element that defines the xsi namespace
+#
+# @in object:   the element node object to add to
+# @out object:  the updated element node object
+#
 def add_xsidef2element: 
     (xsiuri | attribute("xmlns:xsi")) as $xsiatt | 
     add_attr2element($xsiatt);
 
+# produce an XML processing instruction used at the opening of an XML document
+#
+# @in ignored
+# @arg encoding string:  the encoding label to set as the encoding attribute
+#                        to the processing instruction; default="UTF-8".
+# @out string:   the formatted xml processing instruction
+#
 def xmlproc(encoding): "<?xml version=\"1.0\" encoding=\""+encoding+"\"?>";
 def xmlproc: xmlproc("UTF-8");
 
-
+# format the given element node object as the root node of an output XML document
+# 
+# @in object:   the element node object to format
+# @arg cntxt object:   the context data to apply when formatting the data
+# @out string:  the formatted XML document
+#
 def print(cntxt; enc): 
     (context + cntxt) as $c |
     xmlproc(enc)
