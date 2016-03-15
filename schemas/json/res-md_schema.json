@@ -101,7 +101,7 @@
                       "description": "A human-readable name or title for the entity being referenced"
                   },
                   {
-                      "$ref": "#/definitions/identifierInfo"
+                      "$ref": "#/definitions/IdentifierInfo"
                   }
               ],
               "additionalItems": { "$ref": "#/definitions/IdentifierInfo" }

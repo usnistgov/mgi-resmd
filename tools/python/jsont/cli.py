@@ -146,7 +146,7 @@ class JSONT(Runner):
         try:
             transform(self.opts.ssheet, doc, self.opts, out)
         except CLIException, ex:
-            if self.verbose:
+            if self.opts.verbose:
                 if isinstance(ex.cause, TransformApplicationException) and \
                    hasattr(ex.cause, 'input'):
                     self.complain("Problem transforming input: ")

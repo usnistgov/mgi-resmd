@@ -1,0 +1,61 @@
+#! /bin/bash
+#
+#set -x
+xjqpath=
+prog=`basename $0`
+
+if [ -n "$XJQPATH" ]; then
+    patharg="-L$XJQPATH"
+elif [ -n "$xjqpath" ]; then
+    patharg="-L$xjqpath"
+else
+    base=`dirname $0`      # bin or scripts
+    base=`dirname $base`   # base or tools
+    xjqpath="$base/lib/jq"
+    [ ! -f "$xjqpath/xml.jq" ] && xjqpath="$base/lib"
+    [ ! -f "$xjqpath/xml.jq" ] && {
+        base=`dirname $base`
+        xjqpath="$base/tools/jq"
+    }
+    [ ! -f "$xjqpath/xml.jq" ] && xjqpath="/usr/local/lib/jq"
+    patharg="-L$xjqpath"
+    [ ! -f "$xjqpath/xml.jq" ] && patharg=""
+fi
+
+JQ_ARGS=()
+params=
+
+while [ ${#@} -gt 0 ]; do
+    case "$1" in
+        "--config")
+            params="$params $2 $3"
+            shift 2
+            ;;
+        *)
+            JQ_ARGS+=("$1")
+            ;;
+    esac
+    shift
+done
+
+function build_config {
+
+    echo -n "{}"
+
+    while [ ${#@} -gt 0 ]; do
+        echo -n " | .$1 = $2" 
+        shift 2
+    done
+    echo ""
+}
+
+cfgin=`build_config $params`
+cfg=`jq -nc "$cfgin"`
+
+jq $patharg --argjson config "$cfg" "${JQ_ARGS[@]}"
+
+
+
+
+
+    
