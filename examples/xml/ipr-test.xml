@@ -8,6 +8,7 @@
 
    <identity>
      <title>The Interatomic Potentials Repository Project</title>
+     <altTitle type="AlternativeTitle">The Interatomic Potentials Repository Project</altTitle>
      <shortName> IPR </shortName>
      <version>2.0</version>
    </identity>
@@ -15,9 +16,20 @@
      <publisher> 
        NIST/MSED Center for Theoretical and Computational Materials Science (CTCMS) 
      </publisher>
-     <creator> Chandler Becker </creator>
-     <contributor> Zachary Trautt </contributor>
-     <date role="Created" xsi:type="dcr:TypedDate"> 2008-04-01 </date>
+     <publicationYear> 2014 </publicationYear>
+     <creator>
+       <name>Chandler Becker</name>
+       <affiliation> NIST </affiliation>
+     </creator>
+     <creator>
+       <name sur="van Der Graaf" given="Hans">
+         Hans van Der Graaf
+       </name>
+     </creator>
+     <contributor role="DataCurator" xsi:type="dcr:DciteContributor">
+       <name>Zachary Trautt</name>
+     </contributor>
+     <date role="Created" xsi:type="dcr:DciteDate"> 2008-04-01 </date>
      <contact>
        <name>Zachary Trautt</name>
        <emailAddress> zachary.trautt@nist.gov </emailAddress>
