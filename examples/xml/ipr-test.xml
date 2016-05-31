@@ -18,7 +18,7 @@
      </publisher>
      <publicationYear> 2014 </publicationYear>
      <creator>
-       <name>Chandler Becker</name>
+       <name pid="orcid:09834100891">Chandler Becker</name>
        <affiliation> NIST </affiliation>
      </creator>
      <creator>
@@ -27,7 +27,7 @@
        </name>
      </creator>
      <contributor role="DataCurator" xsi:type="dcr:DciteContributor">
-       <name>Zachary Trautt</name>
+       <name pid="orcid:09834100891">Zachary Trautt</name>
      </contributor>
      <date role="Created" xsi:type="dcr:DciteDate"> 2008-04-01 </date>
      <contact>

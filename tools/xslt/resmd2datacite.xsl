@@ -144,15 +144,87 @@
        <creatorName>
           <xsl:apply-templates select="name" mode="flipName"/>
        </creatorName>
-       <xsl:if test="@pid">
+       <xsl:if test="name/@pid">
           <xsl:variable name="scheme">
-             <xsl:apply-templates select="@pid" mode="getidscheme"/>
+             <xsl:call-template name="getidscheme">
+                <xsl:with-param name="pid" select="name/@pid"/>
+             </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="uri">
+             <xsl:call-template name="getiduri">
+                <xsl:with-param name="id" select="$scheme"/>
+             </xsl:call-template>
           </xsl:variable>
           
           <xsl:value-of select="$subsp"/>
-          <nameIdentifier nameIdentifierScheme="$scheme">
-             <xsl:value-of select="@pid"/>
-          </nameIdentifier>
+          <xsl:element name="nameIdentifier">
+             <xsl:attribute name="nameIdentifierScheme">
+                <xsl:value-of select="$scheme"/>
+             </xsl:attribute>
+             <xsl:if test="$uri">
+                <xsl:attribute name="schemeURI">
+                   <xsl:value-of select="$uri"/>
+                </xsl:attribute>
+             </xsl:if>
+             <xsl:value-of select="name/@pid"/>
+          </xsl:element>
+       </xsl:if>
+       <xsl:value-of select="$sp"/>
+     </creator>
+   </xsl:template>
+
+   <xsl:template match="curation" mode="contributors">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+
+     <xsl:value-of select="$sp"/>
+     <contributors>
+        <xsl:if test="contributor">
+          <xsl:apply-templates select="contributor" mode="creators">
+            <xsl:with-param name="sp" select="concat($sp,$step)"/>
+            <xsl:with-param name="step" select="$step"/>
+          </xsl:apply-templates>       
+          <xsl:value-of select="$sp"/>
+        </xsl:if>
+     </contributors>
+   </xsl:template>
+
+   <xsl:template match="creator" mode="creators">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+
+     <xsl:variable name="subsp" select="concat($sp,$step)"/>
+
+     <xsl:value-of select="$sp"/>
+     <creator>
+       <xsl:value-of select="$subsp"/>
+       <creatorName>
+          <xsl:apply-templates select="name" mode="flipName"/>
+       </creatorName>
+       <xsl:if test="name/@pid">
+          <xsl:variable name="scheme">
+             <xsl:call-template name="getidscheme">
+                <xsl:with-param name="pid" select="name/@pid"/>
+             </xsl:call-template>
+          </xsl:variable>
+          <xsl:variable name="uri">
+             <xsl:call-template name="getiduri">
+                <xsl:with-param name="id" select="$scheme"/>
+             </xsl:call-template>
+          </xsl:variable>
+          
+          <xsl:value-of select="$subsp"/>
+          <xsl:element name="nameIdentifier">
+             <xsl:attribute name="nameIdentifierScheme">
+                <xsl:value-of select="$scheme"/>
+             </xsl:attribute>
+             <xsl:if test="$uri">
+                <xsl:attribute name="schemeURI">
+                   <xsl:value-of select="$uri"/>
+                </xsl:attribute>
+             </xsl:if>
+             <xsl:value-of select="name/@pid"/>
+          </xsl:element>
        </xsl:if>
        <xsl:value-of select="$sp"/>
      </creator>
@@ -435,6 +507,31 @@
    </xsl:template>
 
    <xsl:template match="*" mode="flipName">
+      <xsl:choose>
+         <xsl:when test="@sur">
+            <!-- use @sur, @given, @middle -->
+            <xsl:value-of select="@sur"/>
+            <xsl:text>, </xsl:text>
+            <xsl:if test="@given">
+               <xsl:value-of select="@given"/>
+               <xsl:if test="@middle">
+                  <xsl:text> </xsl:text>
+                  <xsl:value-of select="@middle"/>
+               </xsl:if>
+            </xsl:if>
+         </xsl:when>
+         <xsl:when test="contains(.,',')">
+            <!-- guessing already in proper last,-first format -->
+            <xsl:value-of select="."/>
+         </xsl:when>
+         <xsl:otherwise>
+            <!-- auto flip -->
+            <xsl:apply-templates select="." mode="autoflipName"/>
+         </xsl:otherwise>
+      </xsl:choose>
+   </xsl:template>
+
+   <xsl:template match="*" mode="autoflipName">
       <xsl:variable name="split">
          <xsl:call-template name="splitname">
             <xsl:with-param name="name" select="."/>
@@ -541,22 +638,23 @@
       </xsl:choose>
    </xsl:template>
 
-   <xsl:template match="*" mode="getidscheme">
-      <xsl:variable name="id" select="normalize-space(.)"/>
+   <xsl:template name="getidscheme">
+      <xsl:param name="pid"/>
+      <xsl:variable name="id" select="normalize-space($pid)"/>
       <xsl:choose>
          <xsl:when test="starts-with($id,'doi:') or 
-                         starts-with($id,'http://doi.org/">DOI</xsl:when>
+                         starts-with($id,'http://doi.org/')">DOI</xsl:when>
          <xsl:when test="contains($id,'ark:') or 
                          contains($id,'ARK:')">ARK</xsl:when>
          <xsl:when test="starts-with($id,'orcid:') or 
                          starts-with($id,'ORCID:') or 
-                         starts-with($id,'http://orchid.org/">ORCID</xsl:when>
+                         starts-with($id,'http://orchid.org/')">ORCID</xsl:when>
          <xsl:when test="starts-with($id,'isni:') or 
                          starts-with($id,'ISNI:') or 
-                         contains($id,'isni.org/">ISNI</xsl:when>
+                         contains($id,'isni.org/')">ISNI</xsl:when>
          <xsl:when test="starts-with($id,'hdl:') or 
                          starts-with($id,'HDL:') or 
-                         contains($id,'handle.net/">HDL</xsl:when>
+                         contains($id,'handle.net/')">HDL</xsl:when>
          <xsl:when test="starts-with($id,'http:') or 
                          starts-with($id,'https:')">URL</xsl:when>
          <xsl:when test="starts-with($id,'ivo:')">IVOID</xsl:when>
