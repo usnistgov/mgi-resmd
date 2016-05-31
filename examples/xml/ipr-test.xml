@@ -10,7 +10,8 @@
      <title>The Interatomic Potentials Repository Project</title>
      <altTitle type="AlternativeTitle">The Interatomic Potentials Repository Project</altTitle>
      <shortName> IPR </shortName>
-     <version>2.0</version>
+     <version> 2.0 </version>
+     <identifier>ark:asdlf13871</identifier>
    </identity>
    <curation>
      <publisher> 
@@ -51,6 +52,9 @@
        related files are currently available for various metals,
        semiconductors, oxides, and carbon-containing systems. 	  
      </description>
+     <description>
+       You should try it.
+     </description>
      <subject> interatomic potentials </subject>
      <subject> molecular dynamics </subject>
      <subject> metals </subject>
@@ -68,7 +72,8 @@
      <primaryAudience> research </primaryAudience>
    </content>
    <role>
-      <type> Repository </type>
+     <type pid="http://purl.org/dc/dcmitype/Collection"> Collection: Repository </type>
+<!--     <type> Collection: Repository </type> -->
    </role>
    <applicability xsi:type="ms:MaterialsScience">
      <materialType> non-specific </materialType>

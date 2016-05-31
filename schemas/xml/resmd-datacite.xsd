@@ -189,7 +189,7 @@
      <xs:complexContent>
        <xs:extension base="rsm:Person">
 
-          <xs:attribute name="role" type="dcr:ContributorType">
+          <xs:attribute name="role" type="dcr:ContributorType" use="required">
             <xs:annotation>
               <xs:documentation>
                 a label indicating the contribution that this person

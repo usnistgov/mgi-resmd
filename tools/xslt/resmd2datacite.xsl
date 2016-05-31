@@ -33,6 +33,20 @@
 
    <xsl:param name="dataciteNS">http://datacite.org/schema/kernel-3</xsl:param>
 
+   <!--
+     -  the default contributor type to assign to a contributor whose role
+     -  is not otherwise specified.  Good options include, "Researcher",
+     -  "ProjectMember", and "Other"
+     -->
+   <xsl:param name="defaultContributorType">ProjectMember</xsl:param>
+
+   <!--
+     -  the default relation type to assign to a reference citation
+     -  is not otherwise specified.  Good options include, "isDocumentedBy",
+     -  "isReferencedBy", and "isCitedBy"
+     -->
+   <xsl:param name="defaultCitationType">isDocumentedBy</xsl:param>
+
    <xsl:variable name="cr"><xsl:text>
 </xsl:text></xsl:variable>
 
@@ -61,7 +75,7 @@
      <xsl:param name="step"/>
 
      <xsl:element name="resource" namespace="{$dataciteNS}">
-     
+
        <xsl:apply-templates select="identity" mode="identifier">
          <xsl:with-param name="sp" select="concat($sp,$step)"/>
          <xsl:with-param name="step" select="$step"/>
@@ -92,6 +106,43 @@
          <xsl:with-param name="step" select="$step"/>
        </xsl:apply-templates>
 
+       <xsl:apply-templates select="curation" mode="contributors">       
+         <xsl:with-param name="sp" select="concat($sp,$step)"/>
+         <xsl:with-param name="step" select="$step"/>
+       </xsl:apply-templates>
+
+       <xsl:if test="curation/date">
+          <xsl:apply-templates select="curation" mode="dates">       
+            <xsl:with-param name="sp" select="concat($sp,$step)"/>
+            <xsl:with-param name="step" select="$step"/>
+          </xsl:apply-templates>
+       </xsl:if>
+
+       <xsl:apply-templates select="role">
+         <xsl:with-param name="sp" select="concat($sp,$step)"/>
+         <xsl:with-param name="step" select="$step"/>
+       </xsl:apply-templates>
+
+       <xsl:apply-templates select="identity" mode="altids">       
+         <xsl:with-param name="sp" select="concat($sp,$step)"/>
+         <xsl:with-param name="step" select="$step"/>
+       </xsl:apply-templates>
+
+       <xsl:apply-templates select="." mode="relatedIdentifiers">
+         <xsl:with-param name="sp" select="concat($sp,$step)"/>
+         <xsl:with-param name="step" select="$step"/>
+       </xsl:apply-templates>
+
+       <xsl:apply-templates select="identity/version">
+         <xsl:with-param name="sp" select="concat($sp,$step)"/>
+         <xsl:with-param name="step" select="$step"/>
+       </xsl:apply-templates>
+
+       <xsl:apply-templates select="content" mode="descriptions">
+         <xsl:with-param name="sp" select="concat($sp,$step)"/>
+         <xsl:with-param name="step" select="$step"/>
+       </xsl:apply-templates>
+
        <xsl:value-of select="$sp"/>
      </xsl:element>
    </xsl:template>
@@ -102,17 +153,28 @@
 
      <xsl:value-of select="$sp"/>
      <xsl:choose>
-       <xsl:when test="identifier[@type='DOI']">
-         <identifier doiType="DOI">
-           <xsl:value-of select="identifier[@type='DOI']"/>
-         </identifier>
+       <xsl:when test="identifier[starts-with(.,'doi:')]">
+         <xsl:apply-templates select="identifier[starts-with(.,'doi:')]">
+            <xsl:with-param name="type">DOI</xsl:with-param>
+            <xsl:with-param name="sp" select="$sp"/>
+         </xsl:apply-templates>
        </xsl:when>
        <xsl:otherwise>
-         <identifier doiType="URL">
-           <xsl:value-of select="../@localid"/>
-         </identifier>
+         <identifier doiType="DOI"/>
        </xsl:otherwise>
      </xsl:choose>
+
+   </xsl:template>
+
+   <xsl:template match="identifier">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+     <xsl:param name="type"/>
+
+     <xsl:value-of select="$sp"/>
+     <identifier doiType="{$type}">
+       <xsl:value-of select="."/>
+     </identifier>
 
    </xsl:template>
 
@@ -180,27 +242,49 @@
      <xsl:value-of select="$sp"/>
      <contributors>
         <xsl:if test="contributor">
-          <xsl:apply-templates select="contributor" mode="creators">
+          <xsl:apply-templates select="contributor" mode="contributors">
             <xsl:with-param name="sp" select="concat($sp,$step)"/>
             <xsl:with-param name="step" select="$step"/>
           </xsl:apply-templates>       
+        </xsl:if>
+
+        <xsl:if test="contact">
+          <xsl:apply-templates select="contact" mode="contributors">
+            <xsl:with-param name="sp" select="concat($sp,$step)"/>
+            <xsl:with-param name="step" select="$step"/>
+            <xsl:with-param name="type">ContactPerson</xsl:with-param>
+          </xsl:apply-templates>       
+        </xsl:if>
+
+        <xsl:if test="contributor|contact">
           <xsl:value-of select="$sp"/>
         </xsl:if>
      </contributors>
    </xsl:template>
 
-   <xsl:template match="creator" mode="creators">
+   <xsl:template match="contributor|contact" mode="contributors">
      <xsl:param name="sp"/>
      <xsl:param name="step"/>
+     <xsl:param name="type">
+        <xsl:choose>
+           <xsl:when test="contains(@xsi:type,':DciteContributor')">
+              <xsl:value-of select="@role"/>
+           </xsl:when>
+           <xsl:otherwise>
+              <xsl:value-of select="$defaultContributorType"/>
+           </xsl:otherwise>
+        </xsl:choose>
+     </xsl:param>
 
      <xsl:variable name="subsp" select="concat($sp,$step)"/>
 
      <xsl:value-of select="$sp"/>
-     <creator>
+     <contributor contributorType="{$type}">
+
        <xsl:value-of select="$subsp"/>
-       <creatorName>
+       <contributorName>
           <xsl:apply-templates select="name" mode="flipName"/>
-       </creatorName>
+       </contributorName>
        <xsl:if test="name/@pid">
           <xsl:variable name="scheme">
              <xsl:call-template name="getidscheme">
@@ -227,7 +311,7 @@
           </xsl:element>
        </xsl:if>
        <xsl:value-of select="$sp"/>
-     </creator>
+     </contributor>
    </xsl:template>
 
    <xsl:template match="identity" mode="titles">
@@ -347,7 +431,188 @@
      </xsl:element>
    </xsl:template>
 
+   <xsl:template match="curation" mode="dates">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
 
+     <xsl:value-of select="$sp"/>
+     <dates>
+        <xsl:apply-templates select="date" mode="dates">
+           <xsl:with-param name="sp" select="concat($sp,$step)"/>
+           <xsl:with-param name="step" select="$step"/>
+        </xsl:apply-templates>
+        <xsl:value-of select="$sp"/>
+     </dates>
+   </xsl:template>
+
+   <xsl:template match="date" mode="dates">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+     <xsl:param name="type">
+        <xsl:choose>
+           <xsl:when test="contains(@xsi:type,':DciteDate')">
+              <xsl:value-of select="@role"/>
+           </xsl:when>
+           <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
+     </xsl:param>
+
+     <xsl:if test="$type">
+       <xsl:value-of select="$sp"/>
+       <date dateType="{$type}">
+          <xsl:value-of select="."/>
+       </date>
+     </xsl:if>
+   </xsl:template>
+
+   <xsl:template match="role">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+
+     <xsl:param name="pidtype">
+        <xsl:call-template name="typebypid">
+           <xsl:with-param name="pid" select="type/@pid"/>
+        </xsl:call-template>
+     </xsl:param>
+
+     <xsl:param name="gentype">
+        <xsl:choose>
+           <xsl:when test="string-length($pidtype)!=0">
+              <xsl:value-of select="$pidtype"/>
+           </xsl:when>
+           <xsl:when test="contains(type,':')">
+              <xsl:value-of
+                   select="normalize-space(substring-before(type,':'))"/>
+           </xsl:when>
+           <xsl:otherwise>Other</xsl:otherwise>
+        </xsl:choose>
+     </xsl:param>
+
+     <xsl:value-of select="$sp"/>
+     <resourceType resourceTypeGeneral="{$gentype}">
+        <xsl:value-of select="normalize-space(type)"/>
+     </resourceType>
+   </xsl:template>
+
+   <xsl:template match="identity" mode="altids">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+
+     <xsl:value-of select="$sp"/>
+     <alternateIdentifiers>
+        <xsl:apply-templates select="identifier" mode="altids">
+           <xsl:with-param name="sp" select="concat($sp,$step)"/>
+           <xsl:with-param name="step" select="$step"/>
+        </xsl:apply-templates>
+        <xsl:value-of select="$sp"/>
+     </alternateIdentifiers>
+
+   </xsl:template>
+
+   <xsl:template match="identifier" mode="altids">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+     <xsl:param name="type">
+        <xsl:call-template name="getidscheme">
+           <xsl:with-param name="pid" select="."/>
+        </xsl:call-template>
+     </xsl:param>
+
+     <xsl:value-of select="$sp"/>
+     <alternateIdentifier alternateIdentifierType="{$type}">
+        <xsl:value-of select="."/>
+     </alternateIdentifier>
+   </xsl:template>
+
+   <xsl:template match="*[identity]" mode="relatedIdentifiers">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+
+     <xsl:if test="content/referenceCitation[@pid]">
+        <xsl:value-of select="$sp"/>
+        <relatedIdentifiers>
+           <xsl:apply-templates select="content/referenceCitation[@pid]">
+              <xsl:with-param name="sp" select="concat($sp,$step)"/>
+              <xsl:with-param name="step" select="$step"/>
+           </xsl:apply-templates>
+           <xsl:value-of select="$sp"/>
+        </relatedIdentifiers>
+     </xsl:if>   
+   </xsl:template>
+
+   <xsl:template match="referenceCitation">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+     <xsl:param name="type">
+        <xsl:value-of select="$defaultCitationType"/>
+     </xsl:param>
+     <xsl:param name="scheme">
+        <xsl:call-template name="getidscheme">
+           <xsl:with-param name="pid" select="@pid"/>
+        </xsl:call-template>
+     </xsl:param>
+     <xsl:param name="uri">
+        <xsl:if test="string-length($scheme)!=0">
+           <xsl:call-template name="getiduri">
+              <xsl:with-param name="id" select="$scheme"/>
+           </xsl:call-template>
+        </xsl:if>
+     </xsl:param>
+
+     <xsl:value-of select="$sp"/>
+     <xsl:element name="relatedIdentifier">
+        <xsl:attribute name="relatedIdentifierType">
+           <xsl:value-of select="$scheme"/>
+        </xsl:attribute>
+        <xsl:attribute name="relationType">
+           <xsl:value-of select="$type"/>
+        </xsl:attribute>
+
+        <xsl:value-of select="@pid"/>
+     </xsl:element>
+   </xsl:template>
+
+   <xsl:template match="version">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+
+     <xsl:value-of select="$sp"/>
+     <version>
+        <xsl:value-of select="normalize-space(.)"/>
+     </version>
+   </xsl:template>
+
+   <xsl:template match="content" mode="descriptions">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+
+     <xsl:value-of select="$sp"/>
+     <descriptions>
+        <xsl:apply-templates select="description" mode="descriptions">
+           <xsl:with-param name="sp" select="concat($sp,$step)"/>
+           <xsl:with-param name="step" select="$step"/>
+        </xsl:apply-templates>
+        <xsl:value-of select="$sp"/>
+     </descriptions>     
+   </xsl:template>
+
+   <xsl:template match="description" mode="descriptions">
+     <xsl:param name="sp"/>
+     <xsl:param name="step"/>
+     <xsl:param name="type">
+        <xsl:choose>
+           <xsl:when test="position()=1">Abstract</xsl:when>
+           <xsl:otherwise>Other</xsl:otherwise>
+        </xsl:choose>
+     </xsl:param>
+
+     <xsl:value-of select="$sp"/>
+     <description descriptionType="{$type}">
+        <xsl:value-of select="."/>
+     </description>
+   </xsl:template>
+
+      
    <!-- ==========================================================
      -  Utility templates
      -  ========================================================== -->
@@ -649,15 +914,25 @@
          <xsl:when test="starts-with($id,'orcid:') or 
                          starts-with($id,'ORCID:') or 
                          starts-with($id,'http://orchid.org/')">ORCID</xsl:when>
+         <xsl:when test="starts-with($id,'arXiv:') or 
+                         starts-with($id,'http://arxiv.org/')">arXiv</xsl:when>
+         <xsl:when test="starts-with($id,'purl:') or 
+                         starts-with($id,'http://purl.org/')">PURL</xsl:when>
          <xsl:when test="starts-with($id,'isni:') or 
                          starts-with($id,'ISNI:') or 
                          contains($id,'isni.org/')">ISNI</xsl:when>
          <xsl:when test="starts-with($id,'hdl:') or 
                          starts-with($id,'HDL:') or 
-                         contains($id,'handle.net/')">HDL</xsl:when>
+                         contains($id,'handle.net/')">Handle</xsl:when>
+         <xsl:when test="starts-with($id,'issn:') or
+                         starts-with($id,'ISSN:')">ISSN</xsl:when>
+         <xsl:when test="starts-with($id,'isbn:') or
+                         starts-with($id,'ISBN:')">ISBN</xsl:when>
          <xsl:when test="starts-with($id,'http:') or 
                          starts-with($id,'https:')">URL</xsl:when>
          <xsl:when test="starts-with($id,'ivo:')">IVOID</xsl:when>
+         <xsl:when test="starts-with($id,'bibcode:')">bibcode</xsl:when>
+         <xsl:when test="starts-with($id,'arXiv:')">arXiv</xsl:when>
          <xsl:otherwise>unknown</xsl:otherwise>
       </xsl:choose>
    </xsl:template>
@@ -665,11 +940,24 @@
    <xsl:template name="getiduri">
       <xsl:param name="id"/>
       <xsl:choose>
-         <xsl:when test="$id='HDL'">http://handle.net</xsl:when>
+         <xsl:when test="$id='Handle'">http://handle.net</xsl:when>
          <xsl:when test="$id='DOI'">http://doi.org</xsl:when>
          <xsl:when test="$id='ORCID'">http://orcid.org</xsl:when>
          <xsl:when test="$id='ISNI'">http://www.isni.org</xsl:when>
+         <xsl:when test="$id='PURL'">http://purl.org</xsl:when>
          <xsl:otherwise></xsl:otherwise>
+      </xsl:choose>
+   </xsl:template>
+
+   <xsl:template name="typebypid">
+      <xsl:param name="pid"/>
+
+      <xsl:variable name="dcmibase">http://purl.org/dc/dcmitype/</xsl:variable>
+
+      <xsl:choose>
+         <xsl:when test="starts-with($pid,$dcmibase)">
+            <xsl:value-of select="substring-after($pid,$dcmibase)"/>
+         </xsl:when>
       </xsl:choose>
    </xsl:template>
 

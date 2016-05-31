@@ -639,8 +639,9 @@
                 of a resource.  
               </xs:documentation>
               <xs:documentation>
-                recognized values include "created", "released", "published", 
-                and "established". 
+                This date type allows roles that are not covered by the
+                DciteDate type (which is prefered).  This should be used for
+                lifecycle events that are specific in nature to this resource.  
               </xs:documentation>
             </xs:annotation>
          </xs:attribute>
@@ -746,10 +747,11 @@
      </xs:annotation>
 
      <xs:sequence>
-       <xs:element name="description" type="xs:token">
+       <xs:element name="description" type="xs:token" maxOccurs="unbounded">
           <xs:annotation>
              <xs:appinfo>
                <am:dcterm>Description</am:dcterm>
+               <am:datacite>description</am:datacite>
              </xs:appinfo>           
              <xs:documentation>
                An account of the nature of the resource
@@ -758,6 +760,11 @@
                The description may include but is not limited to an abstract, 
                table of contents, reference to a graphical representation of
                content or a free-text account of the content.
+             </xs:documentation>
+             <xs:documentation>
+               Each description element represents a separate paragraph; thus,
+               order is significant (i.e. the first occurance is the first
+               paragraph).  The first occurance should give an overall summary.
              </xs:documentation>
           </xs:annotation>
        </xs:element>
