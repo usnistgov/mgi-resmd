@@ -99,8 +99,17 @@
              </xs:documentation>
            </xs:annotation>
          </xs:element>
-<!--
-  -->
+
+         <xs:element name="related" type="rsm:Related"
+                     minOccurs="0" maxOccurs="unbounded">
+           <xs:annotation>
+             <xs:documentation>
+               A reference to a related resource and the nature of the
+               relationship.
+             </xs:documentation>
+           </xs:annotation>
+         </xs:element>
+
       </xs:sequence>
 
       <xs:attribute name="localid">
@@ -410,7 +419,7 @@
                <am:dcterm>Contributor</am:dcterm>
              </xs:appinfo>
              <xs:documentation>
-               Entity responsible for contributions to the content of
+               Entity responsible for contributions to the development of
                the resource
              </xs:documentation>
           </xs:annotation>
@@ -983,6 +992,53 @@
 
      <xs:sequence>
        
+     </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="Related">
+     <xs:annotation>
+       <xs:documentation>
+         metadata describing describing a relationship between resources.
+       </xs:documentation>
+       <xs:documentation>
+         The subject of the relationship is the resource described by this
+         record.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:sequence>
+       <xs:element name="relationship" type="rsm:NamePID">
+         <xs:annotation>
+           <xs:documentation>
+             The kind of relationship given by a relationship name
+             and, optionally, a URI.
+           </xs:documentation>
+           <xs:documentation>
+             It is recommended that these relationships be drawn from existing
+             ontologies with corresponding URI identifiers.  
+           </xs:documentation>
+           <xs:documentation>
+             It is recommended that the value given in the element content
+             be a displayable, human-friendly name for the relationship.
+             Subtypes (e.g. DciteRelation) can be used to provide a
+             controlled name where a URI is not defined.  
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>
+
+       <xs:element name="resource" type="rsm:NamePID"
+                   maxOccurs="unbounded">
+         <xs:annotation>
+           <xs:documentation>
+             The other resource that this resource is related to.
+           </xs:documentation>
+           <xs:documentation>
+             Multiple occurances can be provided to list all other resources
+             that this resource has the given relationship with.  
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>
+
      </xs:sequence>
    </xs:complexType>
 

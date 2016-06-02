@@ -492,5 +492,350 @@
      </xs:restriction>
    </xs:simpleType>
 
+   <xs:complexType name="DciteRelation">
+     <xs:annotation>
+       <xs:documentation>
+         a relationship type that corresponds directly to one of the types 
+         defined by the datacite metadata schema.  
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:NamePID">
+          <xs:attribute name="label" type="dcr:RelationType" use="required">
+            <xs:annotation>
+              <xs:documentation>
+                a label indicating the Datacite defined relationship type.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+       </xs:extension>
+     </xs:complexContent>
+
+   </xs:complexType>
+
+   <xs:simpleType name="RelationType">
+     <xs:annotation>
+       <xs:appinfo>
+         <am:dataciteproperty>RelationType</am:dataciteproperty>
+       </xs:appinfo>
+       <xs:documentation>
+         Controlled labels that indicate a type of relationship
+         between the resource the record describes (the subject resource)
+         and another resource (the target resource).  These types
+         correspond to those defined by the Datacite Metadata schema (v3.1).
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:string">
+
+       <xs:enumeration value="IsCitedBy">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsCitedBy</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the targe resource includes
+             the subject resource in a citation
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Cites">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>Cites</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource includes
+             the target resource in a citation
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsSupplementTo">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsSupplementTo</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is a supplement
+             to the target resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsSupplementedBy">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsSupplementedBy</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the target resource is a supplement
+             to the subject resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsContinuedBy">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsContinuedBy</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is continued
+             by the target resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Continues">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>Continues</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is a 
+             continuation for the target resource in a citation
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="HasMetadata">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>HasMetadata</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the target resource provides
+             additional metadata about the subject resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsMetadataFor">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsMetadataFor</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource provides
+             additional metadata about the target resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsNewVersionOf">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsNewVersionOf</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is a new 
+             edition of the target resource, where the new edition is a
+             modification or update
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsPreviousVersionOf">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsPreviousVersionOf</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is a previous
+             edition of the target resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsPartOf">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsPartOf</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is a portion
+             of the target resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="HasPart">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>HasPart</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource includes 
+             the target resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsReferencedBy">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsReferencedBy</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is used as a
+             source of information or data by the target resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="References">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>References</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the target resource is used as a
+             source of information or data by the subject resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsDocumentedBy">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsDocumentedBy</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the target resource is documentation
+             about or explaining the subject resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Documents">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>Documents</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is documentation
+             about or explaining the target resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsCompiledBy">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsCompiledBy</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the target resource is used to 
+             compile or create the subject resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Compiles">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>Compiles</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the target resource is the result 
+             of a compile or creation event using the subject resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsVariantFormOf">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsVariantFormOf</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is a variant or 
+             different form of the the target resource, e.g. calculated or
+             calibrated form or uses different packaging
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsOriginalFormOf">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsOriginalFormOf</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is the original
+             form of the the target resource (e.g. before some transformation).
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsIdenticalTo">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsIdenticalTo</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject and target resources 
+             are separate instances of the identical resource
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsReviewedBy">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsReviewedBy</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is reviewed by
+             the target resource 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Reviews">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>Reviews</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is a review of
+             the target resource 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsDerivedFrom">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsDerivedFrom</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the target resource is a source 
+             upon which the subject resource is based
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="IsSourceOf">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dataciteproperty>IsSourceOf</am:dataciteproperty>
+           </xs:appinfo>
+           <xs:documentation>
+             a relationship indicating that the subject resource is a source 
+             upon which the target resource is based
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+
+   
+
 </xs:schema>
    

@@ -80,6 +80,10 @@
      <propertyClass> simulated </propertyClass>
      <propertyClass> structural </propertyClass>
    </applicability>
+   <related>
+     <relationship xsi:type="dcr:DciteRelation" label="IsDocumentedBy"> is documented by </relationship>
+     <resource>IPR Help Page</resource>
+   </related>
    <access>
      <policy><rights> public </rights></policy>
      <portal>

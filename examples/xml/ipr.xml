@@ -15,9 +15,14 @@
      <publisher> 
        NIST/MSED Center for Theoretical and Computational Materials Science (CTCMS) 
      </publisher>
-     <creator> Chandler Becker </creator>
-     <contributor> Zachary Trautt </contributor>
-     <date role="Created" xsi:type="dcr:TypedDate"> 2008-04-01 </date>
+     <creator>
+       <name>Chandler Becker</name>
+       <affiliation> NIST </affiliation>
+     </creator>
+     <contributor role="DataCurator" xsi:type="dcr:DciteContributor">
+       <name>Zachary Trautt</name>
+     </contributor>
+     <date role="Created" xsi:type="dcr:DciteDate"> 2008-04-01 </date>
      <contact>
        <name>Zachary Trautt</name>
        <emailAddress> zachary.trautt@nist.gov </emailAddress>
