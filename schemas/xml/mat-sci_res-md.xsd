@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="urn:nist.gov/schema/mat-sci_res-md/1.0wd" 
+<xs:schema targetNamespace="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
            xmlns="http://www.w3.org/2001/XMLSchema" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-           xmlns:rsm="urn:nist.gov/schema/res-md/1.0wd" 
-           xmlns:ms="urn:nist.gov/schema/mat-sci_res-md/1.0wd" 
-           xmlns:am="urn:nist.gov/schema/mgi.schema.annot" 
+           xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd" 
+           xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
+           xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
            elementFormDefault="unqualified" 
            attributeFormDefault="unqualified" version="0.1">
 
@@ -21,7 +21,7 @@
       </xs:documentation>
    </xs:annotation>
 
-   <xs:import namespace="urn:nist.gov/schema/res-md/1.0wd"/>
+   <xs:import namespace="http://schema.nist.gov/xml/res-md/1.0wd"/>
 
    <xs:complexType name="MaterialsScience">
      <xs:annotation>
