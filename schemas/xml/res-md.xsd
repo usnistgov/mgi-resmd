@@ -14,6 +14,12 @@
         of resources and incorporate domain-specific metadata.  
       </xs:documentation>
       <xs:documentation>
+        While this schema represents the core of the MGI Resource
+        metadata schema, additional extensions are recommended for
+        describing typical materials resources:  resmd-dcite,
+        resmd-access, and resmd-matsci.
+      </xs:documentation>
+      <xs:documentation>
         This schema draws on concepts and patterns used in VOResource v1.0 
         (http://www.ivoa.net/xml/VOResource/v1.0) by Plante et al. 2008,
         VOResource: an XML Encoding Schema for Resource Metadata, v. 1.03
@@ -165,39 +171,6 @@
       </xs:attribute>
    </xs:complexType>
 
-   <xs:complexType name="AccessibleResource">
-     <xs:annotation>
-       <xs:documentation>
-         a kind of resource that can be accessed as part of a federated data
-         application.  
-       </xs:documentation>
-       <xs:documentation>
-         This typically refers to things like data and software that can be
-         downloaded, accessed via an API or portal, or engaged using special
-         software.  
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:Resource">
-         <xs:sequence>
-
-           <xs:element name="access" type="rsm:Access" minOccurs="0">
-             <xs:annotation>
-               <xs:documentation>
-                 Information describing how to access the resource and its 
-                 features and capabilities.  
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>
-
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-
-   </xs:complexType>
-
-   
    <xs:complexType name="Identity">
      <xs:annotation>
        <xs:documentation>

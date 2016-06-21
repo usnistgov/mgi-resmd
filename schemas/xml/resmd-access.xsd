@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://schema.nist.gov/xml/resmd-software/1.0wd" 
+           xmlns="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd" 
+           xmlns:ms="http://schema.nist.gov/xml/resmd-software/1.0wd" 
+           xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
+           elementFormDefault="unqualified" 
+           attributeFormDefault="unqualified" version="0.1">
+
+   <xs:annotation>
+      <xs:documentation>
+        An extension of the MGI resource metadata for describing
+        access to data and service resources.
+      </xs:documentation>
+   </xs:annotation>
+
+   <xs:import namespace="http://schema.nist.gov/xml/res-md/1.0wd"/>
+
+   <xs:complexType name="AccessibleResource">
+     <xs:annotation>
+       <xs:documentation>
+         a kind of resource that can be accessed as part of a federated data
+         application.  
+       </xs:documentation>
+       <xs:documentation>
+         This typically refers to things like data and software that can be
+         downloaded, accessed via an API or portal, or engaged using special
+         software.  
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:Resource">
+         <xs:sequence>
+
+           <xs:element name="access" type="rsm:Access" minOccurs="0">
+             <xs:annotation>
+               <xs:documentation>
+                 Information describing how to access the resource and its 
+                 features and capabilities.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+
+   </xs:complexType>
+
+   
+   
+
+
+</xs:schema>
+
