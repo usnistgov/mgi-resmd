@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Resource xmlns="" xsi:type="rsm:AccessibleResource"
+<Resource xmlns="" xsi:type="rac:AccessibleResource"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
           xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
-          xmlns:sw="http://schema.nist.gov/xml/resmd-software/1.0wd" 
+          xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
           xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
           status="active" localid="urn:nist.gov/nmrr/ipr">
 
@@ -72,33 +72,35 @@
    </content>
 
    <!-- This part contains Software-specific metadata -->
-   <role xsi:type="sw:Software">
+   <role xsi:type="rac:Software">
      <type> Software </type>
-     <supportedOS> Mac OS X </supportedOS>
+<!--     <supportedOS> Mac OS X </supportedOS>
      <supportedOS> Debian Linux </supportedOS>
      <supportedOS> Ubuntu Linux </supportedOS>
-     <supportedOS> Windows XP </supportedOS>
+     <supportedOS> Windows XP </supportedOS>   -->
      <codeLanguage> Python </codeLanguage>
      <!-- ... --> 
    </role>
 
+   <!-- This part contains Materials Science-specific metadata -->
    <applicability xsi:type="ms:MaterialsScience">
      <structuralMorphology>crystalline</structuralMorphology>
      <propertyClass>structural</propertyClass>
    </applicability>     
 
+   <!-- This part describes how to access it. -->
    <access>
      <policy>
        <rights> public </rights>
        <terms> http://www.ctcms.nist.gov/fipy/LICENSE.html </terms>
      </policy>
      <viaDownload>
-       <accessURL type="dir" returns="text/html">
+       <accessURL use="dir" returns="text/html">
           http://www.ctcms.nist.gov/fipy/download/
        </accessURL>
      </viaDownload>
-     <via xsi:type="PortalAccess" pid="">
-       <role xsi:type="Portal">
+     <via xsi:type="rac:AccessViaWeb" pid="">
+       <role>
          <type pid="http://purl.org/dc/dcmitype/InteractiveResource">
            InteractiveResource: Portal
          </type>
