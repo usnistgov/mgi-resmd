@@ -4,6 +4,12 @@
           xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
           xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
           xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
+          xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
+                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/res-md.xsd
+                              http://schema.nist.gov/xml/resmd-datacite/1.0wd
+                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-datacite.xsd
+                              http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
+                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/mat-sci_res-md.xsd"
           status="active" localid="urn:nist.gov/nmrr/ipr">
 
    <identity>

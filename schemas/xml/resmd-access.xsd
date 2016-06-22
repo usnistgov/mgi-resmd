@@ -15,7 +15,8 @@
       </xs:documentation>
    </xs:annotation>
 
-   <xs:import namespace="http://schema.nist.gov/xml/res-md/1.0wd"/>
+   <xs:import namespace="http://schema.nist.gov/xml/res-md/1.0wd"
+              schemaLocation="https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/res-md.xsd"/>
 
    <xs:complexType name="AccessibleResource">
      <xs:annotation>
