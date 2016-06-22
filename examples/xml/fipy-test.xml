@@ -10,7 +10,9 @@
                               http://schema.nist.gov/xml/resmd-datacite/1.0wd
                               https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-datacite.xsd
                               http://schema.nist.gov/xml/resmd-access/1.0wd
-                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-access.xsd"
+                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-access.xsd
+                              http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
+                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/mat-sci_res-md.xsd"
           status="active" localid="urn:nist.gov/nmrr/ipr">
 
    <identity>
