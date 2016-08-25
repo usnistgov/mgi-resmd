@@ -5,7 +5,7 @@
            xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd" 
            xmlns:am="http://schema.nist.gov/xml/nmrr.schema.annot" 
            elementFormDefault="unqualified" 
-           attributeFormDefault="unqualified" version="0.8">
+           attributeFormDefault="unqualified" version="0.9">
 
    <xs:annotation>
       <xs:documentation>
