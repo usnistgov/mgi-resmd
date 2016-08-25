@@ -2,5 +2,6 @@ http://www.openarchives.org/OAI/2.0/ ../../schemas/xml/extern/OAI-PMH-v2.0.xsd
 http://www.openarchives.org/OAI/2.0/oai_dc/ ../../schemas/xml/extern/oai_dc-v2.0.xsd
 http://schema.nist.gov/xml/res-md/1.0wd ../../schemas/xml/res-md.xsd
 http://schema.nist.gov/xml/resmd-datacite/1.0wd ../../schemas/xml/resmd-datacite.xsd
+http://schema.nist.gov/xml/resmd-access/1.0wd ../../schemas/xml/resmd-access.xsd
 http://schema.nist.gov/xml/mat-sci_res-md/1.0wd ../../schemas/xml/mat-sci_res-md.xsd
 

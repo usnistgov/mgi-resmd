@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Resource xmlns="" xsi:type="rac:AccessibleResource"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
+          xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
+          xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
+          xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
+          xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
+                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/res-md.xsd
+                              http://schema.nist.gov/xml/resmd-datacite/1.0wd
+                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-datacite.xsd
+                              http://schema.nist.gov/xml/resmd-access/1.0wd
+                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-access.xsd
+                              http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
+                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/mat-sci_res-md.xsd"
+          status="active" localid="urn:nist.gov/nmrr/ipr">
+
+   <identity>
+     <title> FiPy: A Finite Volume PDE Solver Using Python </title>
+     <shortName> FiPy </shortName>
+     <version>3.1.1</version>
+   </identity>
+
+   <curation>
+     <publisher> 
+       NIST/MSED Center for Theoretical and Computational Materials Science (CTCMS) 
+     </publisher>
+     <publicationYear> 2009 </publicationYear>
+     <creator>
+       <name sur="Guyer" given="Jonathan" middle="E.">Jonathan E. Guyer</name>
+       <affiliation> NIST </affiliation>
+     </creator>
+     <creator>
+       <name sur="Dan" given="J." middle="E.">Dan Wheeler</name>
+       <affiliation> NIST </affiliation>
+     </creator>
+     <creator>
+       <name sur="Warren" given="James" middle="A.">James A. Warren</name>
+       <affiliation> NIST </affiliation>
+     </creator>
+     <date role="Created" xsi:type="dcr:DciteDate"> 2008-04-01 </date>
+     <contact>
+       <name>Jonathan Guyer</name>
+       <emailAddress> jonathan.guyer@nist.gov </emailAddress>
+     </contact>
+   </curation>
+
+   <content>
+     <description>
+       FiPy is an object oriented, partial differential equation (PDE)
+       solver, written in Python, based on a standard finite volume
+       (FV) approach. The framework has been developed in the
+       Materials Science and Engineering Division (MSED) and Center
+       for Theoretical and Computational Materials Science (CTCMS), in
+       the Material Measurement Laboratory (MML) at the National
+       Institute of Standards and Technology (NIST). 
+     </description>
+     <description>
+       The FiPy framework includes terms for transient diffusion,
+       convection and standard sources, enabling the solution of
+       arbitrary combinations of coupled elliptic, hyperbolic and
+       parabolic PDEs. Currently implemented models include phase
+       field treatments of polycrystalline, dendritic, and
+       electrochemical phase transformations, as well as drug eluting
+       stents, reactive wetting, photovoltaics and a level set
+       treatment of the electrodeposition process. 
+     </description>
+     <subject> partial differential equations </subject>
+     <subject> computational materials science </subject>
+     <referenceURL>
+       http://www.ctcms.nist.gov/fipy/
+     </referenceURL>
+     <referenceCitation pid="doi:10.1109/MCSE.2009.52">
+       J. E. Guyer, D. Wheeler &amp; J. A. Warren, "FiPy: Partial
+       Differential Equations with Python," Computing in Science &amp;
+       Engineering 11(3) pp. 6—15 (2009), doi:10.1109/MCSE.2009.52,
+       http://www.ctcms.nist.gov/fipy
+     </referenceCitation>
+     <primaryAudience> research </primaryAudience>
+   </content>
+
+   <!-- This part contains Software-specific metadata -->
+   <role xsi:type="rac:Software">
+     <type> Software </type>
+<!--     <supportedOS> Mac OS X </supportedOS>
+     <supportedOS> Debian Linux </supportedOS>
+     <supportedOS> Ubuntu Linux </supportedOS>
+     <supportedOS> Windows XP </supportedOS>   -->
+     <codeLanguage> Python </codeLanguage>
+     <!-- ... --> 
+   </role>
+
+   <!-- This part contains Materials Science-specific metadata -->
+   <applicability xsi:type="ms:MaterialsScience">
+     <structuralMorphology>crystalline</structuralMorphology>
+     <propertyClass>structural</propertyClass>
+   </applicability>     
+
+   <!-- This part describes how to access it. -->
+   <access>
+     <policy>
+       <rights> public </rights>
+       <terms> http://www.ctcms.nist.gov/fipy/LICENSE.html </terms>
+     </policy>
+     <viaDownload>
+       <accessURL use="dir" returns="text/html">
+          http://www.ctcms.nist.gov/fipy/download/
+       </accessURL>
+     </viaDownload>
+     <via xsi:type="rac:AccessViaWeb" pid="">
+       <role>
+         <type pid="http://purl.org/dc/dcmitype/InteractiveResource">
+           InteractiveResource: Portal
+         </type>
+       </role>
+       <title> FiPy Home page </title>
+       <description> </description>
+       <homeURL> http://www.ctcms.nist.gov/fipy/ </homeURL>
+     </via>
+   </access>
+</Resource>
