@@ -35,20 +35,30 @@
                     "type": "string",
                     "format": "uri",
                     "description": "An identifier for a metadata definition that this property is semantically equivalent"
-                },
-
-                "valueDocumentation": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/Documentation"
-                    },
-                    "description": "definitions of recognized string values for the property being defined",
-                    "notes": [
-                        "Each property name (within valueDocumentation) is an allowed value of the property being defined.  The values give the semantic meaning of the value.",
-                        "valueDescription can be used to define enumerated values; however, use of enum is not required.  Even when any value is allowed for the property, valueDocumentation can be used to define specially recognized values."
-                    ]
                 }
             }
+        },
+
+        "PropertyDocumentation": {
+            "description": "documentation specifically for an object property",
+            "allOf": [
+                { "$ref": "#/definitions/Documentation" },
+                {
+                    "properties": { 
+                        "valueDocumentation": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/Documentation"
+                            },
+                            "description": "definitions of recognized string values for the property being defined",
+                            "notes": [
+                                "Each property name (within valueDocumentation) is an allowed value of the property being defined.  The values give the semantic meaning of the value.",
+                                "valueDescription can be used to define enumerated values; however, use of enum is not required.  Even when any value is allowed for the property, valueDocumentation can be used to define specially recognized values."
+                            ]
+                        }
+                    }
+                } 
+            ]
         },
 
         "EnhancedSchemaArray": {
@@ -65,7 +75,7 @@
             "description": "JSON schema description with enhancements for documentation",
             "allOf": [
                 { "$ref": "http://json-schema.org/draft-04/schema#" },
-                { "$ref": "#/definitions/Documentation" },
+                { "$ref": "#/definitions/PropertyDocumentation" },
                 {
                     "properties": {
                         "$extensionSchemas": {
@@ -110,10 +120,13 @@
                         },
 
                         "dependencies": {
-                            "anyOf": [
-                                { "type": "boolean" },
-                                { "$ref": "#/definitions/EnhancedSchema" }
-                            ]
+                            "type": "object",
+                            "additionalProperties": { 
+                                "anyOf": [
+                                    { "$ref": "#/definitions/EnhancedSchema" },
+                                    { "$ref": "http://json-schema.org/draft-04/schema#/definitions/stringArray" }
+                                ]
+                            }
                         },
 
                         "items": {
