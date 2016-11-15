@@ -50,6 +50,30 @@ class ExtValidator(object):
         """
         return ExtValidator(loader.SchemaLoader.from_directory(dirpath))
 
+    def load_schema(self, schema, uri=None):
+        """
+        load a pre-parsed schema into the validator.  The schema will be checked 
+        for errors first and raise an exception if there is a problem.  If schema
+        with the given ID was already loaded, it will get overriden.  
+
+        :argument dict schema:  the parsed schema object.
+        :argument str  uri:     The URI to associated with the schema.  If not 
+                                 provided, the value of the "id" property will
+                                 be used.  
+        """
+        if not uri:
+            uri = schema.get('id')
+        if not uri:
+            raise ValueError("No id property found; set uri param instead.")
+
+        # check the schema
+        vcls = jsch.validator_for(schema)
+        vcls.check_schema(schema)
+
+        # now add it
+        self._schemaStore[uri] = schema
+        
+        
     def validate(self, instance, minimally=False, strict=False, schemauri=None):
         """
         validate the instance document against its schema and its extensions

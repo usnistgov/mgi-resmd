@@ -104,3 +104,27 @@ class TestExtValidator(object):
         with pytest.raises(val.ValidationError):
             validator.validate_file(probfile, False, True)
 
+    def test_loadschema(self, validator):
+        schema = {
+            "type": "object",
+            "properties": {
+                "name": { "type": "string" }
+            },
+            "id": "urn:gurn"
+        }
+        inst = { "name": "Bob" }
+        uri = "urn:goob"
+
+        assert uri not in validator._schemaStore
+        assert schema['id'] not in validator._schemaStore
+
+        validator.load_schema(schema, uri)
+        validator.validate_against(inst, [uri])
+
+        inst["name"] = 3
+        with pytest.raises(val.ValidationError):
+            validator.validate_against(inst, [uri])
+
+        inst["name"] = "bob"
+        validator.load_schema(schema)
+        validator.validate_against(inst, [schema['id']])
