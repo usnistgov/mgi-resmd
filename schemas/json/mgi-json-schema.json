@@ -28,7 +28,7 @@
                     "description": "additional advice on the use of the thing being defined"
                 },
                 "comments": {
-                    "$ref": "#/defintions/Notes",
+                    "$ref": "#/definitions/Notes",
                     "description": "editorial comments not intended for user consumption"
                 },
                 "equivalentTo": {
