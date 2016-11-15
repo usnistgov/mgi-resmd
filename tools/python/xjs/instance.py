@@ -168,13 +168,13 @@ class Instance(object):
 
     def find_extended_objs(self):
         """
-        return a list of pointer-object tuples that contain a property having
-        the given name
+        return a list of pointer-object tuples that containing the 
+        "$extensionSchemas" property.
         
         This function is equivalent to 
-        self.find_obj_by_prop("$extendedSchemas").  That is, it returns all
+        self.find_obj_by_prop("$extensionSchemas").  That is, it returns all
         objects (including the root object, if applicable) that contains 
-        the "$exendedSchemas" property.  
+        the "$exensionSchemas" property.  
         """
         return self.find_obj_by_prop(EXTSCHEMAS)
 

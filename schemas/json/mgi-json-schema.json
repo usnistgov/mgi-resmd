@@ -39,104 +39,88 @@
             }
         },
 
-        "EnhancedSchema": {
-            "type": "object",
-            "properties": {
-                "id": { "$ref": "http://json-schema.org/draft-04/schema#properties/id" },
-                "$schema": { "$ref": "http://json-schema.org/draft-04/schema#properties/$schema" },
-                "title": { "$ref": "http://json-schema.org/draft-04/schema#properties/title" },
-                "description": { "$ref": "http://json-schema.org/draft-04/schema#properties/description" },
-                "default": { "$ref": "http://json-schema.org/draft-04/schema#properties/default" },
-                "multipleOf": { "$ref": "http://json-schema.org/draft-04/schema#properties/multipleOf" },
-                "maximum": { "$ref": "http://json-schema.org/draft-04/schema#properties/maximum" },
-                "exclusiveMaximum": { "$ref": "http://json-schema.org/draft-04/schema#properties/exclusiveMaximum" },
-                "minimum": { "$ref": "http://json-schema.org/draft-04/schema#properties/minimum" },
-                "exclusiveMinimum": { "$ref": "http://json-schema.org/draft-04/schema#properties/exclusiveMinimum" },
-                "maxLength": { "$ref": "http://json-schema.org/draft-04/schema#properties/maxLength" },
-                "minLength": { "$ref": "http://json-schema.org/draft-04/schema#properties/minLength" },
-                "pattern": { "$ref": "http://json-schema.org/draft-04/schema#properties/pattern" },
-                "additionalItems": { "$ref": "http://json-schema.org/draft-04/schema#properties/additionalItems" },
-                "items": { "$ref": "http://json-schema.org/draft-04/schema#properties/items" },
-                "maxItems": { "$ref": "http://json-schema.org/draft-04/schema#properties/maxItems" },
-                "minItems": { "$ref": "http://json-schema.org/draft-04/schema#properties/minItems" },
-                "uniqueItems": { "$ref": "http://json-schema.org/draft-04/schema#properties/uniqueItems" },
-                "maxProperties": { "$ref": "http://json-schema.org/draft-04/schema#properties/maxProperties" },
-                "minProperties": { "$ref": "http://json-schema.org/draft-04/schema#properties/minProperties" },
-                "required": { "$ref": "http://json-schema.org/draft-04/schema#properties/required" },
-                "additionalProperties": { "$ref": "http://json-schema.org/draft-04/schema#properties/additionalProperties" },
-                "definitions": { "$ref": "http://json-schema.org/draft-04/schema#properties/definitions" },
-                "patternProperties": { "$ref": "http://json-schema.org/draft-04/schema#properties/patternProperties" },
-                "dependencies": { "$ref": "http://json-schema.org/draft-04/schema#properties/dependencies" },
-                "enum": { "$ref": "http://json-schema.org/draft-04/schema#properties/enum" },
-                "type": { "$ref": "http://json-schema.org/draft-04/schema#properties/type" },
-                "allOf": { "$ref": "http://json-schema.org/draft-04/schema#properties/allOf" },
-                "anyOf": { "$ref": "http://json-schema.org/draft-04/schema#properties/anyOf" },
-                "oneOf": { "$ref": "http://json-schema.org/draft-04/schema#properties/oneOf" },
-                "not": { "$ref": "http://json-schema.org/draft-04/schema#properties/not" },
-
-                "properties": {
-                    "allOf": [
-                        { "$ref": "http://json-schema.org/draft-04/schema#properties/properties" },
-                        { "properties": {
-                            "$extensionSchemas": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string",
-                                    "format": "uri"
-                                },
-                                "description": "an array of identifiers that should be considered extensions of the schema given in the $schema property that instances of this schema are also compliant with.",
-                                "notes": [
-                                    "If an application recognizes any of the identifiers given, it can optionally choose to validate the instance against that schema and interpret and additional properties it defines accordingly.",
-                                    "It is recommended that the identifiers are ordered such that each refers to a schema that is an extension of those listed before it."
-                                ]
-                            },
-                            "notes": {
-                                "$ref": "#/definitions/Notes",
-                                "description": "additional advice on the use of the schema being defined"
-                            },
-                            "comments": {
-                                "$ref": "#/definitions/Notes",
-                                "description": "editorial comments not intended for user consumption"
-                            },
-                            "equivalentTo": {
-                                "type": "string",
-                                "format": "uri",
-                                "description": "An identifier for a metadata definition that this property is semantically equivalent"
-                            },
-                            "valueDocumentation": {
-                                "type": "object",
-                                "additionalProperties": {
-                                    "$ref": "#/defintions/Documentation"
-                                },
-                                "description": "definitions of recognized string values for the property being defined",
-                                "notes": [
-                                    "Each property name (within valueDocumentation) is an allowed value of the property being defined.  The values give the semantic meaning of the value.",
-                                    "valueDescription can be used to define enumerated values; however, use of enum is not required.  Even when any value is allowed for the property, valueDocumentation can be used to define specially recognized values."
-                                ]
-                            }
-                        }}
-                    ]
-                },
-
-                "notes": {
-                    "$ref": "#/definitions/Notes",
-                    "description": "additional advice on the use of the thing being defined"
-                },
-                "comments": {
-                    "$ref": "#/defintions/Notes",
-                    "description": "editorial comments not intended for user consumption"
-                },
-                "equivalentTo": {
-                    "type": "string",
-                    "format": "uri",
-                    "description": "An identifier for a metadata definition that this property is semantically equivalent"
+        "EnhancedSchemaArray": {
+            "description": "an array of enhanced schema definitions",
+            "allOf": [
+                { "$ref": "http://json-schema.org/draft-04/schema#/definitions/schemaArray" },
+                {
+                    "items": { "$ref": "#/definitions/EnhancedSchema" }
                 }
+            ]
+        },
 
-            }
+        "EnhancedSchema": {
+            "description": "JSON schema description with enhancements for documentation",
+            "allOf": [
+                { "$ref": "http://json-schema.org/draft-04/schema#" },
+                { "$ref": "#/definitions/Documentation" },
+                {
+                    "properties": {
+                        "$extensionSchemas": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            "description": "an array of identifiers that should be considered extensions of the schema given in the $schema property that instances of this schema are also compliant with.",
+                            "notes": [
+                                "If an application recognizes any of the identifiers given, it can optionally choose to validate the instance against that schema and interpret and additional properties it defines accordingly.",
+                                "It is recommended that the identifiers are ordered such that each refers to a schema that is an extension of those listed before it."
+                            ],
+                            "default": [
+                                "http://mgi.nist.gov/mgi-json-schema/v0.1"
+                            ]
+                        },
+
+                        "definitions": {
+                            "additionalProperties": {
+                                "$ref": "#/definitions/EnhancedSchema"
+                            }
+                        },
+
+                        "properties": {
+                            "additionalProperties": {
+                                "$ref": "#/definitions/EnhancedSchema"
+                            }
+                        },
+
+                        "patternProperties": {
+                            "additionalProperties": {
+                                "$ref": "#/definitions/EnhancedSchema"
+                            }
+                        },
+
+                        "additionalProperties": {
+                            "anyOf": [
+                                { "type": "boolean" },
+                                { "$ref": "#/definitions/EnhancedSchema" }
+                            ]
+                        },
+
+                        "dependencies": {
+                            "anyOf": [
+                                { "type": "boolean" },
+                                { "$ref": "#/definitions/EnhancedSchema" }
+                            ]
+                        },
+
+                        "items": {
+                            "anyOf": [
+                                { "$ref": "#/definitions/EnhancedSchema" },
+                                { "$ref": "#/definitions/EnhancedSchemaArray" }
+                            ]
+                        },
+
+                        "allOf": { "$ref": "#/definitions/EnhancedSchemaArray" },
+                        "anyOf": { "$ref": "#/definitions/EnhancedSchemaArray" },
+                        "oneOf": { "$ref": "#/definitions/EnhancedSchemaArray" },
+                        "not": { "$ref": "#/definitions/EnhancedSchema" }
+
+                    }
+                }
+            ]
         }
     },
-    "allOf": [
-        { "$ref": "http://json-schema.org/draft-04/schema#" },
-        { "$ref": "#/definitions/EnhancedSchema" }
-    ]
+
+    "$ref": "#/definitions/EnhancedSchema" 
 }
