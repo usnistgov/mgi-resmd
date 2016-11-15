@@ -40,7 +40,7 @@
                 "valueDocumentation": {
                     "type": "object",
                     "additionalProperties": {
-                        "$ref": "#/defintions/Documentation"
+                        "$ref": "#/definitions/Documentation"
                     },
                     "description": "definitions of recognized string values for the property being defined",
                     "notes": [
