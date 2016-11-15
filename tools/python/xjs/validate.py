@@ -3,7 +3,7 @@ a module that provides support for validating schemas that support
 extended json-schema tags.
 """
 from __future__ import with_statement
-import sys, os, json, urlparse
+import sys, os, types, json, urlparse
 import jsonschema
 import jsonschema.validators as jsch
 from jsonschema.exceptions import (ValidationError, SchemaError, 
@@ -50,6 +50,30 @@ class ExtValidator(object):
         """
         return ExtValidator(loader.SchemaLoader.from_directory(dirpath))
 
+    def load_schema(self, schema, uri=None):
+        """
+        load a pre-parsed schema into the validator.  The schema will be checked 
+        for errors first and raise an exception if there is a problem.  If schema
+        with the given ID was already loaded, it will get overriden.  
+
+        :argument dict schema:  the parsed schema object.
+        :argument str  uri:     The URI to associated with the schema.  If not 
+                                 provided, the value of the "id" property will
+                                 be used.  
+        """
+        if not uri:
+            uri = schema.get('id')
+        if not uri:
+            raise ValueError("No id property found; set uri param instead.")
+
+        # check the schema
+        vcls = jsch.validator_for(schema)
+        vcls.check_schema(schema)
+
+        # now add it
+        self._schemaStore[uri] = schema
+        
+        
     def validate(self, instance, minimally=False, strict=False, schemauri=None):
         """
         validate the instance document against its schema and its extensions
@@ -65,15 +89,34 @@ class ExtValidator(object):
         self.validate_against(instance, baseSchema, True)
 
         if not minimally:
-            if self.is_extschema_schema(instance):
-                # since EXTSCHEMA_URIS defines the EXTSCHEMAS property,
-                # we need to handle it a little differently
-                extensions = { "/": instance }
-            else: 
-                inst = Instance(instance)
-                extensions = dict(inst.find_extended_objs())
+            # we need to validate any portions including the EXTSCHEMAS property
+            inst = Instance(instance)
+            extensions = dict(inst.find_extended_objs())
 
+            # If instance is actually an extension schema schema, we need to
+            # ignore the definition of the EXTSCHEMAS property.
+            is_extschema = self.is_extschema_schema(instance)
+            
             for ptr in extensions:
+                # make sure that the EXTSCHEMAS property is invoked properly
+                if not isinstance(extensions[ptr][EXTSCHEMAS], list):
+                    if not is_extschema or \
+                       not isinstance(extensions[ptr][EXTSCHEMAS], dict):
+                        msg = "invalid value type for {0} (not an array):\n     {1}"\
+                              .format(EXTSCHEMAS, extensions[ptr][EXTSCHEMAS])
+                        raise ValidationError(msg)
+                    else:
+                        # this is the extension schema schema, so ignore this
+                        # node
+                        continue
+                
+                for val in extensions[ptr][EXTSCHEMAS]:
+                    if not isinstance(val, types.StringTypes):
+                        raise ValidationError(
+                            "invalid {0} array item type:\n    {1}"
+                            .format(EXTSCHEMAS, val))
+                    
+                # now validate marked portion
                 self.validate_against(extensions[ptr], 
                                       extensions[ptr][EXTSCHEMAS], strict)
             
