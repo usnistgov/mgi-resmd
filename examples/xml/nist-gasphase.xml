@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Resource xmlns="" xsi:type="rac:AccessibleResource"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
+          xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
+          xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
+          xmlns:roth="http://schema.nist.gov/xml/resmd-otherroles/1.0wd" 
+          xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd"
+          xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
+                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd
+                              http://schema.nist.gov/xml/resmd-datacite/1.0wd
+                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-datacite.xsd
+                              http://schema.nist.gov/xml/resmd-access/1.0wd
+                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-access.xsd
+                              http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
+                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/mat-sci_res-md.xsd"
+          status="active" localid="urn:nist.gov/nmrr/ipr">
+
+   <identity>
+     <title>NIST/EPA Gas Phase Infrared Library</title>
+     <altTitle type="Subtitle">NIST Standard Reference Database #35</altTitle>
+     <altTitle type="Abbreviation">NIST-GPID</altTitle>
+     <altTitle type="Abbreviation">SRD#35</altTitle>
+     <identifier>doi:10.18434/T45K5N</identifier>
+   </identity>
+
+   <providers>
+     <publisher>US National Institute of Standards and Technology (NIST)</publisher>
+     <publicationYear> 2014 </publicationYear>
+
+     <creator>
+       <name>Carol Clifton</name>
+       <affiliation>NIST</affiliation>
+     </creator>
+     <creator>
+       <name>Jean Gallagher</name>
+       <affiliation>NIST</affiliation>
+     </creator>
+     <creator>
+       <name>Abdullah Shamin</name>
+       <affiliation>NIST</affiliation>
+     </creator>
+     <creator>
+       <name>Stephen Stein</name>
+       <affiliation>NIST</affiliation>
+     </creator>
+     <creator>
+       <name>Hussein Zohdi</name>
+       <affiliation>NIST</affiliation>
+     </creator>
+
+     <contact>
+       <name>Stephen Stein</name>
+       <emailAddress>steve.stein@nist.gov</emailAddress>
+       <timeZone> -0500 </timeZone>
+     </contact>
+   </providers>
+   <content>
+
+     <description>
+       This data collection contains 5,228 infrared spectra of different
+       compounds along with chemical structures for most of them. Spectra are
+       provided on a CD-ROM in the JCAMP-DX (Joint Committee for Atomic and
+       Molecular Physical Data "Data Exchange") format. Chemical structures are
+       provided in the MOL-file format. The IR data originated from two sources,
+       from the so-called "EPA Vapor-Phase IR Library" and from NIST
+       laboratories. The data have been sub-divided in two ways: 1) as
+       concatenated JCAMP and SDF files (concatenated MOL-files) and 2) in
+       individual files where each spectrum and structure is provided in a
+       separate JCAMP and MOL file, using file names containing the CAS registry
+       number of the compound. 
+     </description>
+     <description>
+       The data originally derived from the EPA Vapor-Phase IR Library itself
+       (3,108 spectra) and the spectra measured at NIST (2,120 spectra) are
+       provided in separate directories. All spectra are given as normalized
+       absorbance and empirical formulas and CAS Registry Numbers are given for
+       all compounds. About 80% of these compounds (and nearly all in the NIST
+       collection) have mass spectra included in the NIST/EPA/NIH Mass Spectral
+       Database. 
+     </description>
+     <subject>infrared spectra</subject>
+     <subject>vapor phase</subject>
+     <landingPage>http://dx.doi.org/10.18434/T45K5N</landingPage>
+     <primaryAudience> research </primaryAudience>
+   </content>
+   <role xsi:type="roth:Database">
+      <type> Dataset: Database </type>
+   </role>
+
+   <applicability xsi:type="ms:MaterialsScience">
+     <propertyClass> optical </propertyClass>
+   </applicability>
+
+   <access>
+     <policy>
+       <restriction> fee-required </restriction>
+       <termsURL>http://www.nist.gov/open/license.cfm</termsURL>
+     </policy>
+     <via xsi:type="rac:ViaMedia">
+       <description>CDROM contains 5228 spectra in JCAMP-DX format</description>
+       <accessURL>http://dx.doi.org/10.18434/T45K5N</accessURL>
+       <details><type>Physical Object: Storage Media</type></details>
+       <mediaType>CDROM</mediaType>
+     </via>
+   </access>
+
+</Resource>
+   

@@ -6,22 +6,22 @@
           xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
           xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd"
           xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
-                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/res-md.xsd
+                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd
                               http://schema.nist.gov/xml/resmd-datacite/1.0wd
-                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-datacite.xsd
+                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-datacite.xsd
                               http://schema.nist.gov/xml/resmd-access/1.0wd
-                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-access.xsd
+                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-access.xsd
                               http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
-                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/mat-sci_res-md.xsd"
+                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/mat-sci_res-md.xsd"
           status="active" localid="urn:nist.gov/nmrr/ipr">
 
    <identity>
      <title> FiPy: A Finite Volume PDE Solver Using Python </title>
-     <shortName> FiPy </shortName>
+     <altTitle type="Abbreviation"> FiPy </altTitle>
      <version>3.1.1</version>
    </identity>
 
-   <curation>
+   <providers>
      <publisher> 
        NIST/MSED Center for Theoretical and Computational Materials Science (CTCMS) 
      </publisher>
@@ -43,7 +43,7 @@
        <name>Jonathan Guyer</name>
        <emailAddress> jonathan.guyer@nist.gov </emailAddress>
      </contact>
-   </curation>
+   </providers>
 
    <content>
      <description>
@@ -67,27 +67,28 @@
      </description>
      <subject> partial differential equations </subject>
      <subject> computational materials science </subject>
-     <referenceURL>
+     <landingPage>
        http://www.ctcms.nist.gov/fipy/
-     </referenceURL>
-     <referenceCitation pid="doi:10.1109/MCSE.2009.52">
+     </landingPage>
+     <reference pid="doi:10.1109/MCSE.2009.52">
        J. E. Guyer, D. Wheeler &amp; J. A. Warren, "FiPy: Partial
        Differential Equations with Python," Computing in Science &amp;
        Engineering 11(3) pp. 6—15 (2009), doi:10.1109/MCSE.2009.52,
        http://www.ctcms.nist.gov/fipy
-     </referenceCitation>
+     </reference>
      <primaryAudience> research </primaryAudience>
    </content>
 
    <!-- This part contains Software-specific metadata -->
    <role xsi:type="rac:Software">
      <type> Software </type>
+     <!--
      <supportedOS> Mac OS X </supportedOS>
      <supportedOS> Debian Linux </supportedOS>
      <supportedOS> Ubuntu Linux </supportedOS>
      <supportedOS> Windows XP </supportedOS>
+         ... --> 
      <codeLanguage> Python </codeLanguage>
-     <!-- ... --> 
    </role>
 
    <!-- This part contains Materials Science-specific metadata -->
@@ -99,13 +100,13 @@
    <!-- This part describes how to access the software. -->
    <access>
      <policy>
-       <rights> public </rights>
-       <terms> http://www.ctcms.nist.gov/fipy/LICENSE.html </terms>
+       <restriction> public </restriction>
+       <termsURL> http://www.ctcms.nist.gov/fipy/LICENSE.html </termsURL>
      </policy>
-     <viaDownload>
+     <via xsi:type="rac:ViaDownload">
        <accessURL use="dir" returns="text/html">
           http://www.ctcms.nist.gov/fipy/download/
        </accessURL>
-     </viaDownload>
+     </via>
    </access>
 </Resource>

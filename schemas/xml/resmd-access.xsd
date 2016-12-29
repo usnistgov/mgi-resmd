@@ -6,7 +6,7 @@
            xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
            xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
            elementFormDefault="unqualified" 
-           attributeFormDefault="unqualified" version="0.1">
+           attributeFormDefault="unqualified" version="0.2">
 
    <xs:annotation>
       <xs:documentation>
@@ -16,7 +16,7 @@
    </xs:annotation>
 
    <xs:import namespace="http://schema.nist.gov/xml/res-md/1.0wd"
-              schemaLocation="https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/res-md.xsd"/>
+              schemaLocation="https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd"/>
 
    <xs:complexType name="AccessibleResource">
      <xs:annotation>
@@ -68,19 +68,6 @@
          </xs:annotation>
        </xs:element>
 
-       <xs:element name="viaDownload" type="rac:Download"
-                   minOccurs="0" maxOccurs="unbounded">
-         <xs:annotation>
-           <xs:documentation>
-             A description of URLs for directly downloading the
-             resource.
-           </xs:documentation>
-           <xs:documentation>
-             (only for data collections and software classes?)
-           </xs:documentation>
-         </xs:annotation>
-       </xs:element>
-
        <xs:element name="via" type="rac:AccessVia"
                    minOccurs="0" maxOccurs="unbounded">
          <xs:annotation>
@@ -111,38 +98,16 @@
      </xs:annotation>
 
      <xs:sequence>
-       <xs:element name="role" type="rsm:Role"
-                   minOccurs="0" maxOccurs="1">
-         <xs:annotation>
-           <xs:documentation>
-             An identification of the type of access mechanism this is along
-             with, if appropriate, qualifications on the features and
-             constraints on that mechanism.
-           </xs:documentation>
-           <xs:documentation>
-             The child type element provides the identifying label for the
-             access mechanism.  Recognized types include,
-             'InteractiveResource: Portal', 'Software', and 'Service: API'.
-           </xs:documentation>
-           <xs:documentation>
-             Sub-classes of Role can define additional metadata for describing
-             how it fulfills its role.  The xsi:type attribute must be used
-             to include this additional metadata.  
-           </xs:documentation>
-         </xs:annotation>
-       </xs:element>
-
        <xs:element name="title" type="xs:token"
                    minOccurs="0" maxOccurs="1">
          <xs:annotation>
            <xs:documentation>
-             A name for the access method.
+             A name for the access method or the thing accessed via the
+             accessURL.
            </xs:documentation>
            <xs:documentation>
-             Providing this title is recommended when the access mechanism is
-             distinct from this resource in some way; e.g. if it is a more
-             general platform than this resource, or it is maintained by a
-             a separate entity.
+             The value should be appropriate for use as the text for a
+             hyperlink pointing to the accessURL.
            </xs:documentation>
          </xs:annotation>
        </xs:element>
@@ -158,6 +123,36 @@
              </xs:documentation>
           </xs:annotation>
        </xs:element>
+
+       <xs:element name="accessURL" type="rac:AccessURL" minOccurs="0">
+          <xs:annotation>
+             <xs:documentation>
+               The URL that through which user can access the resource via
+               this method.
+             </xs:documentation>
+             <xs:documentation>
+               The behavior and role of this URL depends on the specific type
+               of access method.
+             </xs:documentation>
+          </xs:annotation>
+       </xs:element>       
+
+       <xs:element name="details" type="rsm:ResourceRole"
+                   minOccurs="0" maxOccurs="1">
+         <xs:annotation>
+           <xs:documentation>
+             An identification of the type of access mechanism this is along
+             with, if appropriate, qualifications on the features and
+             constraints on that mechanism.
+           </xs:documentation>
+           <xs:documentation>
+             The child type element provides the identifying label for the
+             access mechanism.  Recognized types include,
+             'InteractiveResource: Portal', 'Software', and 'Service: API'.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>
+
      </xs:sequence>
 
      <xs:attribute name="pid" type="xs:anyURI">
@@ -178,35 +173,50 @@
      
    </xs:complexType>
 
-   <xs:complexType name="AccessViaWeb">
+   <xs:complexType name="DownloadDetailsType">
      <xs:annotation>
        <xs:documentation>
-         metadata describing how one can access a resource
+         a Role whose type is forced to be 'Download'.
+       </xs:documentation>
+       <xs:documentation>
+         This is only intended for use within an AccessVia subclass.
        </xs:documentation>
      </xs:annotation>
 
      <xs:complexContent>
-       <xs:extension base="rac:AccessVia">
+       <xs:restriction base="rsm:ResourceRole">
          <xs:sequence>
-
-           <xs:element name="homeURL" type="xs:anyURI" minOccurs="0">
-              <xs:annotation>
-                 <xs:documentation>
-                   URL for accessing (via a browser) the home or entrance
-                   page that provides access to the resource.
-                 </xs:documentation>
-                 <xs:documentation>
-                   This should be provided when the URL is different from
-                   the resource's referenceURL.
-                 </xs:documentation>
-              </xs:annotation>
-           </xs:element>       
-
+           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
+                       fixed="Download"/>
          </xs:sequence>
-       </xs:extension>
+       </xs:restriction>
      </xs:complexContent>
+   </xs:complexType>
 
-     
+   <xs:complexType name="ViaDownload">
+     <xs:annotation>
+       <xs:documentation>
+         metadata describing how one can access a resource via the web
+       </xs:documentation>
+       <xs:documentation>
+         The accessURL is a URL that (when accessed via HTTP GET) will can be
+         used to download a file representing part or all of this resource.
+         (See also the use attribute which refines its behavior).  The
+         accessURL element is required.  
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rac:AccessVia">
+         <xs:sequence>
+           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
+           <xs:element name="description" type="xs:token" minOccurs="0"/>
+           <xs:element name="accessURL" type="rac:AccessURL" minOccurs="1"/>
+           <xs:element name="details" type="rac:DownloadDetailsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
    </xs:complexType>
 
    <xs:complexType name="Policy">
@@ -217,22 +227,38 @@
      </xs:annotation>
 
      <xs:sequence>
-       <xs:element name="rights" type="rac:Rights"
-                   minOccurs="1" maxOccurs="unbounded">
+       <xs:element name="restriction" type="rac:Restriction"
+                   minOccurs="1" maxOccurs="4">
+         <xs:annotation>
+           <xs:appinfo>
+             <am:dcterm>accessRights</am:dcterm>
+           </xs:appinfo>           
+           <xs:documentation>
+             A label indicating a restriction in accessing this resource.  
+           </xs:documentation>
+           <xs:documentation>
+             This should be repeated for all Restriction values that apply.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>
+
+       <xs:element name="rights" type="xs:token" minOccurs="0" maxOccurs="1">
          <xs:annotation>
            <xs:appinfo>
              <am:dcterm>Rights</am:dcterm>
            </xs:appinfo>           
            <xs:documentation>
-             Information about the held in and over the resource.
+             A brief, user-friendly statement clarifying who may access this 
+             resource and under what conditions.
            </xs:documentation>
            <xs:documentation>
-             This should be repeated for all Rights values that apply.
+             Official legal statements giving the terms of use should be
+             provided via the termsURI element.
            </xs:documentation>
          </xs:annotation>
        </xs:element>
 
-       <xs:element name="terms" type="xs:anyURI" minOccurs="0" maxOccurs="1">
+       <xs:element name="termsURL" type="xs:anyURI" minOccurs="0" maxOccurs="1">
          <xs:annotation>
            <xs:appinfo>
              <am:dcterm>Rights</am:dcterm>
@@ -247,7 +273,7 @@
      </xs:sequence>
    </xs:complexType>
 
-   <xs:simpleType name="Rights">
+   <xs:simpleType name="Restriction">
       <xs:restriction base="xs:token">
          <xs:enumeration value="public">
             <xs:annotation>
@@ -285,41 +311,6 @@
          </xs:enumeration>
       </xs:restriction>
    </xs:simpleType>
-
-   <xs:complexType name="Download">
-     <xs:annotation>
-       <xs:documentation>
-         A description of how to download data or related files via simple
-         (HTTP GET) URLs.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:sequence>
-       <xs:element name="description" type="xs:token" minOccurs="0">
-          <xs:annotation>
-             <xs:documentation>
-               A summary of what the download URL delivers
-             </xs:documentation>
-             <xs:documentation>
-               Providing a description is recommended if more than one
-               portal is available.  If the accessURL's use attribute is set 
-               to "base", describe what is expected to be appended to the URL
-               to retrieve individual files.  
-             </xs:documentation>
-          </xs:annotation>
-       </xs:element>
-
-       <xs:element name="accessURL" type="rac:AccessURL">
-          <xs:annotation>
-             <xs:documentation>
-                The URL that, when accessed (via HTTP GET), will deliver the 
-                data or file associated with this resource.  
-             </xs:documentation>
-          </xs:annotation>
-       </xs:element>       
-     </xs:sequence>
-     
-   </xs:complexType>
 
    <xs:complexType name="AccessURL">
      <xs:simpleContent>
@@ -393,7 +384,7 @@
      </xs:annotation>
 
      <xs:complexContent>
-       <xs:restriction base="rsm:Role">
+       <xs:restriction base="rsm:ResourceRole">
          <xs:sequence>
            <xs:element name="type" type="rsm:RoleType" minOccurs="1"
                        fixed="Software">
@@ -436,6 +427,116 @@
 
    </xs:complexType>
 
+   <xs:complexType name="ViaSoftware">
+     <xs:annotation>
+       <xs:documentation>
+         metadata describing how one can access a resource via locally
+         installable software.
+       </xs:documentation>
+       <xs:documentation>
+         The accessURL points to the home page for the software from which it
+         can be downloaded.  
+       </xs:documentation>
+       <xs:documentation>
+         The details element provides additional information about supported
+         platforms, licensing, etc. 
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rac:AccessVia">
+         <xs:sequence>
+           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
+           <xs:element name="description" type="xs:token" minOccurs="0"/>
+           <xs:element name="accessURL" type="rac:AccessURL" minOccurs="0"/>
+           <xs:element name="details" type="rac:Software"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="MediaDetailsType">
+     <xs:annotation>
+       <xs:documentation>
+         a Role whose type is forced to be 'Media'.
+       </xs:documentation>
+       <xs:documentation>
+         This is only intended for use within an AccessVia subclass.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
+                       fixed="Physical Object: Storage Media">
+             <xs:annotation>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/PhysicalObject
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="ViaMediaRestriction" abstract="true">
+     <xs:annotation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rac:AccessVia">
+         <xs:sequence>
+           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
+           <xs:element name="description" type="xs:token" minOccurs="0"/>
+           <xs:element name="accessURL" type="rac:AccessURL" minOccurs="0"/>
+           <xs:element name="details" type="rac:MediaDetailsType"
+                       minOccurs="1" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="ViaMedia">
+     <xs:annotation>
+       <xs:documentation>
+         A description of access to a resource via physical storage media
+       </xs:documentation>
+       <xs:documentation>
+         The accessURL points to a web page that describes how to request the
+         media.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rac:ViaMediaRestriction">
+         <xs:sequence>
+
+           <xs:element name="mediaType" type="xs:token"
+                       minOccurs="1" maxOccurs="unbounded">
+              <xs:annotation>
+                 <xs:documentation>
+                   The type of media provided
+                 </xs:documentation>
+                 <xs:documentation>
+                   Recommended values include "CDROM", "DVD", etc.
+                 </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+            
+           <xs:element name="requestURL" type="xs:anyURI" minOccurs="0">
+              <xs:annotation>
+             </xs:annotation>
+           </xs:element>
+         
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
    <xs:complexType name="ServiceAPIRoleTypeRestriction" abstract="true">
      <xs:annotation>
        <xs:documentation>
@@ -444,7 +545,7 @@
      </xs:annotation>
 
      <xs:complexContent>
-       <xs:restriction base="rsm:Role">
+       <xs:restriction base="rsm:ResourceRole">
          <xs:sequence>
            <xs:element name="type" type="rsm:RoleType" minOccurs="1"
                        fixed="Service: API">
@@ -504,6 +605,105 @@
        </xs:extension>
      </xs:complexContent>
 
+   </xs:complexType>
+
+   <xs:complexType name="ViaServiceAPI">
+     <xs:annotation>
+       <xs:documentation>
+         metadata describing how one can access a resource via a web service
+         API 
+       </xs:documentation>
+       <xs:documentation>
+         The accessURL points to a documentation and/or GUI front-end to the 
+         service.  
+       </xs:documentation>
+       <xs:documentation>
+         The details element provides additional information about supported
+         platforms, licensing, etc. 
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rac:AccessVia">
+         <xs:sequence>
+           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
+           <xs:element name="description" type="xs:token" minOccurs="0"/>
+           <xs:element name="accessURL" type="rac:AccessURL" minOccurs="0"/>
+           <xs:element name="details" type="rac:Software"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="PortalRoleTypeRestriction" abstract="true">
+     <xs:annotation>
+       <xs:documentation>
+         a Role whose type is forced to be 'InteractiveResource: Portal'.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
+                       fixed="InteractiveResource: Portal">
+             <xs:annotation>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Software
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="Portal">
+     <xs:annotation>
+       <xs:documentation>
+         metadata for describing a web portal, a web site that aggregrates and
+         provides interaction with data and browser-based tools.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rac:PortalRoleTypeRestriction">
+         <xs:sequence>
+
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+
+   </xs:complexType>
+
+   <xs:complexType name="ViaPortal">
+     <xs:annotation>
+       <xs:documentation>
+         description of acces to a resource via a portal.
+       </xs:documentation>
+       <xs:documentation>
+         The accessURL points to the landing page for the portal.
+       </xs:documentation>
+       <xs:documentation>
+         Use this AccessVia type when the resource is accessible via a portal
+         that is not specific to this resource.  In such a case the accessURL
+         given here would not be the same as the resource's landingPage URL.  
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rac:AccessVia">
+         <xs:sequence>
+           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
+           <xs:element name="description" type="xs:token" minOccurs="0"/>
+           <xs:element name="accessURL" type="rac:AccessURL" minOccurs="0"/>
+           <xs:element name="details" type="rac:Portal"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
    </xs:complexType>
 
 
