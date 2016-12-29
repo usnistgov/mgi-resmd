@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Resource xmlns="" xsi:type="rac:AccessibleResource"
+<rsm:Resource xmlns="" xsi:type="rac:AccessibleResource"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
           xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
@@ -82,4 +82,4 @@
      <policy><restriction> public </restriction></policy>
    </access>
 
-</Resource>
+</rsm:Resource>
