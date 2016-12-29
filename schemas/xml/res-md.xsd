@@ -5,7 +5,7 @@
            xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd" 
            xmlns:am="http://schema.nist.gov/xml/nmrr.schema.annot" 
            elementFormDefault="unqualified" 
-           attributeFormDefault="unqualified" version="0.9">
+           attributeFormDefault="unqualified" version="0.10">
 
    <xs:annotation>
       <xs:documentation>
@@ -29,6 +29,16 @@
 
    <xs:import namespace="http://www.w3.org/XML/1998/namespace"
               schemaLocation="http://www.w3.org/2009/01/xml.xsd"/>
+
+   <xs:element name="Resource" type="rsm:Resource">
+      <xs:annotation>
+         <xs:documentation>
+           a root element for a document describing a Resource,
+           an identified, described, and discoverable component of the 
+           distributed data environment. 
+         </xs:documentation>
+      </xs:annotation>
+   </xs:element>
    
    <xs:complexType name="Resource">
       <xs:annotation>
@@ -55,7 +65,7 @@
             </xs:annotation>
          </xs:element>
 
-         <xs:element name="curation" type="rsm:Curation">
+         <xs:element name="providers" type="rsm:Providers">
            <xs:annotation>
              <xs:documentation>
                Information regarding the general curation of the resource
@@ -72,7 +82,7 @@
            </xs:annotation>
          </xs:element>
 
-         <xs:element name="role" type="rsm:Role"
+         <xs:element name="role" type="rsm:ResourceRole"
                      minOccurs="1" maxOccurs="unbounded">
            <xs:annotation>
              <xs:documentation>
@@ -205,24 +215,6 @@
             </xs:annotation>
          </xs:element>
 
-         <xs:element name="shortName" type="xs:token" minOccurs="0">
-            <xs:annotation>
-               <xs:documentation>
-                 a short name or abbreviation given to the resource.
-               </xs:documentation>
-               <xs:documentation>
-                 This name will be used where brief annotations for
-                 the resource name are required.  Applications may 
-                 use this to refer to this resource in a compact display.  
-                 This is NOT expected to be globally unique; thus, it 
-                 should not be used as an identifier.  
-               </xs:documentation>
-               <xs:documentation>
-                 One word or a few letters is recommended.  
-               </xs:documentation>
-            </xs:annotation>
-         </xs:element>
-
          <xs:element name="version" type="xs:token" minOccurs="0">
             <xs:annotation>
                <xs:documentation>
@@ -338,10 +330,31 @@
          </xs:annotation>
        </xs:enumeration>
          
+       <xs:enumeration value="Abbreviation">
+         <xs:annotation>
+           <xs:documentation>
+             title value represents an abbreviation of the title.
+           </xs:documentation>
+           <xs:documentation>
+             An abbreviation might be, for example, initials or an acronym.
+           </xs:documentation>
+           <xs:documentation>
+             This name will be used where brief annotations for
+             the resource name are required.  Applications may 
+             use this to refer to this resource in a compact display.  
+             This is NOT expected to be globally unique; thus, it 
+             should not be used as an identifier.  
+           </xs:documentation>
+           <xs:documentation>
+             One word or a few letters is recommended.  
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+         
      </xs:restriction>
    </xs:simpleType>
         
-   <xs:complexType name="Curation">
+   <xs:complexType name="Providers">
      <xs:annotation>
        <xs:documentation>
          Information regarding the general curation of a resource
@@ -763,16 +776,17 @@
           </xs:annotation>
        </xs:element>
 
-       <xs:element name="referenceURL" type="xs:anyURI">
+       <xs:element name="landingPage" type="xs:anyURI">
           <xs:annotation>
-             <xs:documentation>
-                URL pointing to a human-readable document describing this 
-                resource.   
+            <xs:documentation>
+                URL pointing to the definitive, human-readable document or web
+                page that serves as the primary description of or entry to
+                this resource.
              </xs:documentation>
           </xs:annotation>
        </xs:element>
 
-       <xs:element name="referenceCitation" type="rsm:NamePID" 
+       <xs:element name="reference" type="rsm:NamePID" 
                    minOccurs="0" maxOccurs="unbounded">
           <xs:annotation>
              <xs:documentation>
@@ -785,6 +799,12 @@
                 an article bibliography).  The pid attribute gives a persistant 
                 or otherwise unambiguous identifier for the article; a DOI
                 is prefered.  
+             </xs:documentation>
+             <xs:documentation>
+               It is recommended that while multiple references can be given,
+               only those that provide the fullest or most direct descriptions
+               of this resource be listed (as opposed to simple mentions or
+               citations by derived works).
              </xs:documentation>
           </xs:annotation>
        </xs:element>
@@ -813,6 +833,10 @@
        <xs:documentation>
          a type for expressing a subject keyword that may be drawn from
          a standard set of keywords
+       </xs:documentation>
+       <xs:documentation>
+         Usually, when the pid attribute can be provided, it is usually not
+         necessary to provide values for scheme or schemaURI.  
        </xs:documentation>
      </xs:annotation>
 
@@ -888,7 +912,7 @@
      </xs:restriction>
    </xs:simpleType>
 
-   <xs:complexType name="Role">
+   <xs:complexType name="ResourceRole">
      <xs:annotation>
        <xs:documentation>
          metadata describing the resource's role as a resource of a particular

@@ -18,11 +18,11 @@
    <identity>
      <title>The Interatomic Potentials Repository Project</title>
      <altTitle type="AlternativeTitle">The Interatomic Potentials Repository Project</altTitle>
-     <shortName> IPR </shortName>
+     <altTitle type="Abbreviation"> IPR </altTitle>
      <version> 2.0 </version>
      <identifier>ark:asdlf13871</identifier>
    </identity>
-   <curation>
+   <providers>
      <publisher> 
        NIST/MSED Center for Theoretical and Computational Materials Science (CTCMS) 
      </publisher>
@@ -45,7 +45,7 @@
        <emailAddress> zachary.trautt@nist.gov </emailAddress>
        <timeZone> -0500 </timeZone>
      </contact>
-   </curation>
+   </providers>
    <content>
      <description>
        This repository provides a source for interatomic potentials
@@ -69,15 +69,15 @@
      <subject> metals </subject>
      <subject> force fields </subject>
      <subject> atomistic simulations </subject>
-     <referenceURL>
+     <landingPage>
        http://www.ctcms.nist.gov/potentials/
-     </referenceURL>
-     <referenceCitation pid="doi:10.1016/j.cossms.2013.10.001">
+     </landingPage>
+     <reference pid="doi:10.1016/j.cossms.2013.10.001">
        Becker, C.A. et al., "Considerations for choosing and using force 
        fields and interatomic potentials in materials science and 
        engineering," Current Opinion in Solid State and Materials Science, 
        17, 277-283 (2013).
-     </referenceCitation>
+     </reference>
      <primaryAudience> research </primaryAudience>
    </content>
    <role>
@@ -94,10 +94,10 @@
      <resource>IPR Help Page</resource>
    </related>
    <access>
-     <policy><rights> public </rights></policy>
-     <via xsi:type="rac:AccessViaWeb">
-       <role> <type> InteractiveResource: Portal </type></role>
-       <homeURL> http://www.ctcms.nist.gov/potentials/ </homeURL>
+     <policy><restriction> public </restriction></policy>
+     <via xsi:type="rac:ViaPortal">
+       <accessURL> http://www.ctcms.nist.gov/potentials/ </accessURL>
+       <details> <type> InteractiveResource: Portal </type></details>
      </via>
    </access>
 

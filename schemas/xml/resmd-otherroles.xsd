@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://schema.nist.gov/xml/resmd-otherroles/1.0wd" 
+           xmlns="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd" 
+           xmlns:roth="http://schema.nist.gov/xml/resmd-otherroles/1.0wd" 
+           xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
+           elementFormDefault="unqualified" 
+           attributeFormDefault="unqualified" version="0.1">
+
+   <xs:annotation>
+      <xs:documentation>
+        An extension of the MGI resource metadata that defines simple resource
+        types that do not offer any extended role metadata.  
+      </xs:documentation>
+   </xs:annotation>
+
+   <xs:import namespace="http://schema.nist.gov/xml/res-md/1.0wd"
+              schemaLocation="https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd"/>
+
+   <xs:complexType name="Repository">
+     <xs:annotation>
+       <xs:documentation>
+         a resource that aggregates and makes accessible many datasets together
+         as part of a collection.  
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
+                       fixed="Collection: Repository">
+             <xs:annotation>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Collection
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="Database">
+     <xs:annotation>
+       <xs:documentation>
+         a searchable collection of tabular or property-oriented data
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
+                       fixed="Dataset: Database">
+             <xs:annotation>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Dataset.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+
+</xs:schema>
+
