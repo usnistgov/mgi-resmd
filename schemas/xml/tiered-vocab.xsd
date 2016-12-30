@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://schema.nist.gov/xml/tieredvocab/1.0wd" 
+           xmlns="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tv="http://schema.nist.gov/xml/tieredvocab/1.0wd" 
+           xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
+           elementFormDefault="unqualified" 
+           attributeFormDefault="unqualified" version="0.1">
+
+   <xs:complexType name="TieredVocabulary">
+     <xs:annotation>
+       <xs:documentation>
+         A container for vocabulary terms that are grouped into a hierarchical
+         structure.  Implicit in the organization is a relationship between
+         terms in different levels--typically, that a term at a given level
+         is a more refined term than the term at its enclosing level.  
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:sequence>
+       <xs:element name="t" type="xs:token" minOccurs="1" maxOccurs="unbounded">
+         <xs:annotation>
+           <xs:documentation>
+             a term at one level of the hierarchy.
+           </xs:documentation>
+           <xs:documentation>
+             The order of the occurences of this element is significant:
+             The first element represents the first tier, and subsequent
+             elements represent terms from enclosed tiers of the hierarchy.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>
+     </xs:sequence>
+   </xs:complexType>   
+
+   <xs:complexType name="OneTieredVocabulary">
+     <xs:annotation>
+       <xs:documentation>
+         A 1-level vocabulary container
+       </xs:documentation>
+       <xs:documentation>
+         This is used as a base type for tiered vocabularies of a set level.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="tv:TieredVocabulary">
+         <xs:sequence>
+           <xs:element name="t" type="xs:token"
+                       minOccurs="1" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="TwoTieredVocabulary">
+     <xs:annotation>
+       <xs:documentation>
+         A 2-level vocabulary container
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="tv:OneTieredVocabulary">
+         <xs:sequence>
+           <xs:element name="t2" type="xs:token"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="ThreeTieredVocabulary">
+     <xs:annotation>
+       <xs:documentation>
+         A 2-level vocabulary container
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="tv:TwoTieredVocabulary">
+         <xs:sequence>
+           <xs:element name="t3" type="xs:token"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+
+</xs:schema>
