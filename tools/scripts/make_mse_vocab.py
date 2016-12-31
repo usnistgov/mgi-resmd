@@ -5,7 +5,7 @@ a script that reads an MSE vocabulary encoded in a Excel spreadsheet and writes
 it out as an XML Schema.
 """
 import openpyxl as xl
-import os, sys
+import os, sys, re
 from argparse import ArgumentParser
 from collections import OrderedDict
 
@@ -125,7 +125,7 @@ def define_opts(progname=None):
     parser.add_argument('file', metavar='VOCAB_XSL', type=str, nargs=1,
                         help="Excel file to convert")
     parser.add_argument('-v', '--set-version', type=str, dest='version',
-                        help="set the version for the output schema")
+                        default='', help="set the version for the output schema")
     parser.add_argument('-c', '--use-camelcase', action='store_true',
                         dest='camel',
                         help="use camel case for generated type names")
@@ -138,7 +138,10 @@ def define_opts(progname=None):
 
 def get_vocab_data(filename):
     wb = xl.load_workbook(filename=filename)
-    return wb.get_sheet_by_name('Data')
+    sheets = wb.get_sheet_names()
+    if len(sheets) < 1:
+        raise VocabFormatError("No sheets found in Excel spreadsheet")
+    return wb.get_sheet_by_name(sheets[0])
 
 class VocabFormatError(Exception):
     """
@@ -149,20 +152,25 @@ class VocabFormatError(Exception):
         self.lineno = lineno
         if not msg:
             msg = "Input spreadsheet formatting error" 
-        super(self, VocabFormatError).__init__(msg)
+        super(VocabFormatError, self).__init__(msg)
 
     def __str__(self):
         msg = self.message
         if isinstance(self.lineno, int):
             msg += " at " + str(self.lineno)
-        if self.rowdata is not None:
-            msg += ":\n   " + str(self.rowdata)
+        if self.row is not None:
+            msg += ":\n   " + str([cell.value for cell in self.row[:3]])
         return msg
 
+PAREN_RE = re.compile(r"[\(\)]")
+OPENP_RE = re.compile(r"\(")
+SLASH_RE = re.compile(r"/")
 def us_delim(term):
+    term = SLASH_RE.sub("", PAREN_RE.sub("", term))
     return "_".join(term.split())
 
 def camel_case(term):
+    term = SLASH_RE.sub("", PAREN_RE.sub("", OPENP_RE.sub("_", term)))
     return "".join([word.capitalize() for word in term.split()])
 
 class TermSet(object):
@@ -259,11 +267,16 @@ class Property(object):
             self.lev1[lev1] = TermSet(lev1, self.prop, lev2, self.to_name)
 
     def add_term_row(self, row, lineno=None):
-        cells = [cell.strip() for cell in row]
+        cells = [cell.value for cell in row[:3]]
+        if cells[2] is None:
+            cells[2] = ""
+        if len(filter(lambda c: c is None, cells)) > 0:
+            raise VocabFormatError("Empty cells where data expected", row,lineno)
+        cells = [cell.strip() for cell in cells]
         try:
             self.add_term(cells[1], cells[2])
         except VocabFormatError, ex:
-            ex.row = cells
+            ex.row = row
             ex.lineno = lineno
             raise
 
@@ -314,24 +327,28 @@ class Property(object):
     
 def main(opts):
 
-    Property.to_name = (opts.camel and camelcase) or us_delim
+    to_name = (opts.camel and camel_case) or us_delim
     ws = get_vocab_data(opts.file[0])
 
     # read in the data from the spreadsheet
     props = OrderedDict()
     line = 1
     for cells in ws.iter_rows():
-        if len(cells) > 2:
-            if cells[0] in props:
-                prop = props[cells[0]]
+        if len(cells) > 2 and cells[1].value is not None:
+            if cells[0].value is None:
+                raise VocabFormatError("Empty property name", cells, line)
+            pname = cells[0].value.strip()
+            if pname in props:
+                prop = props[pname]
             else:
-                prop = Property(cells[0])
-                props[cells[0]] = prop
+                prop = Property(pname, to_name=to_name)
+                props[pname] = prop
             prop.add_term_row(cells, line)
         line += 1
 
     # write out schema
-    write_schema_doc(sys.stdout, {"tns": opts.ns, "version": opts.version})
+    write_schema_doc(sys.stdout, props,
+                     {"tns": opts.ns, "version": opts.version})
 
 def write_schema_doc(out, props, hdrdata):
     write_forward(out, hdrdata)
@@ -411,6 +428,6 @@ if __name__ == '__main__':
             test(opts)
         else:
             main(opts)
-    except RuntimeError, ex:
+    except (RuntimeError, VocabFormatError), ex:
         sys.stderr.write(prog+": "+str(ex)+"\n")
         sys.exit(1)
