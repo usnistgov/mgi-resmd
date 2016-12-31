@@ -17,11 +17,11 @@ epilog=None
 
 FORWARD = \
 """<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="{ns}" 
+<xs:schema targetNamespace="{tns}" 
            xmlns="http://www.w3.org/2001/XMLSchema" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            xmlns:tv="http://schema.nist.gov/xml/tieredvocab/1.0wd" 
-           xmlns:vt="http://schema.nist.gov/xml/vocabtest" 
+           xmlns:mse="{tns}"
            xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
            elementFormDefault="unqualified" 
            attributeFormDefault="unqualified" version="{version}">
@@ -36,21 +36,42 @@ AFTERWARD = \
 """
 
 # This template must have one line with {value} in it
-L2TYPE = \
-"""
+L2ENUM = \
+ """ 
    <xs:simpleType name="{name}">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for {lev1} vocabulary terms describing {prop}
+       </xs:documentation>
+     </xs:annotation>
+
      <xs:restriction base="xs:token">
        <xs:enumeration value="{value}"/>
      </xs:restriction>
    </xs:simpleType>
-"""
+ """
+
+L1ENUM = \
+ """ 
+   <xs:simpleType name="{name}">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Level 1 vocabulary terms describing {prop}
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="{value}"/>
+     </xs:restriction>
+   </xs:simpleType>
+ """
 
 L1TYPE = \
 """
    <xs:complexType name="{name}">
      <xs:annotation>
        <xs:documentation>
-         {lev1} vocabulary terms describing {prop}
+         {lev1} vocabulary sub-terms describing {prop}
        </xs:documentation>
      </xs:annotation>
 
@@ -73,7 +94,7 @@ L0TYPE = \
    <xs:complexType name="{name}" abstract="true">
      <xs:annotation>
        <xs:documentation>
-         a Property that captures {prop}
+         a property that captures {prop} vocabulary
        </xs:documentation>
      </xs:annotation>
 
@@ -107,10 +128,12 @@ def define_opts(progname=None):
                         help="set the version for the output schema")
     parser.add_argument('-c', '--use-camelcase', action='store_true',
                         dest='camel',
-                        help="set the version for the output schema")
+                        help="use camel case for generated type names")
     parser.add_argument('-n', '--namespace', type=str, dest='ns', metavar='NS',
                         default='https://www.nist.gov/od/sch/mse-vocab/v1.0wd',
                         help='set the schema namespace to NS')
+    parser.add_argument('-t', '--run-test', type=str, dest='test',metavar='TEST',
+                        default=None, help='run the test named TEST')
     return parser
 
 def get_vocab_data(filename):
@@ -136,38 +159,89 @@ class VocabFormatError(Exception):
             msg += ":\n   " + str(self.rowdata)
         return msg
 
-class TermSet(object):
-    """
-    a container for the set of terms that can be used to describe a Property
-    """
-    def __init__(self, lev1, lev0=None, lev2=None):
-        self.label = lev1
-        self.name = camel_case(lev1)
-        self.prop = lev0
-        self.lev2 = set()
-        if lev2 is not None:
-            self.add_subterm(lev2)
-
-    def add_subterm(self, lev2):
-        self.lev2.add(lev2)
-
 def us_delim(term):
     return "_".join(term.split())
 
 def camel_case(term):
     return "".join([word.capitalize() for word in term.split()])
 
+class TermSet(object):
+    """
+    a container for the set of terms that can be used to describe a Property
+    """
+    def __init__(self, lev1, lev0=None, lev2=None, to_name=us_delim):
+        self.label = lev1
+        self.lev1 = lev1
+        if self.lev1.endswith('(s)'):
+            self.lev1 = self.lev1[:-3]
+        self.name = to_name(self.lev1)
+        self.prop = lev0
+        self.lev2 = []
+        if lev2 is not None:
+            self.add_subterm(lev2)
+
+    def add_subterm(self, lev2):
+        """
+        add a new level-2 qualifying term
+        """
+        if lev2.endswith('(s)'):
+            lev2 = lev2[:-3]
+        if lev2 not in self.lev2:
+            self.lev2.append(lev2)
+
+
+    def to_enum_type(self, format, data=None):
+        """
+        create the xs:simpleType definition that captures the level 2 
+        allowed values
+        """
+        if data is None:
+            data = {}
+        tdata = { "lev1": self.label, "name": self.name+"Type",
+                  "prop": self.prop }
+        tdata.update(data)
+
+        return make_enum_type(self.lev2, format, tdata)
+
+def make_enum_type(terms, format, data):
+    """
+    create the xs:simpleType definition that captures the level 2 
+    allowed values
+    """
+
+    # first extract the enumeration-{value} line
+    lines = format.splitlines()
+    enumline = filter(lambda n: "{value}" in n[1], enumerate(lines))
+    if len(enumline) > 0:
+        lineno = enumline[0][0]
+        enumline = enumline[0][1]
+        lines.pop(lineno)
+
+        #
+        elines = []
+        for val in reversed(terms):
+            edata = data.copy()
+            edata['value'] = val
+            lines.insert(lineno, enumline.format(**edata))
+            
+    format = "\n".join(lines)
+    return format.format(**data)
+                
+
 class Property(object):
     """
     a set of vocabulary corresponding to a level-0 term.
     """
-    def __init__(self, name, lev1=None, lev2=None):
-        self.lev0 = name
-        self.lev1 = {}
+    # to_name = us_delim
+    
+    def __init__(self, name, lev1=None, lev2=None, to_name=us_delim):
+        self.to_name = to_name
+        self.prop = name
+        self.lev1 = OrderedDict()
 
         if name.endswith('(s)'):
             name = name[:-3]
-        self.name = camel_case(name)
+        self.name = to_name(name)
 
         if lev1:
             self.add_term(lev1, lev2)
@@ -177,21 +251,70 @@ class Property(object):
     def add_term(self, lev1, lev2=""):
         if lev2 == ".":
             lev2 == ""
+        if lev1.endswith('(s)'):
+            lev1 = lev1[:-3]
         if lev1 in self.lev1:
             self.lev1[lev1].add_subterm(lev2)
         else:
-            self.lev1[lev1] = TermSet(lev1, self.lev0, self.lev2)
+            self.lev1[lev1] = TermSet(lev1, self.prop, lev2, self.to_name)
 
-    def add_term_row(self, cells, lineno=None):
+    def add_term_row(self, row, lineno=None):
+        cells = [cell.strip() for cell in row]
         try:
             self.add_term(cells[1], cells[2])
         except VocabFormatError, ex:
             ex.row = cells
             ex.lineno = lineno
             raise
+
+    def to_enum_type(self, format, data=None):
+        """
+        create the xs:simpleType definition that captures the level 2 
+        allowed values
+        """
+        if data is None:
+            data = {}
+        tdata = { "name": self.name+"Type", "prop": self.prop }
+        tdata.update(data)
+
+        return make_enum_type(self.lev1.keys(), format, tdata)
+
+    def to_term_type(self, termset, format, data=None):
+        """
+        create the xs:complexType for restricting level 2 terms
+        """
+        if data is None:
+            data = {}
+        tdata = { "name": termset.name, "prop": self.prop, "value": termset.lev1,
+                  "lev1": termset.lev1, "propType": self.name+"Type",
+                  "propName": self.name, "lev1Type": termset.name+"Type" }
+        tdata.update(data)
+
+        return format.format(**tdata)
+
+    def to_prop_type(self, format, data=None):
+        """
+        create the base property xs:complexType
+        """
+        if data is None:
+            data = {}
+        tdata = { "name": self.name, "prop": self.prop, 
+                  "propType": self.name+"Type" }
+        tdata.update(data)
+
+        return format.format(**tdata)
+
+    def write_schema(self, out):
+        out.write(self.to_prop_type(L0TYPE))
+        out.write(self.to_enum_type(L1ENUM))
+        for key in self.lev1:
+            out.write(self.to_term_type(self.lev1[key], L1TYPE))
+            out.write(self.lev1[key].to_enum_type(L2ENUM)) 
+        
     
 def main(opts):
 
+    Property.to_name = (opts.camel and camelcase) or us_delim
     ws = get_vocab_data(opts.file[0])
 
     # read in the data from the spreadsheet
@@ -208,24 +331,86 @@ def main(opts):
         line += 1
 
     # write out schema
-    write_forward(sys.stdout, {"tns": opts.ns, "version": opts.version})
+    write_schema_doc(sys.stdout, {"tns": opts.ns, "version": opts.version})
+
+def write_schema_doc(out, props, hdrdata):
+    write_forward(out, hdrdata)
     for prop in props.itervalues():
-        write_prop(sys.stdout, prop)
-    write_afterward(sys.stdout)
+        write_prop(out, prop)
+    write_afterward(out, hdrdata)
 
 def write_forward(out, data):
     out.write(FORWARD.format(**data))
 
 def write_afterward(out, data):
-    out.write(AFTERWARD)
+    out.write(AFTERWARD.format(**data))
 
 def write_prop(out, prop):
-    out.write(prop.to_schema())
+    prop.write_schema(out)
 
-opts = None
+def test_termset_enum(opts):
+    ts = TermSet("Ceramics", lev0="Material Type")
+    ts.add_subterm("Perovskite")
+    ts.add_subterm("")
+    sys.stdout.write(ts.to_enum_type(L2ENUM, {"prop": "Material type"}))
+
+def test_property_enum(opts):
+    p = Property("Material Type")
+    p.add_term("Ceramics", ".")
+    p.add_term("Ceramics", "Perovskite")
+    p.add_term("Metals and alloys")
+    p.add_term("Metamaterials")
+    sys.stdout.write(p.to_enum_type(L1ENUM, {"prop": "Material type"}))
+
+def test_term_type(opts):
+    p = Property("Material Type")
+    ts = TermSet("Ceramics", lev0="Material Type")
+    ts.add_subterm("Perovskite")
+    ts.add_subterm("")
+    sys.stdout.write(p.to_term_type(ts, L1TYPE))
+
+def test_prop_type(opts):
+    p = Property("Material Type")
+    sys.stdout.write(p.to_prop_type(L0TYPE))
+
+def test_to_schema(opts):
+    p = Property("Material Type")
+    p.add_term("Ceramics", "")
+    p.add_term("Ceramics", "Perovskite")
+    p.add_term("Metals and alloys")
+    p.add_term("Metamaterials")
+    p.write_schema(sys.stdout)
+
+def test_doc(opts):
+    p = Property("Material Type")
+    p.add_term("Ceramics", "")
+    p.add_term("Ceramics", "Perovskite")
+    p.add_term("Metals and alloys")
+    p.add_term("Metamaterials")
+    write_schema_doc(sys.stdout, {p.prop: p},
+                     {"tns": opts.ns, "version": opts.version})
+
+
+test = { "termset_enum": test_termset_enum,
+         "property_enum": test_property_enum,
+         "term_type": test_term_type,
+         "prop_type": test_prop_type,
+         "schema": test_to_schema,
+         "all": test_doc,
+         "doc": test_doc
+     }
+
 if __name__ == '__main__':
     try:
         opts = define_opts(prog).parse_args(sys.argv[1:])
-        main(opts)
+        if opts.test:
+            try:
+                test = test[opts.test]
+            except KeyError, e:
+                raise RuntimeError(opts.test + ": Not a recognized test")
+            test(opts)
+        else:
+            main(opts)
     except RuntimeError, ex:
-        sys.stderr.write("Error: "+str(ex))
+        sys.stderr.write(prog+": "+str(ex)+"\n")
+        sys.exit(1)
