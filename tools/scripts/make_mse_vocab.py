@@ -38,7 +38,7 @@ AFTERWARD = \
 # This template must have one line with {value} in it
 L2ENUM = \
  """ 
-   <xs:simpleType name="{propName}_{name}">
+   <xs:simpleType name="{name}_{propName}Type">
      <xs:annotation>
        <xs:documentation>
          Allowed values for {lev1} vocabulary terms describing {prop}
@@ -53,7 +53,7 @@ L2ENUM = \
 
 L1ENUM = \
  """ 
-   <xs:simpleType name="{name}">
+   <xs:simpleType name="{name}Type">
      <xs:annotation>
        <xs:documentation>
          Allowed values for Level 1 vocabulary terms describing {prop}
@@ -68,7 +68,7 @@ L1ENUM = \
 
 L1TYPE = \
 """
-   <xs:complexType name="{propName}_{name}">
+   <xs:complexType name="{name}_{propName}">
      <xs:annotation>
        <xs:documentation>
          {lev1} vocabulary sub-terms describing {prop}
@@ -78,9 +78,9 @@ L1TYPE = \
      <xs:complexContent>
        <xs:restriction base="mse:{propName}">
          <xs:sequence>
-           <xs:element name="t" type="mse:{propType}"
+           <xs:element name="t" type="mse:{propType}Type"
                        minOccurs="1" maxOccurs="1" fixed="{value}"/>
-           <xs:element name="t2" type="mse:{propName}_{lev1Type}"
+           <xs:element name="t2" type="mse:{lev1Type}_{propName}Type"
                        minOccurs="0" maxOccurs="1"/>
          </xs:sequence>
        </xs:restriction>
@@ -101,7 +101,7 @@ L0TYPE = \
      <xs:complexContent>
        <xs:restriction base="tv:TwoTieredVocabulary">
          <xs:sequence>
-           <xs:element name="t" type="mse:{propType}"
+           <xs:element name="t" type="mse:{propType}Type"
                        minOccurs="1" maxOccurs="1"/>
            <xs:element name="t2" type="xs:token"
                        minOccurs="0" maxOccurs="1"/>
@@ -122,7 +122,7 @@ if not prog:
 def define_opts(progname=None):
 
     parser = ArgumentParser(progname, None, description, epilog)
-    parser.add_argument('file', metavar='VOCAB_XSL', type=str, nargs=1,
+    parser.add_argument('file', metavar='VOCAB_XLS', type=str, nargs=1,
                         help="Excel file to convert")
     parser.add_argument('-v', '--set-version', type=str, dest='version',
                         default='', help="set the version for the output schema")
@@ -210,7 +210,7 @@ class TermSet(object):
         """
         if data is None:
             data = {}
-        tdata = { "lev1": self.label, "name": self.name+"Type",
+        tdata = { "lev1": self.label, "name": self.name,
                   "prop": self.prop, "propName": self.propName }
         tdata.update(data)
 
@@ -292,7 +292,7 @@ class Property(object):
         """
         if data is None:
             data = {}
-        tdata = { "name": self.name+"Type", "prop": self.prop }
+        tdata = { "name": self.name, "prop": self.prop }
         tdata.update(data)
 
         return make_enum_type(self.lev1.keys(), format, tdata)
@@ -304,8 +304,8 @@ class Property(object):
         if data is None:
             data = {}
         tdata = { "name": termset.name, "prop": self.prop, "value": termset.lev1,
-                  "lev1": termset.lev1, "propType": self.name+"Type",
-                  "propName": self.name, "lev1Type": termset.name+"Type" }
+                  "lev1": termset.lev1, "propType": self.name,
+                  "propName": self.name, "lev1Type": termset.name }
         tdata.update(data)
 
         return format.format(**tdata)
@@ -317,7 +317,7 @@ class Property(object):
         if data is None:
             data = {}
         tdata = { "name": self.name, "prop": self.prop, 
-                  "propType": self.name+"Type" }
+                  "propType": self.name }
         tdata.update(data)
 
         return format.format(**tdata)

@@ -86,7 +86,7 @@
 <!--     <type> Collection: Repository </type> -->
    </role>
    <applicability xsi:type="ms:MaterialsScience">
-     <propertyAddressed xsi:type="mse:Properties_addressed_Microstructural">
+     <propertyAddressed xsi:type="mse:Microstructural_Properties_addressed">
        <t> Microstructural </t>
      </propertyAddressed>
    </applicability>

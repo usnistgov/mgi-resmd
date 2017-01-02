@@ -94,15 +94,15 @@
 
    <!-- This part contains Materials Science-specific metadata -->
    <applicability xsi:type="ms:MaterialsScience">
-     <structuralFeature xsi:type="mse:Structural_Feature_Microstructure">
+     <structuralFeature xsi:type="mse:Microstructure_Structural_Feature">
        <t>  Microstructure </t>
        <t2> single crystal </t2>
      </structuralFeature>
-     <structuralFeature xsi:type="mse:Structural_Feature_Microstructure">
+     <structuralFeature xsi:type="mse:Microstructure_Structural_Feature">
        <t>  Microstructure </t>
        <t2> polycrystalline </t2>
      </structuralFeature>
-     <propertyAddressed xsi:type="mse:Properties_addressed_Microstructural">
+     <propertyAddressed xsi:type="mse:Microstructural_Properties_addressed">
        <t> Microstructural </t>
      </propertyAddressed>
    </applicability>     

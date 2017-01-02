@@ -90,7 +90,7 @@
    </role>
 
    <applicability xsi:type="ms:MaterialsScience">
-     <propertyAddressed xsi:type="mse:Properties_addressed_Optical">
+     <propertyAddressed xsi:type="mse:Optical_Properties_addressed">
        <t> Optical </t>
      </propertyAddressed>
    </applicability>
