@@ -25,7 +25,6 @@ FORWARD = \
            xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
            elementFormDefault="unqualified" 
            attributeFormDefault="unqualified" version="{version}">
-
 """
 
 AFTERWARD = \
