@@ -38,7 +38,7 @@ AFTERWARD = \
 # This template must have one line with {value} in it
 L2ENUM = \
  """ 
-   <xs:simpleType name="{name}">
+   <xs:simpleType name="{propName}_{name}">
      <xs:annotation>
        <xs:documentation>
          Allowed values for {lev1} vocabulary terms describing {prop}
@@ -68,7 +68,7 @@ L1ENUM = \
 
 L1TYPE = \
 """
-   <xs:complexType name="{name}">
+   <xs:complexType name="{propName}_{name}">
      <xs:annotation>
        <xs:documentation>
          {lev1} vocabulary sub-terms describing {prop}
@@ -80,7 +80,7 @@ L1TYPE = \
          <xs:sequence>
            <xs:element name="t" type="mse:{propType}"
                        minOccurs="1" maxOccurs="1" fixed="{value}"/>
-           <xs:element name="t2" type="mse:{lev1Type}"
+           <xs:element name="t2" type="mse:{propName}_{lev1Type}"
                        minOccurs="0" maxOccurs="1"/>
          </xs:sequence>
        </xs:restriction>
@@ -130,7 +130,7 @@ def define_opts(progname=None):
                         dest='camel',
                         help="use camel case for generated type names")
     parser.add_argument('-n', '--namespace', type=str, dest='ns', metavar='NS',
-                        default='https://www.nist.gov/od/sch/mse-vocab/v1.0wd',
+                        default='https://www.nist.gov/od/sch/mse-vocab/1.0wd',
                         help='set the schema namespace to NS')
     parser.add_argument('-t', '--run-test', type=str, dest='test',metavar='TEST',
                         default=None, help='run the test named TEST')
@@ -166,10 +166,14 @@ PAREN_RE = re.compile(r"[\(\)]")
 OPENP_RE = re.compile(r"\(")
 SLASH_RE = re.compile(r"/")
 def us_delim(term):
+    if term.endswith('(s)'):
+        term = term[:-3]
     term = SLASH_RE.sub("", PAREN_RE.sub("", term))
     return "_".join(term.split())
 
 def camel_case(term):
+    if term.endswith('(s)'):
+        term = term[:-3]
     term = SLASH_RE.sub("", PAREN_RE.sub("", OPENP_RE.sub("_", term)))
     return "".join([word.capitalize() for word in term.split()])
 
@@ -184,6 +188,7 @@ class TermSet(object):
             self.lev1 = self.lev1[:-3]
         self.name = to_name(self.lev1)
         self.prop = lev0
+        self.propName = to_name(self.prop)
         self.lev2 = []
         if lev2 is not None:
             self.add_subterm(lev2)
@@ -206,7 +211,7 @@ class TermSet(object):
         if data is None:
             data = {}
         tdata = { "lev1": self.label, "name": self.name+"Type",
-                  "prop": self.prop }
+                  "prop": self.prop, "propName": self.propName }
         tdata.update(data)
 
         return make_enum_type(self.lev2, format, tdata)

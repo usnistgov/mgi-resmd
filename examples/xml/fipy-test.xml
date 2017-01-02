@@ -5,6 +5,7 @@
           xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
           xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
           xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
+          xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
           xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
                               https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd
                               http://schema.nist.gov/xml/resmd-datacite/1.0wd
@@ -92,8 +93,17 @@
 
    <!-- This part contains Materials Science-specific metadata -->
    <applicability xsi:type="ms:MaterialsScience">
-     <structuralMorphology>crystalline</structuralMorphology>
-     <propertyClass>structural</propertyClass>
+     <structuralFeature xsi:type="mse:Structural_Feature_Microstructure">
+       <t>  Microstructure </t>
+       <t2> single crystal </t2>
+     </structuralFeature>
+     <structuralFeature xsi:type="mse:Structural_Feature_Microstructure">
+       <t>  Microstructure </t>
+       <t2> polycrystalline </t2>
+     </structuralFeature>
+     <propertyAddressed xsi:type="mse:Properties_addressed_Microstructural">
+       <t> Microstructural </t>
+     </propertyAddressed>
    </applicability>     
 
    <!-- This part describes how to access it. -->

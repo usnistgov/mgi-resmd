@@ -1,0 +1,3023 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
+           xmlns="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:tv="http://schema.nist.gov/xml/tieredvocab/1.0wd" 
+           xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd"
+           xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
+           elementFormDefault="unqualified" 
+           attributeFormDefault="unqualified" version="draft10">
+
+   <xs:import namespace="http://schema.nist.gov/xml/tieredvocab/1.0wd"
+              schemaLocation="https://raw.githubusercontent.com/RayPlante/mgi-resmd/tieredvocab/schemas/xml/tiered-vocab.xsd"/>
+
+   <xs:complexType name="Material_type" abstract="true">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Material type(s) vocabulary
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="tv:TwoTieredVocabulary">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1"/>
+           <xs:element name="t2" type="xs:token"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_typeType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Level 1 vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="Biological"/>
+       <xs:enumeration value="Biomaterials"/>
+       <xs:enumeration value="Ceramics"/>
+       <xs:enumeration value="Metals and alloys"/>
+       <xs:enumeration value="Metamaterial"/>
+       <xs:enumeration value="Molecular fluids"/>
+       <xs:enumeration value="Organic (Carbon-containing)"/>
+       <xs:enumeration value="Organometallic"/>
+       <xs:enumeration value="Oxides"/>
+       <xs:enumeration value="Polymer"/>
+       <xs:enumeration value="Semiconductor"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Biological">
+     <xs:annotation>
+       <xs:documentation>
+         Biological vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Biological"/>
+           <xs:element name="t2" type="mse:Material_type_BiologicalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_BiologicalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Biological vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Biomaterials">
+     <xs:annotation>
+       <xs:documentation>
+         Biomaterials vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Biomaterials"/>
+           <xs:element name="t2" type="mse:Material_type_BiomaterialsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_BiomaterialsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Biomaterials vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Ceramics">
+     <xs:annotation>
+       <xs:documentation>
+         Ceramics vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Ceramics"/>
+           <xs:element name="t2" type="mse:Material_type_CeramicsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_CeramicsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Ceramics vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Perovskite"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Metals_and_alloys">
+     <xs:annotation>
+       <xs:documentation>
+         Metals and alloys vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Metals and alloys"/>
+           <xs:element name="t2" type="mse:Material_type_Metals_and_alloysType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_Metals_and_alloysType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Metals and alloys vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Al-containing"/>
+       <xs:enumeration value="Commercially pure metals"/>
+       <xs:enumeration value="Cu-containing"/>
+       <xs:enumeration value="Fe-containing (inc. steel)"/>
+       <xs:enumeration value="Intermetallics"/>
+       <xs:enumeration value="Mg-containing"/>
+       <xs:enumeration value="Ni-containing"/>
+       <xs:enumeration value="Refractory"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Metamaterial">
+     <xs:annotation>
+       <xs:documentation>
+         Metamaterial vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Metamaterial"/>
+           <xs:element name="t2" type="mse:Material_type_MetamaterialType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_MetamaterialType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Metamaterial vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Molecular_fluids">
+     <xs:annotation>
+       <xs:documentation>
+         Molecular fluids vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Molecular fluids"/>
+           <xs:element name="t2" type="mse:Material_type_Molecular_fluidsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_Molecular_fluidsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Molecular fluids vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Organic_Carbon-containing">
+     <xs:annotation>
+       <xs:documentation>
+         Organic (Carbon-containing) vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Organic (Carbon-containing)"/>
+           <xs:element name="t2" type="mse:Material_type_Organic_Carbon-containingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_Organic_Carbon-containingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Organic (Carbon-containing) vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Organometallic">
+     <xs:annotation>
+       <xs:documentation>
+         Organometallic vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Organometallic"/>
+           <xs:element name="t2" type="mse:Material_type_OrganometallicType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_OrganometallicType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Organometallic vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Oxides">
+     <xs:annotation>
+       <xs:documentation>
+         Oxides vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Oxides"/>
+           <xs:element name="t2" type="mse:Material_type_OxidesType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_OxidesType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Oxides vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Polymer">
+     <xs:annotation>
+       <xs:documentation>
+         Polymer vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Polymer"/>
+           <xs:element name="t2" type="mse:Material_type_PolymerType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_PolymerType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Polymer vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Copolymer"/>
+       <xs:enumeration value="Elastomer"/>
+       <xs:enumeration value="Homopolymer"/>
+       <xs:enumeration value="Polymer Blend"/>
+       <xs:enumeration value="Thermoplastic"/>
+       <xs:enumeration value="Thermoset"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Material_type_Semiconductor">
+     <xs:annotation>
+       <xs:documentation>
+         Semiconductor vocabulary sub-terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Material_type">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Material_typeType"
+                       minOccurs="1" maxOccurs="1" fixed="Semiconductor"/>
+           <xs:element name="t2" type="mse:Material_type_SemiconductorType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Material_type_SemiconductorType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Semiconductor vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="II-VI"/>
+       <xs:enumeration value="III-V"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature" abstract="true">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Structural Feature(s) vocabulary
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="tv:TwoTieredVocabulary">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1"/>
+           <xs:element name="t2" type="xs:token"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_FeatureType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Level 1 vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="Composites"/>
+       <xs:enumeration value="Defects"/>
+       <xs:enumeration value="Engineered structures"/>
+       <xs:enumeration value="Interfacial"/>
+       <xs:enumeration value="Interphase"/>
+       <xs:enumeration value="Microstructure"/>
+       <xs:enumeration value="Morphology"/>
+       <xs:enumeration value="Phase"/>
+       <xs:enumeration value="Surfaces"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature_Composites">
+     <xs:annotation>
+       <xs:documentation>
+         Composites vocabulary sub-terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Structural_Feature">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1" fixed="Composites"/>
+           <xs:element name="t2" type="mse:Structural_Feature_CompositesType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_Feature_CompositesType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Composites vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="fiber-reinforced"/>
+       <xs:enumeration value="metal-matrix"/>
+       <xs:enumeration value="nanocomposites"/>
+       <xs:enumeration value="particle-reinforced"/>
+       <xs:enumeration value="polymer-matrix"/>
+       <xs:enumeration value="structural"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature_Defects">
+     <xs:annotation>
+       <xs:documentation>
+         Defects vocabulary sub-terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Structural_Feature">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1" fixed="Defects"/>
+           <xs:element name="t2" type="mse:Structural_Feature_DefectsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_Feature_DefectsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Defects vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Dislocations"/>
+       <xs:enumeration value="Point defects"/>
+       <xs:enumeration value="Voids"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature_Engineered_structures">
+     <xs:annotation>
+       <xs:documentation>
+         Engineered structures vocabulary sub-terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Structural_Feature">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1" fixed="Engineered structures"/>
+           <xs:element name="t2" type="mse:Structural_Feature_Engineered_structuresType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_Feature_Engineered_structuresType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Engineered structures vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature_Interfacial">
+     <xs:annotation>
+       <xs:documentation>
+         Interfacial vocabulary sub-terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Structural_Feature">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1" fixed="Interfacial"/>
+           <xs:element name="t2" type="mse:Structural_Feature_InterfacialType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_Feature_InterfacialType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Interfacial vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature_Interphase">
+     <xs:annotation>
+       <xs:documentation>
+         Interphase vocabulary sub-terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Structural_Feature">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1" fixed="Interphase"/>
+           <xs:element name="t2" type="mse:Structural_Feature_InterphaseType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_Feature_InterphaseType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Interphase vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature_Microstructure">
+     <xs:annotation>
+       <xs:documentation>
+         Microstructure vocabulary sub-terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Structural_Feature">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1" fixed="Microstructure"/>
+           <xs:element name="t2" type="mse:Structural_Feature_MicrostructureType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_Feature_MicrostructureType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Microstructure vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="compound"/>
+       <xs:enumeration value="dendritic"/>
+       <xs:enumeration value="eutectic"/>
+       <xs:enumeration value="grains"/>
+       <xs:enumeration value="nanocrystalline"/>
+       <xs:enumeration value="polycrystalline"/>
+       <xs:enumeration value="polydispersity"/>
+       <xs:enumeration value="precipitates"/>
+       <xs:enumeration value="quasicrystalline"/>
+       <xs:enumeration value="single crystal"/>
+       <xs:enumeration value="twinned"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature_Morphology">
+     <xs:annotation>
+       <xs:documentation>
+         Morphology vocabulary sub-terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Structural_Feature">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1" fixed="Morphology"/>
+           <xs:element name="t2" type="mse:Structural_Feature_MorphologyType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_Feature_MorphologyType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Morphology vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="1D"/>
+       <xs:enumeration value="2D"/>
+       <xs:enumeration value="amorphous"/>
+       <xs:enumeration value="clusters"/>
+       <xs:enumeration value="complex fluids"/>
+       <xs:enumeration value="glass"/>
+       <xs:enumeration value="layered"/>
+       <xs:enumeration value="nanoparticle / nanotube"/>
+       <xs:enumeration value="open-framework"/>
+       <xs:enumeration value="particles / colloids"/>
+       <xs:enumeration value="tacticity"/>
+       <xs:enumeration value="thin film"/>
+       <xs:enumeration value="wires"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature_Phase">
+     <xs:annotation>
+       <xs:documentation>
+         Phase vocabulary sub-terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Structural_Feature">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1" fixed="Phase"/>
+           <xs:element name="t2" type="mse:Structural_Feature_PhaseType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_Feature_PhaseType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Phase vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="crystalline"/>
+       <xs:enumeration value="gas"/>
+       <xs:enumeration value="melt"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Structural_Feature_Surfaces">
+     <xs:annotation>
+       <xs:documentation>
+         Surfaces vocabulary sub-terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Structural_Feature">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Structural_FeatureType"
+                       minOccurs="1" maxOccurs="1" fixed="Surfaces"/>
+           <xs:element name="t2" type="mse:Structural_Feature_SurfacesType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Structural_Feature_SurfacesType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Surfaces vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed" abstract="true">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Properties addressed vocabulary
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="tv:TwoTieredVocabulary">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1"/>
+           <xs:element name="t2" type="xs:token"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressedType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Level 1 vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="Chemical"/>
+       <xs:enumeration value="Corrosion"/>
+       <xs:enumeration value="Crystallographic"/>
+       <xs:enumeration value="Electrical"/>
+       <xs:enumeration value="Kinetic"/>
+       <xs:enumeration value="Magnetic"/>
+       <xs:enumeration value="Mechanical"/>
+       <xs:enumeration value="Microstructural"/>
+       <xs:enumeration value="Optical"/>
+       <xs:enumeration value="Rheological"/>
+       <xs:enumeration value="Structural"/>
+       <xs:enumeration value="Thermodynamic"/>
+       <xs:enumeration value="Toxicity / Safety"/>
+       <xs:enumeration value="Transport"/>
+       <xs:enumeration value="Vibrational or Electronic"/>
+       <xs:enumeration value="Viscoelastic / creep"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Chemical">
+     <xs:annotation>
+       <xs:documentation>
+         Chemical vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Chemical"/>
+           <xs:element name="t2" type="mse:Properties_addressed_ChemicalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_ChemicalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Chemical vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Composition"/>
+       <xs:enumeration value="Molecular weights"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Corrosion">
+     <xs:annotation>
+       <xs:documentation>
+         Corrosion vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Corrosion"/>
+           <xs:element name="t2" type="mse:Properties_addressed_CorrosionType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_CorrosionType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Corrosion vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Crystallographic">
+     <xs:annotation>
+       <xs:documentation>
+         Crystallographic vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Crystallographic"/>
+           <xs:element name="t2" type="mse:Properties_addressed_CrystallographicType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_CrystallographicType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Crystallographic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Orientation maps"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Electrical">
+     <xs:annotation>
+       <xs:documentation>
+         Electrical vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Electrical"/>
+           <xs:element name="t2" type="mse:Properties_addressed_ElectricalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_ElectricalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Electrical vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Conductivity"/>
+       <xs:enumeration value="Dielectric constant"/>
+       <xs:enumeration value="Dielectric dispersion"/>
+       <xs:enumeration value="electrostrictive"/>
+       <xs:enumeration value="piezoelectric"/>
+       <xs:enumeration value="Power conversion efficiency"/>
+       <xs:enumeration value="pyroelectric"/>
+       <xs:enumeration value="Resistivity"/>
+       <xs:enumeration value="Superconductivity"/>
+       <xs:enumeration value="thermoelectric"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Kinetic">
+     <xs:annotation>
+       <xs:documentation>
+         Kinetic vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Kinetic"/>
+           <xs:element name="t2" type="mse:Properties_addressed_KineticType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_KineticType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Kinetic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Grain growth"/>
+       <xs:enumeration value="Phase evolution"/>
+       <xs:enumeration value="Phase transitions and ordering"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Magnetic">
+     <xs:annotation>
+       <xs:documentation>
+         Magnetic vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Magnetic"/>
+           <xs:element name="t2" type="mse:Properties_addressed_MagneticType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_MagneticType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Magnetic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Mechanical">
+     <xs:annotation>
+       <xs:documentation>
+         Mechanical vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Mechanical"/>
+           <xs:element name="t2" type="mse:Properties_addressed_MechanicalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_MechanicalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Mechanical vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="acoustic emission"/>
+       <xs:enumeration value="compression response"/>
+       <xs:enumeration value="deformation mechanisms"/>
+       <xs:enumeration value="elasticity"/>
+       <xs:enumeration value="flexural response"/>
+       <xs:enumeration value="fracture behavior"/>
+       <xs:enumeration value="impact response"/>
+       <xs:enumeration value="phonon modes"/>
+       <xs:enumeration value="plasticity"/>
+       <xs:enumeration value="shear response"/>
+       <xs:enumeration value="strength"/>
+       <xs:enumeration value="tensile response (inc stress-strain)"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Microstructural">
+     <xs:annotation>
+       <xs:documentation>
+         Microstructural vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Microstructural"/>
+           <xs:element name="t2" type="mse:Properties_addressed_MicrostructuralType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_MicrostructuralType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Microstructural vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="clustering"/>
+       <xs:enumeration value="crystallinity"/>
+       <xs:enumeration value="defect structures"/>
+       <xs:enumeration value="density"/>
+       <xs:enumeration value="dispersion"/>
+       <xs:enumeration value="particle shape"/>
+       <xs:enumeration value="porosity"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Optical">
+     <xs:annotation>
+       <xs:documentation>
+         Optical vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Optical"/>
+           <xs:element name="t2" type="mse:Properties_addressed_OpticalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_OpticalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Optical vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Rheological">
+     <xs:annotation>
+       <xs:documentation>
+         Rheological vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Rheological"/>
+           <xs:element name="t2" type="mse:Properties_addressed_RheologicalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_RheologicalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Rheological vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="viscosity"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Structural">
+     <xs:annotation>
+       <xs:documentation>
+         Structural vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Structural"/>
+           <xs:element name="t2" type="mse:Properties_addressed_StructuralType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_StructuralType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Structural vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Thermodynamic">
+     <xs:annotation>
+       <xs:documentation>
+         Thermodynamic vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Thermodynamic"/>
+           <xs:element name="t2" type="mse:Properties_addressed_ThermodynamicType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_ThermodynamicType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Thermodynamic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="calorimetry profile"/>
+       <xs:enumeration value="crystallization temperature"/>
+       <xs:enumeration value="Glass transition temperature"/>
+       <xs:enumeration value="grain boundary energies"/>
+       <xs:enumeration value="heat capacity"/>
+       <xs:enumeration value="heat of fusion"/>
+       <xs:enumeration value="heat of solidification"/>
+       <xs:enumeration value="interfacial energies"/>
+       <xs:enumeration value="liquid crystal phase transition temperature"/>
+       <xs:enumeration value="Melting temperature"/>
+       <xs:enumeration value="Phase diagram"/>
+       <xs:enumeration value="specific heat"/>
+       <xs:enumeration value="surface energies"/>
+       <xs:enumeration value="thermal conductivity"/>
+       <xs:enumeration value="thermal decomposition temperature"/>
+       <xs:enumeration value="thermal expansion"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Toxicity_Safety">
+     <xs:annotation>
+       <xs:documentation>
+         Toxicity / Safety vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Toxicity / Safety"/>
+           <xs:element name="t2" type="mse:Properties_addressed_Toxicity_SafetyType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_Toxicity_SafetyType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Toxicity / Safety vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Transport">
+     <xs:annotation>
+       <xs:documentation>
+         Transport vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Transport"/>
+           <xs:element name="t2" type="mse:Properties_addressed_TransportType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_TransportType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Transport vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="diffusivity"/>
+       <xs:enumeration value="tracer diffusivity"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Vibrational_or_Electronic">
+     <xs:annotation>
+       <xs:documentation>
+         Vibrational or Electronic vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Vibrational or Electronic"/>
+           <xs:element name="t2" type="mse:Properties_addressed_Vibrational_or_ElectronicType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_Vibrational_or_ElectronicType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Vibrational or Electronic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="band gap"/>
+       <xs:enumeration value="spin polarization"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Properties_addressed_Viscoelastic_creep">
+     <xs:annotation>
+       <xs:documentation>
+         Viscoelastic / creep vocabulary sub-terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Properties_addressed">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Properties_addressedType"
+                       minOccurs="1" maxOccurs="1" fixed="Viscoelastic / creep"/>
+           <xs:element name="t2" type="mse:Properties_addressed_Viscoelastic_creepType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Properties_addressed_Viscoelastic_creepType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Viscoelastic / creep vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods" abstract="true">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Experimental Methods vocabulary
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="tv:TwoTieredVocabulary">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1"/>
+           <xs:element name="t2" type="xs:token"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_MethodsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Level 1 vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="Charge distribution"/>
+       <xs:enumeration value="Dilatometry"/>
+       <xs:enumeration value="Electrochemical"/>
+       <xs:enumeration value="Mechanical"/>
+       <xs:enumeration value="Microscopy"/>
+       <xs:enumeration value="Optical"/>
+       <xs:enumeration value="Profilometry"/>
+       <xs:enumeration value="Scattering / Diffraction"/>
+       <xs:enumeration value="Spectrometry"/>
+       <xs:enumeration value="Spectroscopy"/>
+       <xs:enumeration value="Thermochemical"/>
+       <xs:enumeration value="Tomography"/>
+       <xs:enumeration value="Ultrasonic"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Charge_distribution">
+     <xs:annotation>
+       <xs:documentation>
+         Charge distribution vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Charge distribution"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_Charge_distributionType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_Charge_distributionType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Charge distribution vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="pulsed electroacoustic method"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Dilatometry">
+     <xs:annotation>
+       <xs:documentation>
+         Dilatometry vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Dilatometry"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_DilatometryType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_DilatometryType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Dilatometry vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Electrochemical">
+     <xs:annotation>
+       <xs:documentation>
+         Electrochemical vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Electrochemical"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_ElectrochemicalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_ElectrochemicalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Electrochemical vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Amperometry"/>
+       <xs:enumeration value="Voltammetry"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Mechanical">
+     <xs:annotation>
+       <xs:documentation>
+         Mechanical vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Mechanical"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_MechanicalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_MechanicalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Mechanical vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="nanoindentation"/>
+       <xs:enumeration value="Tensile tests"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Microscopy">
+     <xs:annotation>
+       <xs:documentation>
+         Microscopy vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Microscopy"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_MicroscopyType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_MicroscopyType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Microscopy vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Analytical Electron Microscopy"/>
+       <xs:enumeration value="atomic force microscopy (AFM)"/>
+       <xs:enumeration value="Electron Probe Microanalysis"/>
+       <xs:enumeration value="Environmental SEM"/>
+       <xs:enumeration value="Field Emission Electron Probe"/>
+       <xs:enumeration value="optical"/>
+       <xs:enumeration value="Photoluminescence Microscopy"/>
+       <xs:enumeration value="Scanning Auger Electron Microscopy"/>
+       <xs:enumeration value="Scanning Electron Microscopy"/>
+       <xs:enumeration value="Scanning Kelvin Probe"/>
+       <xs:enumeration value="Scanning Probe Microscopy"/>
+       <xs:enumeration value="Scanning Tunneling Microscopy"/>
+       <xs:enumeration value="Tunneling Electron Microscopy"/>
+       <xs:enumeration value="X-ray Optical Interferometer"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Optical">
+     <xs:annotation>
+       <xs:documentation>
+         Optical vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Optical"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_OpticalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_OpticalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Optical vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Ellipsometry"/>
+       <xs:enumeration value="Fractography"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Profilometry">
+     <xs:annotation>
+       <xs:documentation>
+         Profilometry vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Profilometry"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_ProfilometryType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_ProfilometryType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Profilometry vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Scattering_Diffraction">
+     <xs:annotation>
+       <xs:documentation>
+         Scattering / Diffraction vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Scattering / Diffraction"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_Scattering_DiffractionType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_Scattering_DiffractionType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Scattering / Diffraction vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Electron Backscatter Diffraction (SEM)"/>
+       <xs:enumeration value="Neutron [elastic]"/>
+       <xs:enumeration value="Neutron [inelastic]"/>
+       <xs:enumeration value="Small angle x-ray scattering / USAXS"/>
+       <xs:enumeration value="small-angle neutron"/>
+       <xs:enumeration value="Synchrotron"/>
+       <xs:enumeration value="X-ray Diffraction"/>
+       <xs:enumeration value="X-ray reflectivity"/>
+       <xs:enumeration value="X-ray topography"/>
+       <xs:enumeration value="XRD Grazing Incidence"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Spectrometry">
+     <xs:annotation>
+       <xs:documentation>
+         Spectrometry vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Spectrometry"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_SpectrometryType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_SpectrometryType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Spectrometry vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Alpha Spectrometry"/>
+       <xs:enumeration value="Energy Dispersive x-Ray Spectometry"/>
+       <xs:enumeration value="Gamma spectrometry"/>
+       <xs:enumeration value="ion mobility spectrometry"/>
+       <xs:enumeration value="IR/FTIR Spectrometry"/>
+       <xs:enumeration value="Mass Spectrometry"/>
+       <xs:enumeration value="Secondary Ion Mass Spectrometry"/>
+       <xs:enumeration value="X-ray Flourescence Spectrometry"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Spectroscopy">
+     <xs:annotation>
+       <xs:documentation>
+         Spectroscopy vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Spectroscopy"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_SpectroscopyType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_SpectroscopyType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Spectroscopy vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="dielectric and impedance spectroscopy"/>
+       <xs:enumeration value="dynamic mechanical analysis / spectroscopy"/>
+       <xs:enumeration value="Electron Energy-Loss Spectroscopy"/>
+       <xs:enumeration value="EXAFS"/>
+       <xs:enumeration value="Fourier-Transform Infrared spectroscopy"/>
+       <xs:enumeration value="NEXAFS"/>
+       <xs:enumeration value="NMR"/>
+       <xs:enumeration value="Raman"/>
+       <xs:enumeration value="X-ray Absorption Spectroscopy"/>
+       <xs:enumeration value="X-ray Emission Spectroscopy"/>
+       <xs:enumeration value="X-ray photoelectron spectroscopy"/>
+       <xs:enumeration value="XPS Variable Kinetic"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Thermochemical">
+     <xs:annotation>
+       <xs:documentation>
+         Thermochemical vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Thermochemical"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_ThermochemicalType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_ThermochemicalType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Thermochemical vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="Calorimetry / Microcalorimetry"/>
+       <xs:enumeration value="Differential Scanning Calorimetry (DSC)"/>
+       <xs:enumeration value="Differential thermal analysis"/>
+       <xs:enumeration value="thermogravimetry (Thermal Gravimetric Analysis)"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Tomography">
+     <xs:annotation>
+       <xs:documentation>
+         Tomography vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Tomography"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_TomographyType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_TomographyType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Tomography vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="atom probe tomography"/>
+       <xs:enumeration value="X-ray tomography"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Experimental_Methods_Ultrasonic">
+     <xs:annotation>
+       <xs:documentation>
+         Ultrasonic vocabulary sub-terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Experimental_Methods">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Experimental_MethodsType"
+                       minOccurs="1" maxOccurs="1" fixed="Ultrasonic"/>
+           <xs:element name="t2" type="mse:Experimental_Methods_UltrasonicType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Experimental_Methods_UltrasonicType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Ultrasonic vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method" abstract="true">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Computational method(s) vocabulary
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="tv:TwoTieredVocabulary">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1"/>
+           <xs:element name="t2" type="xs:token"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_methodType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Level 1 vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="Boundary tracking / level set"/>
+       <xs:enumeration value="Crystal plasticity calculation"/>
+       <xs:enumeration value="Density Functional Theory (Electronic Structure)"/>
+       <xs:enumeration value="Dislocation Dynamics"/>
+       <xs:enumeration value="Finite Element Analysis / Modeling"/>
+       <xs:enumeration value="Molecular Dynamics"/>
+       <xs:enumeration value="Monte-Carlo Methods"/>
+       <xs:enumeration value="Multiscale Simulations"/>
+       <xs:enumeration value="Phase-field Calculations"/>
+       <xs:enumeration value="Reverse Monte Carlo (RMC)"/>
+       <xs:enumeration value="Simulated experiment"/>
+       <xs:enumeration value="Statistical Mechanics"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Boundary_tracking_level_set">
+     <xs:annotation>
+       <xs:documentation>
+         Boundary tracking / level set vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Boundary tracking / level set"/>
+           <xs:element name="t2" type="mse:Computational_method_Boundary_tracking_level_setType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Boundary_tracking_level_setType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Boundary tracking / level set vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Crystal_plasticity_calculation">
+     <xs:annotation>
+       <xs:documentation>
+         Crystal plasticity calculation vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Crystal plasticity calculation"/>
+           <xs:element name="t2" type="mse:Computational_method_Crystal_plasticity_calculationType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Crystal_plasticity_calculationType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Crystal plasticity calculation vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Density_Functional_Theory_Electronic_Structure">
+     <xs:annotation>
+       <xs:documentation>
+         Density Functional Theory (Electronic Structure) vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Density Functional Theory (Electronic Structure)"/>
+           <xs:element name="t2" type="mse:Computational_method_Density_Functional_Theory_Electronic_StructureType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Density_Functional_Theory_Electronic_StructureType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Density Functional Theory (Electronic Structure) vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Dislocation_Dynamics">
+     <xs:annotation>
+       <xs:documentation>
+         Dislocation Dynamics vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Dislocation Dynamics"/>
+           <xs:element name="t2" type="mse:Computational_method_Dislocation_DynamicsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Dislocation_DynamicsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Dislocation Dynamics vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Finite_Element_Analysis_Modeling">
+     <xs:annotation>
+       <xs:documentation>
+         Finite Element Analysis / Modeling vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Finite Element Analysis / Modeling"/>
+           <xs:element name="t2" type="mse:Computational_method_Finite_Element_Analysis_ModelingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Finite_Element_Analysis_ModelingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Finite Element Analysis / Modeling vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Molecular_Dynamics">
+     <xs:annotation>
+       <xs:documentation>
+         Molecular Dynamics vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Molecular Dynamics"/>
+           <xs:element name="t2" type="mse:Computational_method_Molecular_DynamicsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Molecular_DynamicsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Molecular Dynamics vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Monte-Carlo_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Monte-Carlo Methods vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Monte-Carlo Methods"/>
+           <xs:element name="t2" type="mse:Computational_method_Monte-Carlo_MethodsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Monte-Carlo_MethodsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Monte-Carlo Methods vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Multiscale_Simulations">
+     <xs:annotation>
+       <xs:documentation>
+         Multiscale Simulations vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Multiscale Simulations"/>
+           <xs:element name="t2" type="mse:Computational_method_Multiscale_SimulationsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Multiscale_SimulationsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Multiscale Simulations vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Phase-field_Calculations">
+     <xs:annotation>
+       <xs:documentation>
+         Phase-field Calculations vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Phase-field Calculations"/>
+           <xs:element name="t2" type="mse:Computational_method_Phase-field_CalculationsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Phase-field_CalculationsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Phase-field Calculations vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Reverse_Monte_Carlo_RMC">
+     <xs:annotation>
+       <xs:documentation>
+         Reverse Monte Carlo (RMC) vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Reverse Monte Carlo (RMC)"/>
+           <xs:element name="t2" type="mse:Computational_method_Reverse_Monte_Carlo_RMCType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Reverse_Monte_Carlo_RMCType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Reverse Monte Carlo (RMC) vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Simulated_experiment">
+     <xs:annotation>
+       <xs:documentation>
+         Simulated experiment vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Simulated experiment"/>
+           <xs:element name="t2" type="mse:Computational_method_Simulated_experimentType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Simulated_experimentType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Simulated experiment vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Computational_method_Statistical_Mechanics">
+     <xs:annotation>
+       <xs:documentation>
+         Statistical Mechanics vocabulary sub-terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Computational_method">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Computational_methodType"
+                       minOccurs="1" maxOccurs="1" fixed="Statistical Mechanics"/>
+           <xs:element name="t2" type="mse:Computational_method_Statistical_MechanicsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Computational_method_Statistical_MechanicsType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Statistical Mechanics vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value=""/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing" abstract="true">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Synthesis and Processing vocabulary
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="tv:TwoTieredVocabulary">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1"/>
+           <xs:element name="t2" type="xs:token"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_ProcessingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Level 1 vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="Annealing"/>
+       <xs:enumeration value="Casting"/>
+       <xs:enumeration value="Curing"/>
+       <xs:enumeration value="Deposition processing"/>
+       <xs:enumeration value="Drying"/>
+       <xs:enumeration value="Forming"/>
+       <xs:enumeration value="Homogenization"/>
+       <xs:enumeration value="Mechanical surface modification"/>
+       <xs:enumeration value="Powder processing"/>
+       <xs:enumeration value="Quenching"/>
+       <xs:enumeration value="Reactive"/>
+       <xs:enumeration value="Reductive roasting"/>
+       <xs:enumeration value="Sectioning"/>
+       <xs:enumeration value="Self-assembly"/>
+       <xs:enumeration value="Solidification"/>
+       <xs:enumeration value="Subtractive processing"/>
+       <xs:enumeration value="Thermal plasma processing"/>
+       <xs:enumeration value="Ultra-sonication"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Annealing">
+     <xs:annotation>
+       <xs:documentation>
+         Annealing vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Annealing"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_AnnealingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_AnnealingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Annealing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="aging"/>
+       <xs:enumeration value="homogenization"/>
+       <xs:enumeration value="normalizing"/>
+       <xs:enumeration value="recrystallization"/>
+       <xs:enumeration value="stress relieving"/>
+       <xs:enumeration value="tempering"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Casting">
+     <xs:annotation>
+       <xs:documentation>
+         Casting vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Casting"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_CastingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_CastingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Casting vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="centrifugal casting"/>
+       <xs:enumeration value="continuous casting"/>
+       <xs:enumeration value="die casting"/>
+       <xs:enumeration value="investing casting"/>
+       <xs:enumeration value="sand casting"/>
+       <xs:enumeration value="slip casting"/>
+       <xs:enumeration value="vacuum arc melting"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Curing">
+     <xs:annotation>
+       <xs:documentation>
+         Curing vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Curing"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_CuringType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_CuringType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Curing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Deposition_processing">
+     <xs:annotation>
+       <xs:documentation>
+         Deposition processing vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Deposition processing"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_Deposition_processingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_Deposition_processingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Deposition processing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="chemical vapor deposition"/>
+       <xs:enumeration value="electrodeposition"/>
+       <xs:enumeration value="electron beam deposition"/>
+       <xs:enumeration value="evaporation"/>
+       <xs:enumeration value="ion beam deposition"/>
+       <xs:enumeration value="physical vapor deposition"/>
+       <xs:enumeration value="plasma spraying"/>
+       <xs:enumeration value="pulsed laser deposition"/>
+       <xs:enumeration value="splatter"/>
+       <xs:enumeration value="sputter coating"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Drying">
+     <xs:annotation>
+       <xs:documentation>
+         Drying vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Drying"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_DryingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_DryingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Drying vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Forming">
+     <xs:annotation>
+       <xs:documentation>
+         Forming vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Forming"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_FormingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_FormingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Forming vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="cold rolling"/>
+       <xs:enumeration value="drawing"/>
+       <xs:enumeration value="extrusion"/>
+       <xs:enumeration value="forging"/>
+       <xs:enumeration value="hot pressing"/>
+       <xs:enumeration value="hot rolling"/>
+       <xs:enumeration value="milling"/>
+       <xs:enumeration value="molding"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Homogenization">
+     <xs:annotation>
+       <xs:documentation>
+         Homogenization vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Homogenization"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_HomogenizationType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_HomogenizationType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Homogenization vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="mechanical mixing"/>
+       <xs:enumeration value="melt mixing"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Mechanical_surface_modification">
+     <xs:annotation>
+       <xs:documentation>
+         Mechanical surface modification vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Mechanical surface modification"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_Mechanical_surface_modificationType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_Mechanical_surface_modificationType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Mechanical surface modification vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="polishing"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Powder_processing">
+     <xs:annotation>
+       <xs:documentation>
+         Powder processing vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Powder processing"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_Powder_processingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_Powder_processingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Powder processing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="atomization"/>
+       <xs:enumeration value="ball milling"/>
+       <xs:enumeration value="centrifugal disintegration"/>
+       <xs:enumeration value="sintering"/>
+       <xs:enumeration value="sponge iron process"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Quenching">
+     <xs:annotation>
+       <xs:documentation>
+         Quenching vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Quenching"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_QuenchingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_QuenchingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Quenching vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="air cooled / quench"/>
+       <xs:enumeration value="brine quench"/>
+       <xs:enumeration value="furnace cooled"/>
+       <xs:enumeration value="gas cooled"/>
+       <xs:enumeration value="ice quench"/>
+       <xs:enumeration value="liquid N2 quench"/>
+       <xs:enumeration value="oil quench"/>
+       <xs:enumeration value="water quench"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Reactive">
+     <xs:annotation>
+       <xs:documentation>
+         Reactive vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Reactive"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_ReactiveType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_ReactiveType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Reactive vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="in-situ polymerization"/>
+       <xs:enumeration value="solution processing"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Reductive_roasting">
+     <xs:annotation>
+       <xs:documentation>
+         Reductive roasting vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Reductive roasting"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_Reductive_roastingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_Reductive_roastingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Reductive roasting vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Sectioning">
+     <xs:annotation>
+       <xs:documentation>
+         Sectioning vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Sectioning"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_SectioningType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_SectioningType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Sectioning vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Self-assembly">
+     <xs:annotation>
+       <xs:documentation>
+         Self-assembly vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Self-assembly"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_Self-assemblyType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_Self-assemblyType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Self-assembly vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Solidification">
+     <xs:annotation>
+       <xs:documentation>
+         Solidification vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Solidification"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_SolidificationType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_SolidificationType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Solidification vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="directional solidification"/>
+       <xs:enumeration value="rapid solidification"/>
+       <xs:enumeration value="seeded solidification"/>
+       <xs:enumeration value="single crystal solidification"/>
+       <xs:enumeration value="zone refining"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Subtractive_processing">
+     <xs:annotation>
+       <xs:documentation>
+         Subtractive processing vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Subtractive processing"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_Subtractive_processingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_Subtractive_processingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Subtractive processing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+       <xs:enumeration value="dissolving / etching"/>
+       <xs:enumeration value="focused ion beam (FIB)"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Thermal_plasma_processing">
+     <xs:annotation>
+       <xs:documentation>
+         Thermal plasma processing vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Thermal plasma processing"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_Thermal_plasma_processingType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_Thermal_plasma_processingType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Thermal plasma processing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:complexType name="Synthesis_and_Processing_Ultra-sonication">
+     <xs:annotation>
+       <xs:documentation>
+         Ultra-sonication vocabulary sub-terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="mse:Synthesis_and_Processing">
+         <xs:sequence>
+           <xs:element name="t" type="mse:Synthesis_and_ProcessingType"
+                       minOccurs="1" maxOccurs="1" fixed="Ultra-sonication"/>
+           <xs:element name="t2" type="mse:Synthesis_and_Processing_Ultra-sonicationType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+
+     </xs:complexContent>
+   </xs:complexType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing_Ultra-sonicationType">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Ultra-sonication vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="."/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+</xs:schema>
