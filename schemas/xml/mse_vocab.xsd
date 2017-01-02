@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
+           xmlns="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:tv="http://schema.nist.gov/xml/tieredvocab/1.0wd" 
+           xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd"
+           xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
+           elementFormDefault="unqualified" 
+           attributeFormDefault="unqualified" version="draft10">
+
+   <xs:simpleType name="Material_type" type="xs:token" abstract="true">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Material type(s) vocabulary
+       </xs:documentation>
+     </xs:annotation>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Biological_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Biological vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Material_type">
+       <xs:enumeration value="Biological"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Biomaterials_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Biomaterials vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="Biomaterials"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Ceramics_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Ceramics vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="Ceramics"/>
+       <xs:enumeration value="Ceramics: Perovskite"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Metals_and_alloys_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Metals and alloys vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="Metals and alloys"/>
+       <xs:enumeration value="Metals and alloys: Al-containing"/>
+       <xs:enumeration value="Metals and alloys: Commercially pure metals"/>
+       <xs:enumeration value="Metals and alloys: Cu-containing"/>
+       <xs:enumeration value="Metals and alloys: Fe-containing (inc. steel)"/>
+       <xs:enumeration value="Metals and alloys: Intermetallics"/>
+       <xs:enumeration value="Metals and alloys: Mg-containing"/>
+       <xs:enumeration value="Metals and alloys: Ni-containing"/>
+       <xs:enumeration value="Metals and alloys: Refractory"/>
+     </xs:restriction>
+   </xs:simpleType>
+
+</xs:schema>
