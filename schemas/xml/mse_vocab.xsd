@@ -28,7 +28,7 @@
        <xs:enumeration value="Biological"/>
      </xs:restriction>
    </xs:simpleType>
- 
+  
    <xs:simpleType name="Biomaterials_Material_type">
      <xs:annotation>
        <xs:documentation>
@@ -40,7 +40,7 @@
        <xs:enumeration value="Biomaterials"/>
      </xs:restriction>
    </xs:simpleType>
- 
+  
    <xs:simpleType name="Ceramics_Material_type">
      <xs:annotation>
        <xs:documentation>
@@ -53,7 +53,7 @@
        <xs:enumeration value="Ceramics: Perovskite"/>
      </xs:restriction>
    </xs:simpleType>
- 
+  
    <xs:simpleType name="Metals_and_alloys_Material_type">
      <xs:annotation>
        <xs:documentation>
@@ -73,5 +73,1163 @@
        <xs:enumeration value="Metals and alloys: Refractory"/>
      </xs:restriction>
    </xs:simpleType>
+  
+   <xs:simpleType name="Metamaterial_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Metamaterial vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
 
+     <xs:restriction base="mse:Material_type">
+       <xs:enumeration value="Metamaterial"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Molecular_fluids_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Molecular fluids vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Material_type">
+       <xs:enumeration value="Molecular fluids"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Organic_Carbon-containing_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Organic (Carbon-containing) vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Material_type">
+       <xs:enumeration value="Organic (Carbon-containing)"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Organometallic_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Organometallic vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Material_type">
+       <xs:enumeration value="Organometallic"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Oxides_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Oxides vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Material_type">
+       <xs:enumeration value="Oxides"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Polymer_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Polymer vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Material_type">
+       <xs:enumeration value="Polymer"/>
+       <xs:enumeration value="Polymer: Copolymer"/>
+       <xs:enumeration value="Polymer: Elastomer"/>
+       <xs:enumeration value="Polymer: Homopolymer"/>
+       <xs:enumeration value="Polymer: Polymer Blend"/>
+       <xs:enumeration value="Polymer: Thermoplastic"/>
+       <xs:enumeration value="Polymer: Thermoset"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Semiconductor_Material_type">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Semiconductor vocabulary terms describing Material type(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Material_type">
+       <xs:enumeration value="Semiconductor"/>
+       <xs:enumeration value="Semiconductor: II-VI"/>
+       <xs:enumeration value="Semiconductor: III-V"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Structural Feature(s) vocabulary
+       </xs:documentation>
+     </xs:annotation>
+     <xs:restriction base="xs:token"/>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Composites_Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Composites vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Structural_Feature">
+       <xs:enumeration value="Composites"/>
+       <xs:enumeration value="Composites: fiber-reinforced"/>
+       <xs:enumeration value="Composites: metal-matrix"/>
+       <xs:enumeration value="Composites: nanocomposites"/>
+       <xs:enumeration value="Composites: particle-reinforced"/>
+       <xs:enumeration value="Composites: polymer-matrix"/>
+       <xs:enumeration value="Composites: structural"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Defects_Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Defects vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Structural_Feature">
+       <xs:enumeration value="Defects"/>
+       <xs:enumeration value="Defects: Dislocations"/>
+       <xs:enumeration value="Defects: Point defects"/>
+       <xs:enumeration value="Defects: Voids"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Engineered_structures_Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Engineered structures vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Structural_Feature">
+       <xs:enumeration value="Engineered structures"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Interfacial_Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Interfacial vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Structural_Feature">
+       <xs:enumeration value="Interfacial"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Interphase_Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Interphase vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Structural_Feature">
+       <xs:enumeration value="Interphase"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Microstructure_Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Microstructure vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Structural_Feature">
+       <xs:enumeration value="Microstructure"/>
+       <xs:enumeration value="Microstructure: compound"/>
+       <xs:enumeration value="Microstructure: dendritic"/>
+       <xs:enumeration value="Microstructure: eutectic"/>
+       <xs:enumeration value="Microstructure: grains"/>
+       <xs:enumeration value="Microstructure: nanocrystalline"/>
+       <xs:enumeration value="Microstructure: polycrystalline"/>
+       <xs:enumeration value="Microstructure: polydispersity"/>
+       <xs:enumeration value="Microstructure: precipitates"/>
+       <xs:enumeration value="Microstructure: quasicrystalline"/>
+       <xs:enumeration value="Microstructure: single crystal"/>
+       <xs:enumeration value="Microstructure: twinned"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Morphology_Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Morphology vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Structural_Feature">
+       <xs:enumeration value="Morphology"/>
+       <xs:enumeration value="Morphology: 1D"/>
+       <xs:enumeration value="Morphology: 2D"/>
+       <xs:enumeration value="Morphology: amorphous"/>
+       <xs:enumeration value="Morphology: clusters"/>
+       <xs:enumeration value="Morphology: complex fluids"/>
+       <xs:enumeration value="Morphology: glass"/>
+       <xs:enumeration value="Morphology: layered"/>
+       <xs:enumeration value="Morphology: nanoparticle / nanotube"/>
+       <xs:enumeration value="Morphology: open-framework"/>
+       <xs:enumeration value="Morphology: particles / colloids"/>
+       <xs:enumeration value="Morphology: tacticity"/>
+       <xs:enumeration value="Morphology: thin film"/>
+       <xs:enumeration value="Morphology: wires"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Phase_Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Phase vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Structural_Feature">
+       <xs:enumeration value="Phase"/>
+       <xs:enumeration value="Phase: crystalline"/>
+       <xs:enumeration value="Phase: gas"/>
+       <xs:enumeration value="Phase: melt"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Surfaces_Structural_Feature">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Surfaces vocabulary terms describing Structural Feature(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Structural_Feature">
+       <xs:enumeration value="Surfaces"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Properties addressed vocabulary
+       </xs:documentation>
+     </xs:annotation>
+     <xs:restriction base="xs:token"/>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Chemical_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Chemical vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Chemical"/>
+       <xs:enumeration value="Chemical: Composition"/>
+       <xs:enumeration value="Chemical: Molecular weights"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Corrosion_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Corrosion vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Corrosion"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Crystallographic_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Crystallographic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Crystallographic"/>
+       <xs:enumeration value="Crystallographic: Orientation maps"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Electrical_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Electrical vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Electrical"/>
+       <xs:enumeration value="Electrical: Conductivity"/>
+       <xs:enumeration value="Electrical: Dielectric constant"/>
+       <xs:enumeration value="Electrical: Dielectric dispersion"/>
+       <xs:enumeration value="Electrical: electrostrictive"/>
+       <xs:enumeration value="Electrical: piezoelectric"/>
+       <xs:enumeration value="Electrical: Power conversion efficiency"/>
+       <xs:enumeration value="Electrical: pyroelectric"/>
+       <xs:enumeration value="Electrical: Resistivity"/>
+       <xs:enumeration value="Electrical: Superconductivity"/>
+       <xs:enumeration value="Electrical: thermoelectric"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Kinetic_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Kinetic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Kinetic"/>
+       <xs:enumeration value="Kinetic: Grain growth"/>
+       <xs:enumeration value="Kinetic: Phase evolution"/>
+       <xs:enumeration value="Kinetic: Phase transitions and ordering"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Magnetic_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Magnetic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Magnetic"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Mechanical_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Mechanical vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Mechanical"/>
+       <xs:enumeration value="Mechanical: acoustic emission"/>
+       <xs:enumeration value="Mechanical: compression response"/>
+       <xs:enumeration value="Mechanical: deformation mechanisms"/>
+       <xs:enumeration value="Mechanical: elasticity"/>
+       <xs:enumeration value="Mechanical: flexural response"/>
+       <xs:enumeration value="Mechanical: fracture behavior"/>
+       <xs:enumeration value="Mechanical: impact response"/>
+       <xs:enumeration value="Mechanical: phonon modes"/>
+       <xs:enumeration value="Mechanical: plasticity"/>
+       <xs:enumeration value="Mechanical: shear response"/>
+       <xs:enumeration value="Mechanical: strength"/>
+       <xs:enumeration value="Mechanical: tensile response (inc stress-strain)"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Microstructural_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Microstructural vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Microstructural"/>
+       <xs:enumeration value="Microstructural: clustering"/>
+       <xs:enumeration value="Microstructural: crystallinity"/>
+       <xs:enumeration value="Microstructural: defect structures"/>
+       <xs:enumeration value="Microstructural: density"/>
+       <xs:enumeration value="Microstructural: dispersion"/>
+       <xs:enumeration value="Microstructural: particle shape"/>
+       <xs:enumeration value="Microstructural: porosity"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Optical_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Optical vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Optical"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Rheological_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Rheological vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Rheological"/>
+       <xs:enumeration value="Rheological: viscosity"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Structural_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Structural vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Structural"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Thermodynamic_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Thermodynamic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Thermodynamic"/>
+       <xs:enumeration value="Thermodynamic: calorimetry profile"/>
+       <xs:enumeration value="Thermodynamic: crystallization temperature"/>
+       <xs:enumeration value="Thermodynamic: Glass transition temperature"/>
+       <xs:enumeration value="Thermodynamic: grain boundary energies"/>
+       <xs:enumeration value="Thermodynamic: heat capacity"/>
+       <xs:enumeration value="Thermodynamic: heat of fusion"/>
+       <xs:enumeration value="Thermodynamic: heat of solidification"/>
+       <xs:enumeration value="Thermodynamic: interfacial energies"/>
+       <xs:enumeration value="Thermodynamic: liquid crystal phase transition temperature"/>
+       <xs:enumeration value="Thermodynamic: Melting temperature"/>
+       <xs:enumeration value="Thermodynamic: Phase diagram"/>
+       <xs:enumeration value="Thermodynamic: specific heat"/>
+       <xs:enumeration value="Thermodynamic: surface energies"/>
+       <xs:enumeration value="Thermodynamic: thermal conductivity"/>
+       <xs:enumeration value="Thermodynamic: thermal decomposition temperature"/>
+       <xs:enumeration value="Thermodynamic: thermal expansion"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Toxicity_Safety_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Toxicity / Safety vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Toxicity / Safety"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Transport_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Transport vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Transport"/>
+       <xs:enumeration value="Transport: diffusivity"/>
+       <xs:enumeration value="Transport: tracer diffusivity"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Vibrational_or_Electronic_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Vibrational or Electronic vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Vibrational or Electronic"/>
+       <xs:enumeration value="Vibrational or Electronic: band gap"/>
+       <xs:enumeration value="Vibrational or Electronic: spin polarization"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Viscoelastic_creep_Properties_addressed">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Viscoelastic / creep vocabulary terms describing Properties addressed
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Properties_addressed">
+       <xs:enumeration value="Viscoelastic / creep"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Experimental Methods vocabulary
+       </xs:documentation>
+     </xs:annotation>
+     <xs:restriction base="xs:token"/>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Charge_distribution_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Charge distribution vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Charge distribution"/>
+       <xs:enumeration value="Charge distribution: pulsed electroacoustic method"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Dilatometry_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Dilatometry vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Dilatometry"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Electrochemical_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Electrochemical vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Electrochemical"/>
+       <xs:enumeration value="Electrochemical: Amperometry"/>
+       <xs:enumeration value="Electrochemical: Voltammetry"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Mechanical_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Mechanical vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Mechanical"/>
+       <xs:enumeration value="Mechanical: nanoindentation"/>
+       <xs:enumeration value="Mechanical: Tensile tests"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Microscopy_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Microscopy vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Microscopy"/>
+       <xs:enumeration value="Microscopy: Analytical Electron Microscopy"/>
+       <xs:enumeration value="Microscopy: atomic force microscopy (AFM)"/>
+       <xs:enumeration value="Microscopy: Electron Probe Microanalysis"/>
+       <xs:enumeration value="Microscopy: Environmental SEM"/>
+       <xs:enumeration value="Microscopy: Field Emission Electron Probe"/>
+       <xs:enumeration value="Microscopy: optical"/>
+       <xs:enumeration value="Microscopy: Photoluminescence Microscopy"/>
+       <xs:enumeration value="Microscopy: Scanning Auger Electron Microscopy"/>
+       <xs:enumeration value="Microscopy: Scanning Electron Microscopy"/>
+       <xs:enumeration value="Microscopy: Scanning Kelvin Probe"/>
+       <xs:enumeration value="Microscopy: Scanning Probe Microscopy"/>
+       <xs:enumeration value="Microscopy: Scanning Tunneling Microscopy"/>
+       <xs:enumeration value="Microscopy: Tunneling Electron Microscopy"/>
+       <xs:enumeration value="Microscopy: X-ray Optical Interferometer"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Optical_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Optical vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Optical"/>
+       <xs:enumeration value="Optical: Ellipsometry"/>
+       <xs:enumeration value="Optical: Fractography"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Profilometry_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Profilometry vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Profilometry"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Scattering_Diffraction_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Scattering / Diffraction vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Scattering / Diffraction"/>
+       <xs:enumeration value="Scattering / Diffraction: Electron Backscatter Diffraction (SEM)"/>
+       <xs:enumeration value="Scattering / Diffraction: Neutron [elastic]"/>
+       <xs:enumeration value="Scattering / Diffraction: Neutron [inelastic]"/>
+       <xs:enumeration value="Scattering / Diffraction: Small angle x-ray scattering / USAXS"/>
+       <xs:enumeration value="Scattering / Diffraction: small-angle neutron"/>
+       <xs:enumeration value="Scattering / Diffraction: Synchrotron"/>
+       <xs:enumeration value="Scattering / Diffraction: X-ray Diffraction"/>
+       <xs:enumeration value="Scattering / Diffraction: X-ray reflectivity"/>
+       <xs:enumeration value="Scattering / Diffraction: X-ray topography"/>
+       <xs:enumeration value="Scattering / Diffraction: XRD Grazing Incidence"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Spectrometry_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Spectrometry vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Spectrometry"/>
+       <xs:enumeration value="Spectrometry: Alpha Spectrometry"/>
+       <xs:enumeration value="Spectrometry: Energy Dispersive x-Ray Spectometry"/>
+       <xs:enumeration value="Spectrometry: Gamma spectrometry"/>
+       <xs:enumeration value="Spectrometry: ion mobility spectrometry"/>
+       <xs:enumeration value="Spectrometry: IR/FTIR Spectrometry"/>
+       <xs:enumeration value="Spectrometry: Mass Spectrometry"/>
+       <xs:enumeration value="Spectrometry: Secondary Ion Mass Spectrometry"/>
+       <xs:enumeration value="Spectrometry: X-ray Flourescence Spectrometry"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Spectroscopy_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Spectroscopy vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Spectroscopy"/>
+       <xs:enumeration value="Spectroscopy: dielectric and impedance spectroscopy"/>
+       <xs:enumeration value="Spectroscopy: dynamic mechanical analysis / spectroscopy"/>
+       <xs:enumeration value="Spectroscopy: Electron Energy-Loss Spectroscopy"/>
+       <xs:enumeration value="Spectroscopy: EXAFS"/>
+       <xs:enumeration value="Spectroscopy: Fourier-Transform Infrared spectroscopy"/>
+       <xs:enumeration value="Spectroscopy: NEXAFS"/>
+       <xs:enumeration value="Spectroscopy: NMR"/>
+       <xs:enumeration value="Spectroscopy: Raman"/>
+       <xs:enumeration value="Spectroscopy: X-ray Absorption Spectroscopy"/>
+       <xs:enumeration value="Spectroscopy: X-ray Emission Spectroscopy"/>
+       <xs:enumeration value="Spectroscopy: X-ray photoelectron spectroscopy"/>
+       <xs:enumeration value="Spectroscopy: XPS Variable Kinetic"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Thermochemical_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Thermochemical vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Thermochemical"/>
+       <xs:enumeration value="Thermochemical: Calorimetry / Microcalorimetry"/>
+       <xs:enumeration value="Thermochemical: Differential Scanning Calorimetry (DSC)"/>
+       <xs:enumeration value="Thermochemical: Differential thermal analysis"/>
+       <xs:enumeration value="Thermochemical: thermogravimetry (Thermal Gravimetric Analysis)"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Tomography_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Tomography vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Tomography"/>
+       <xs:enumeration value="Tomography: atom probe tomography"/>
+       <xs:enumeration value="Tomography: X-ray tomography"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Ultrasonic_Experimental_Methods">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Ultrasonic vocabulary terms describing Experimental Methods
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Experimental_Methods">
+       <xs:enumeration value="Ultrasonic"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Computational method(s) vocabulary
+       </xs:documentation>
+     </xs:annotation>
+     <xs:restriction base="xs:token"/>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Boundary_tracking_level_set_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Boundary tracking / level set vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Boundary tracking / level set"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Crystal_plasticity_calculation_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Crystal plasticity calculation vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Crystal plasticity calculation"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Density_Functional_Theory_Electronic_Structure_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Density Functional Theory (Electronic Structure) vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Density Functional Theory (Electronic Structure)"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Dislocation_Dynamics_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Dislocation Dynamics vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Dislocation Dynamics"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Finite_Element_Analysis_Modeling_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Finite Element Analysis / Modeling vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Finite Element Analysis / Modeling"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Molecular_Dynamics_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Molecular Dynamics vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Molecular Dynamics"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Monte-Carlo_Methods_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Monte-Carlo Methods vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Monte-Carlo Methods"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Multiscale_Simulations_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Multiscale Simulations vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Multiscale Simulations"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Phase-field_Calculations_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Phase-field Calculations vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Phase-field Calculations"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Reverse_Monte_Carlo_RMC_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Reverse Monte Carlo (RMC) vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Reverse Monte Carlo (RMC)"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Simulated_experiment_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Simulated experiment vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Simulated experiment"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Statistical_Mechanics_Computational_method">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Statistical Mechanics vocabulary terms describing Computational method(s)
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Computational_method">
+       <xs:enumeration value="Statistical Mechanics"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Synthesis and Processing vocabulary
+       </xs:documentation>
+     </xs:annotation>
+     <xs:restriction base="xs:token"/>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="Annealing_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Annealing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Annealing"/>
+       <xs:enumeration value="Annealing: aging"/>
+       <xs:enumeration value="Annealing: homogenization"/>
+       <xs:enumeration value="Annealing: normalizing"/>
+       <xs:enumeration value="Annealing: recrystallization"/>
+       <xs:enumeration value="Annealing: stress relieving"/>
+       <xs:enumeration value="Annealing: tempering"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Casting_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Casting vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Casting"/>
+       <xs:enumeration value="Casting: centrifugal casting"/>
+       <xs:enumeration value="Casting: continuous casting"/>
+       <xs:enumeration value="Casting: die casting"/>
+       <xs:enumeration value="Casting: investing casting"/>
+       <xs:enumeration value="Casting: sand casting"/>
+       <xs:enumeration value="Casting: slip casting"/>
+       <xs:enumeration value="Casting: vacuum arc melting"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Curing_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Curing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Curing"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Deposition_processing_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Deposition processing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Deposition processing"/>
+       <xs:enumeration value="Deposition processing: chemical vapor deposition"/>
+       <xs:enumeration value="Deposition processing: electrodeposition"/>
+       <xs:enumeration value="Deposition processing: electron beam deposition"/>
+       <xs:enumeration value="Deposition processing: evaporation"/>
+       <xs:enumeration value="Deposition processing: ion beam deposition"/>
+       <xs:enumeration value="Deposition processing: physical vapor deposition"/>
+       <xs:enumeration value="Deposition processing: plasma spraying"/>
+       <xs:enumeration value="Deposition processing: pulsed laser deposition"/>
+       <xs:enumeration value="Deposition processing: splatter"/>
+       <xs:enumeration value="Deposition processing: sputter coating"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Drying_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Drying vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Drying"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Forming_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Forming vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Forming"/>
+       <xs:enumeration value="Forming: cold rolling"/>
+       <xs:enumeration value="Forming: drawing"/>
+       <xs:enumeration value="Forming: extrusion"/>
+       <xs:enumeration value="Forming: forging"/>
+       <xs:enumeration value="Forming: hot pressing"/>
+       <xs:enumeration value="Forming: hot rolling"/>
+       <xs:enumeration value="Forming: milling"/>
+       <xs:enumeration value="Forming: molding"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Homogenization_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Homogenization vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Homogenization"/>
+       <xs:enumeration value="Homogenization: mechanical mixing"/>
+       <xs:enumeration value="Homogenization: melt mixing"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Mechanical_surface_modification_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Mechanical surface modification vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Mechanical surface modification"/>
+       <xs:enumeration value="Mechanical surface modification: polishing"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Powder_processing_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Powder processing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Powder processing"/>
+       <xs:enumeration value="Powder processing: atomization"/>
+       <xs:enumeration value="Powder processing: ball milling"/>
+       <xs:enumeration value="Powder processing: centrifugal disintegration"/>
+       <xs:enumeration value="Powder processing: sintering"/>
+       <xs:enumeration value="Powder processing: sponge iron process"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Quenching_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Quenching vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Quenching"/>
+       <xs:enumeration value="Quenching: air cooled / quench"/>
+       <xs:enumeration value="Quenching: brine quench"/>
+       <xs:enumeration value="Quenching: furnace cooled"/>
+       <xs:enumeration value="Quenching: gas cooled"/>
+       <xs:enumeration value="Quenching: ice quench"/>
+       <xs:enumeration value="Quenching: liquid N2 quench"/>
+       <xs:enumeration value="Quenching: oil quench"/>
+       <xs:enumeration value="Quenching: water quench"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Reactive_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Reactive vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Reactive"/>
+       <xs:enumeration value="Reactive: in-situ polymerization"/>
+       <xs:enumeration value="Reactive: solution processing"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Reductive_roasting_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Reductive roasting vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Reductive roasting"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Sectioning_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Sectioning vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Sectioning"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Self-assembly_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Self-assembly vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Self-assembly"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Solidification_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Solidification vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Solidification"/>
+       <xs:enumeration value="Solidification: directional solidification"/>
+       <xs:enumeration value="Solidification: rapid solidification"/>
+       <xs:enumeration value="Solidification: seeded solidification"/>
+       <xs:enumeration value="Solidification: single crystal solidification"/>
+       <xs:enumeration value="Solidification: zone refining"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Subtractive_processing_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Subtractive processing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Subtractive processing"/>
+       <xs:enumeration value="Subtractive processing: dissolving / etching"/>
+       <xs:enumeration value="Subtractive processing: focused ion beam (FIB)"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Thermal_plasma_processing_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Thermal plasma processing vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Thermal plasma processing"/>
+     </xs:restriction>
+   </xs:simpleType>
+  
+   <xs:simpleType name="Ultra-sonication_Synthesis_and_Processing">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for Ultra-sonication vocabulary terms describing Synthesis and Processing
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="mse:Synthesis_and_Processing">
+       <xs:enumeration value="Ultra-sonication"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
 </xs:schema>
