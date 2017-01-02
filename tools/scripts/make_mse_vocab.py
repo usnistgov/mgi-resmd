@@ -50,12 +50,13 @@ L2ENUM = \
 
 L0TYPE = \
 """
-   <xs:simpleType name="{name}" type="xs:token" abstract="true">
+   <xs:simpleType name="{name}" abstract="true">
      <xs:annotation>
        <xs:documentation>
          a property that captures {prop} vocabulary
        </xs:documentation>
      </xs:annotation>
+     <xs:restriction base="xs:token"/>
    </xs:simpleType>
 """
 
