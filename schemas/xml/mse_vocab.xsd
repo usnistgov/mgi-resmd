@@ -8,7 +8,7 @@
            elementFormDefault="unqualified" 
            attributeFormDefault="unqualified" version="draft10">
 
-   <xs:simpleType name="Material_type" abstract="true">
+   <xs:simpleType name="Material_type">
      <xs:annotation>
        <xs:documentation>
          a property that captures Material type(s) vocabulary

@@ -50,7 +50,7 @@ L2ENUM = \
 
 L0TYPE = \
 """
-   <xs:simpleType name="{name}" abstract="true">
+   <xs:simpleType name="{name}">
      <xs:annotation>
        <xs:documentation>
          a property that captures {prop} vocabulary
