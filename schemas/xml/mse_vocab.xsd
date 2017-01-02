@@ -35,7 +35,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="xs:token">
+     <xs:restriction base="xs:Material_type">
        <xs:enumeration value="Biomaterials"/>
      </xs:restriction>
    </xs:simpleType>
@@ -47,7 +47,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="xs:token">
+     <xs:restriction base="xs:Material_type">
        <xs:enumeration value="Ceramics"/>
        <xs:enumeration value="Ceramics: Perovskite"/>
      </xs:restriction>
@@ -60,7 +60,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="xs:token">
+     <xs:restriction base="xs:Material_type">
        <xs:enumeration value="Metals and alloys"/>
        <xs:enumeration value="Metals and alloys: Al-containing"/>
        <xs:enumeration value="Metals and alloys: Commercially pure metals"/>
