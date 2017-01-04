@@ -207,7 +207,7 @@ def define_opts(progname=None):
                         dest='camel',
                         help="use camel case for generated type names")
     parser.add_argument('-n', '--namespace', type=str, dest='ns', metavar='NS',
-                        default='https://www.nist.gov/od/sch/mse-vocab/1.0wd',
+                        default='https://www.nist.gov/od/sch/vocabdemo/3',
                         help='set the schema namespace to NS')
     parser.add_argument('-t', '--run-test', type=str, dest='test',metavar='TEST',
                         default=None, help='run the test named TEST')

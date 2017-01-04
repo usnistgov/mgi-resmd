@@ -4,4 +4,5 @@ http://schema.nist.gov/xml/resmd-access/1.0wd ../../schemas/xml/resmd-access.xsd
 http://schema.nist.gov/xml/resmd-otherroles/1.0wd ../../schemas/xml/resmd-otherroles.xsd
 https://www.nist.gov/od/sch/mse-vocab/1.0wd ../../schemas/xml/mse_vocab.xsd
 http://schema.nist.gov/xml/mat-sci_res-md/1.0wd ../../schemas/xml/mat-sci_res-md.xsd
+https://www.nist.gov/od/sch/vocabdemo/3 ../../schemas/xml/vocabdemo3.xsd
 

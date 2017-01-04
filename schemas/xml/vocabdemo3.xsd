@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
+<xs:schema targetNamespace="https://www.nist.gov/od/sch/vocabdemo/3" 
            xmlns="http://www.w3.org/2001/XMLSchema" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-           xmlns:rsm="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
-           xmlns:tv="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
-           xmlns:ms="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
-           xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd"
+           xmlns:rsm="https://www.nist.gov/od/sch/vocabdemo/3" 
+           xmlns:tv="https://www.nist.gov/od/sch/vocabdemo/3" 
+           xmlns:ms="https://www.nist.gov/od/sch/vocabdemo/3" 
+           xmlns:mse="https://www.nist.gov/od/sch/vocabdemo/3"
            xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
            elementFormDefault="unqualified" 
            attributeFormDefault="unqualified" version="draft10">

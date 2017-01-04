@@ -1,20 +1,24 @@
-<rsm:Applicability  xsi:type="MaterialsScience" xmlns=""
+<vd:Applicability  xsi:type="MaterialsScience" xmlns=""
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xmlns:rsm="https://www.nist.gov/od/sch/mse-vocab/1.0wd">
-  <materialType xsi:type="rsm:Metals_and_alloys_Material_type"
-                xmlns:rsm="https://www.nist.gov/od/sch/mse-vocab/1.0wd">
+                xmlns:vd="https://www.nist.gov/od/sch/vocabdemo/3">
+
+  <materialType xsi:type="vd:Metals_and_alloys_Material_type">
     <t>Metals and alloys: Fe-containing (inc. steel)</t>
   </materialType>
-  <materialType xsi:type="rsm:Semiconductor_Material_type">
+  <materialType xsi:type="vd:Semiconductor_Material_type">
     <t>Semiconductor: III-V</t>
   </materialType>
-  <structuralFeature xsi:type="rsm:Composites_Structural_Feature">
+
+  <structuralFeature xsi:type="vd:Composites_Structural_Feature">
     <t>Composites: metal-matrix</t>
   </structuralFeature>
-  <propertyAddressed xsi:type="rsm:Electrical_Properties_addressed">
+
+  <propertyAddressed xsi:type="vd:Electrical_Properties_addressed">
     <t>Electrical: Resistivity</t>
   </propertyAddressed>
-  <experimentalMethod xsi:type="rsm:Scattering_Diffraction_Experimental_Methods">
+
+  <experimentalMethod xsi:type="vd:Scattering_Diffraction_Experimental_Methods">
     <t>Scattering / Diffraction: X-ray Diffraction</t>
   </experimentalMethod>
-</rsm:Applicability>
+
+</vd:Applicability>
