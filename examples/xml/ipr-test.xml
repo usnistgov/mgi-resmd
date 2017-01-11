@@ -5,6 +5,7 @@
           xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
           xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
           xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
+          xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
           xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
                               https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/res-md.xsd
                               http://schema.nist.gov/xml/resmd-datacite/1.0wd
@@ -85,9 +86,9 @@
 <!--     <type> Collection: Repository </type> -->
    </role>
    <applicability xsi:type="ms:MaterialsScience">
-     <materialType> non-specific </materialType>
-     <propertyClass> simulated </propertyClass>
-     <propertyClass> structural </propertyClass>
+     <propertyAddressed xsi:type="mse:Microstructural_Properties_addressed">
+       Microstructural
+     </propertyAddressed>
    </applicability>
    <related>
      <relationship xsi:type="dcr:DciteRelation" label="IsDocumentedBy"> is documented by </relationship>
