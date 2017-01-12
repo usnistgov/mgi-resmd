@@ -193,6 +193,26 @@
      </xs:complexContent>
    </xs:complexType>
 
+   <xs:complexType name="ViaDownloadRestrict" abstract="true">
+     <xs:annotation>
+       <xs:documentation>
+         abstract type for restricting type to download
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:restriction base="rac:AccessVia">
+         <xs:sequence>
+           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
+           <xs:element name="description" type="xs:token" minOccurs="0"/>
+           <xs:element name="accessURL" type="rac:AccessURL" minOccurs="1"/>
+           <xs:element name="details" type="rac:DownloadDetailsType"
+                       minOccurs="0" maxOccurs="1"/>
+         </xs:sequence>
+       </xs:restriction>
+     </xs:complexContent>
+   </xs:complexType>
+
    <xs:complexType name="ViaDownload">
      <xs:annotation>
        <xs:documentation>
@@ -207,15 +227,32 @@
      </xs:annotation>
 
      <xs:complexContent>
-       <xs:restriction base="rac:AccessVia">
+       <xs:extension base="rac:ViaDownloadRestrict">
          <xs:sequence>
-           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
-           <xs:element name="description" type="xs:token" minOccurs="0"/>
-           <xs:element name="accessURL" type="rac:AccessURL" minOccurs="1"/>
-           <xs:element name="details" type="rac:DownloadDetailsType"
-                       minOccurs="0" maxOccurs="1"/>
+           <xs:element name="format" type="xs:token"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:documentation>
+                 The MIME type describing the format of the downloadable
+                 file or files.
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+           <xs:element name="filesize" type="xs:token" minOccurs="0">
+             <xs:annotation>
+               <xs:documentation>
+                 The maximum size of the downloadable file in measured
+                 in kilobytes.
+               </xs:documentation>
+               <xs:documentation>
+                 The actual size can be provided if this section
+                 describes only one file.  In either case, this value
+                 should be considered approximate.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
          </xs:sequence>
-       </xs:restriction>
+       </xs:extension>
      </xs:complexContent>
    </xs:complexType>
 
@@ -629,7 +666,7 @@
            <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
            <xs:element name="description" type="xs:token" minOccurs="0"/>
            <xs:element name="accessURL" type="rac:AccessURL" minOccurs="0"/>
-           <xs:element name="details" type="rac:Software"
+           <xs:element name="details" type="rac:ServiceAPI"
                        minOccurs="0" maxOccurs="1"/>
          </xs:sequence>
        </xs:restriction>
