@@ -22,7 +22,8 @@
       resource.
 
       Note the localid attribute above is the identifier assigned by the
-      creating registry.
+      creating registry.  Below, multiple <identifier> elements may appear
+      for different identifier systems as they apply to this resourse.
 
       Title is required, all other fields are optional
     -->
@@ -31,6 +32,7 @@
      <altTitle type="Subtitle"> Special Repository #3 </altTitle>
      <altTitle type="Abbreviation"> IPR </altTitle>
      <version>2.0</version>
+     <identifier> doi:10.18434/T4585F </identifier>
      <logo> https://www.ctcms.nist.gov/potentials/ipr.png </logo>
    </identity>
 
