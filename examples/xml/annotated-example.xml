@@ -36,12 +36,14 @@
 
    <!--
        This section indicates who is responsible for making this resource
-       available
+       available.  The publisher and various name elements can be
+       annotated with an identifier (via pid attribute).
      -->
    <providers>
      <publisher> 
        NIST/MSED Center for Theoretical and Computational Materials Science (CTCMS) 
      </publisher>
+     <publicationYear> 2011 </publicationYear>
 
      <creator>
        <name>Chandler Becker</name>
@@ -49,9 +51,11 @@
      </creator>
 
      <contributor role="DataCurator" xsi:type="dcr:DciteContributor">
-       <name>Zachary Trautt</name>
+       <name pid="orcid:0000-0001-5929-0354"> Zachary Trautt </name>
      </contributor>
 
+     <!-- Datacite date types:  Created, Accepted, Copyrighted,
+          Available, Collected, Issued, Submitted, Updated, Valid -->
      <date role="Created" xsi:type="dcr:DciteDate"> 2008-04-01 </date>
 
      <contact>
@@ -60,7 +64,13 @@
        <timeZone> -0500 </timeZone>
      </contact>
    </providers>
+
+   <!--
+       This section summarizes in general what this resource is about
+       and/or contains.
+     -->
    <content>
+
      <description>
        This repository provides a source for interatomic potentials
        (force fields), related files, and evaluation tools to help
@@ -75,32 +85,135 @@
        related files are currently available for various metals,
        semiconductors, oxides, and carbon-containing systems. 	  
      </description>
+
      <subject> interatomic potentials </subject>
      <subject> molecular dynamics </subject>
      <subject> metals </subject>
      <subject> force fields </subject>
      <subject> atomistic simulations </subject>
+
      <landingPage>
        http://www.ctcms.nist.gov/potentials/
      </landingPage>
+
      <reference pid="doi:10.1016/j.cossms.2013.10.001">
        Becker, C.A. et al., "Considerations for choosing and using force 
        fields and interatomic potentials in materials science and 
        engineering," Current Opinion in Solid State and Materials Science, 
        17, 277-283 (2013).
      </reference>
+
      <primaryAudience> research </primaryAudience>
    </content>
+
+   <!--
+       a resource can be of several types.  It's role as that type is
+       expressed as a <role> element, and some role types can have
+       additional metadata associated with them.  Software is an
+       example that would have extended metadata.
+     -->
    <role xsi:type="roth:Repository">
       <type> Collection: Repository </type>
    </role>
+
+   <role xsi:type="roth:Portal">
+      <type> Interactive Resource: Portal </type>
+   </role>
+
+   <!--
+       The applicability element provides 
+     -->
    <applicability xsi:type="ms:MaterialsScience">
-     <materialType> non-specific </materialType>
-     <propertyClass> simulated </propertyClass>
-     <propertyClass> structural </propertyClass>
+
+       <materialType xsi:type="mse:Ceramics_Material_type">
+         Ceramics: Perovskite
+       </materialType>
+
+       <structuralFeature xsi:type="mse:Composites_Structural_Feature">
+         Composites: nanocomposites
+       </structuralFeature>
+       <structuralFeature xsi:type="mse:Defects_Structural_Feature">
+         Defects: Point defects
+       </structuralFeature>
+       
+       <propertyAddressed xsi:type="mse:Microstructural_Properties_addressed">
+         Microstructural
+       </propertyAddressed>
+
+       <experimentalMethod xsi:type="mse:Charge_distribution_Experimental_Methods">
+         Charge distribution
+       </experimentalMethod>
+
+       <computationalMethod xsi:type="mse:Dislocation_Dynamics_Computational_Methods">
+         Dislocation Dynamics
+       </computationalMethod>
+
+       <synthesisProcessing xsi:type="mse:Annealing_Synthesis_and_Processing">
+         Annealing: normalizing
+       </synthesisProcessing>
+
    </applicability>
+
+   <!--
+       This section describes ways that the resource can be accessed. 
+     -->
    <access>
-     <policy><restriction> public </restriction></policy>
+
+     <policy>
+       <!-- keywords describing restrictions on access:
+            public, open-login, proprietary, fee-required -->
+       <restriction> public </restriction>
+       <restriction> proprietary </restriction>
+
+       <rights> Access to some data items require logins and authorization </rights>
+       <termsURL> https://www.nist.gov/director/licensing </termsURL>
+     </policy>
+
+     <!--
+         multiple <via> elements can describe different ways for accessing
+         a resource
+       -->
+     <via xsi:type="ViaPortal">
+       <title> The IPR Portal </title>
+       <description> ... </description>
+
+       <!-- if different from landing page -->
+       <accessURL> https://www.ctcms.nist.gov/potentials/search </accessURL>
+
+       <details><type> InteractiveResource: Portal </type></details>
+     </via>       
+
+     <!-- downloadable file or directory of files -->
+     <via xsi:type="ViaDownload">
+       <title> The IPR database </title>
+       <description> ... </description>
+       <accessURL> https://www.ctcms.nist.gov/potentials/data.json </accessURL>
+       <details><type> Download </type></details>
+       <format> text/json </format>
+       <filesize> 1100 </filesize>
+     </via>       
+
+     <!-- service API (that may conform to some standard) -->
+     <via xsi:type="ViaDownload">
+       <title> The IPR search service </title>
+       <description> ... </description>
+       <details><type> Service: API </type></details>
+       <baseURL> https://www.ctcms.nist.gov/potentials/api </baseURL>
+       <specificationURL> https://... </specificationURL>
+       <complianceID> https://... </complianceID>
+     </via>
+
+     <!-- via media one can order -->
+     <via xsi:type="ViaMedia">
+       <title> The IPR Database </title>
+       <description> ... </description>
+
+       <!-- if different from landing page -->
+       <accessURL> https://www.ctcms.nist.gov/potentials/order </accessURL>
+
+       <details><type> Physical Object: Storage Media </type></details>
+       <mediaType> CDROM </mediaType>
+     </via>       
    </access>
 
 </rsm:Resource>
