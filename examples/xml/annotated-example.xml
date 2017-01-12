@@ -5,6 +5,7 @@
           xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
           xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
           xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
+          xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
           xmlns:roth="http://schema.nist.gov/xml/resmd-otherroles/1.0wd" 
           xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
                               https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd
@@ -25,7 +26,7 @@
 
       Title is required, all other fields are optional
     -->
-  <identity>
+   <identity>
      <title>The Interatomic Potentials Repository Project</title>
      <altTitle type="Subtitle"> Special Repository #3 </altTitle>
      <altTitle type="Abbreviation"> IPR </altTitle>
@@ -116,8 +117,8 @@
       <type> Collection: Repository </type>
    </role>
 
-   <role xsi:type="roth:Portal">
-      <type> Interactive Resource: Portal </type>
+   <role xsi:type="roth:Database">
+      <type> Dataset: Database </type>
    </role>
 
    <!--
@@ -144,7 +145,7 @@
          Charge distribution
        </experimentalMethod>
 
-       <computationalMethod xsi:type="mse:Dislocation_Dynamics_Computational_Methods">
+       <computationalMethod xsi:type="mse:Dislocation_Dynamics_Computational_method">
          Dislocation Dynamics
        </computationalMethod>
 
@@ -173,7 +174,7 @@
          multiple <via> elements can describe different ways for accessing
          a resource
        -->
-     <via xsi:type="ViaPortal">
+     <via xsi:type="rac:ViaPortal">
        <title> The IPR Portal </title>
        <description> ... </description>
 
@@ -184,7 +185,7 @@
      </via>       
 
      <!-- downloadable file or directory of files -->
-     <via xsi:type="ViaDownload">
+     <via xsi:type="rac:ViaDownload">
        <title> The IPR database </title>
        <description> ... </description>
        <accessURL> https://www.ctcms.nist.gov/potentials/data.json </accessURL>
@@ -194,17 +195,19 @@
      </via>       
 
      <!-- service API (that may conform to some standard) -->
-     <via xsi:type="ViaDownload">
+     <via xsi:type="rac:ViaServiceAPI">
        <title> The IPR search service </title>
        <description> ... </description>
-       <details><type> Service: API </type></details>
-       <baseURL> https://www.ctcms.nist.gov/potentials/api </baseURL>
-       <specificationURL> https://... </specificationURL>
-       <complianceID> https://... </complianceID>
+       <details>
+         <type> Service: API </type>
+         <baseURL> https://www.ctcms.nist.gov/potentials/api </baseURL>
+         <specificationURL> https://... </specificationURL>
+         <complianceID> https://... </complianceID>
+       </details>
      </via>
 
      <!-- via media one can order -->
-     <via xsi:type="ViaMedia">
+     <via xsi:type="rac:ViaMedia">
        <title> The IPR Database </title>
        <description> ... </description>
 
