@@ -1,20 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rsm:Resource xmlns="" xsi:type="rac:AccessibleResource"
+<Resource xmlns="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
+          xsi:type="rsm:AccessibleResource"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
-          xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
-          xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
-          xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
-          xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
-          xmlns:roth="http://schema.nist.gov/xml/resmd-otherroles/1.0wd" 
-          xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd
-                              http://schema.nist.gov/xml/resmd-datacite/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-datacite.xsd
-                              http://schema.nist.gov/xml/resmd-access/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-access.xsd
-                              http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/mat-sci_res-md.xsd"
+          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
           status="active" localid="urn:nist.gov/nmrr/ipr">
 
   <!--
@@ -115,27 +103,27 @@
        additional metadata associated with them.  Software is an
        example that would have extended metadata.
      -->
-   <role xsi:type="roth:Repository">
+   <role xsi:type="rsm:Repository">
       <type> Collection: Repository </type>
    </role>
 
-   <role xsi:type="roth:Database">
+   <role xsi:type="rsm:Database">
       <type> Dataset: Database </type>
    </role>
 
    <!--
        The applicability element provides 
      -->
-   <applicability xsi:type="ms:MaterialsScience">
+   <applicability xsi:type="rsm:MaterialsScience">
 
-       <materialType xsi:type="mse:Ceramics_Material_type">
+       <materialType xsi:type="rsm:Ceramics_Material_type">
          Ceramics: Perovskite
        </materialType>
 
-       <structuralFeature xsi:type="mse:Composites_Structural_Feature">
+       <structuralFeature xsi:type="rsm:Composites_Structural_Feature">
          Composites: nanocomposites
        </structuralFeature>
-       <structuralFeature xsi:type="mse:Defects_Structural_Feature">
+       <structuralFeature xsi:type="rsm:Defects_Structural_Feature">
          Defects: Point defects
        </structuralFeature>
        
@@ -176,7 +164,7 @@
          multiple <via> elements can describe different ways for accessing
          a resource
        -->
-     <via xsi:type="rac:ViaPortal">
+     <via xsi:type="rsm:ViaPortal">
        <title> The IPR Portal </title>
        <description> ... </description>
 
@@ -187,7 +175,7 @@
      </via>       
 
      <!-- downloadable file or directory of files -->
-     <via xsi:type="rac:ViaDownload">
+     <via xsi:type="rsm:ViaDownload">
        <title> The IPR database </title>
        <description> ... </description>
        <accessURL> https://www.ctcms.nist.gov/potentials/data.json </accessURL>
@@ -197,7 +185,7 @@
      </via>       
 
      <!-- service API (that may conform to some standard) -->
-     <via xsi:type="rac:ViaServiceAPI">
+     <via xsi:type="rsm:ViaServiceAPI">
        <title> The IPR search service </title>
        <description> ... </description>
        <details>
@@ -209,7 +197,7 @@
      </via>
 
      <!-- via media one can order -->
-     <via xsi:type="rac:ViaMedia">
+     <via xsi:type="rsm:ViaMedia">
        <title> The IPR Database </title>
        <description> ... </description>
 
@@ -221,4 +209,4 @@
      </via>       
    </access>
 
-</rsm:Resource>
+</Resource>

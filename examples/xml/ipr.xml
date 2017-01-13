@@ -1,20 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rsm:Resource xmlns="" xsi:type="rac:AccessibleResource"
+<Resource xmlns="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
+          xsi:type="rsm:AccessibleResource"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
-          xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
-          xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
-          xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
-          xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
-          xmlns:roth="http://schema.nist.gov/xml/resmd-otherroles/1.0wd" 
-          xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd
-                              http://schema.nist.gov/xml/resmd-datacite/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-datacite.xsd
-                              http://schema.nist.gov/xml/resmd-access/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-access.xsd
-                              http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/mat-sci_res-md.xsd"
+          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
           status="active" localid="urn:nist.gov/nmrr/ipr">
 
    <identity>
@@ -30,10 +18,10 @@
        <name>Chandler Becker</name>
        <affiliation> NIST </affiliation>
      </creator>
-     <contributor role="DataCurator" xsi:type="dcr:DciteContributor">
+     <contributor role="DataCurator" xsi:type="rsm:DciteContributor">
        <name>Zachary Trautt</name>
      </contributor>
-     <date role="Created" xsi:type="dcr:DciteDate"> 2008-04-01 </date>
+     <date role="Created" xsi:type="rsm:DciteDate"> 2008-04-01 </date>
      <contact>
        <name>Zachary Trautt</name>
        <emailAddress> zachary.trautt@nist.gov </emailAddress>
@@ -71,11 +59,11 @@
      </reference>
      <primaryAudience> research </primaryAudience>
    </content>
-   <role xsi:type="roth:Repository">
+   <role xsi:type="rsm:Repository">
       <type> Collection: Repository </type>
    </role>
-   <applicability xsi:type="ms:MaterialsScience">
-     <propertyAddressed xsi:type="mse:Microstructural_Properties_addressed">
+   <applicability xsi:type="rsm:MaterialsScience">
+     <propertyAddressed xsi:type="rsm:Microstructural_Properties_addressed">
        Microstructural
      </propertyAddressed>
    </applicability>
@@ -83,4 +71,4 @@
      <policy><restriction> public </restriction></policy>
    </access>
 
-</rsm:Resource>
+</Resource>

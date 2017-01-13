@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
+<xs:schema targetNamespace="http://schema.nist.gov/xml/res-md/1.0wd-02-2017" 
            xmlns="http://www.w3.org/2001/XMLSchema" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-           xmlns:tv="http://schema.nist.gov/xml/tieredvocab/1.0wd" 
-           xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd"
+           xmlns:mse="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
            xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
-           elementFormDefault="unqualified" 
+           elementFormDefault="qualified" 
            attributeFormDefault="unqualified" version="draft10">
 
    <xs:simpleType name="Material_type">

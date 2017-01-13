@@ -1,20 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rsm:Resource xmlns="" xsi:type="rac:AccessibleResource"
+<Resource xmlns="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
+          xsi:type="rsm:AccessibleResource"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
-          xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
-          xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
-          xmlns:roth="http://schema.nist.gov/xml/resmd-otherroles/1.0wd" 
-          xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd"
-          xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
-          xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd
-                              http://schema.nist.gov/xml/resmd-datacite/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-datacite.xsd
-                              http://schema.nist.gov/xml/resmd-access/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-access.xsd
-                              http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/mat-sci_res-md.xsd"
+          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
           status="active" localid="urn:nist.gov/nmrr/ipr">
 
    <identity>
@@ -85,12 +73,12 @@
      <landingPage>http://dx.doi.org/10.18434/T45K5N</landingPage>
      <primaryAudience> research </primaryAudience>
    </content>
-   <role xsi:type="roth:Database">
+   <role xsi:type="rsm:Database">
       <type> Dataset: Database </type>
    </role>
 
-   <applicability xsi:type="ms:MaterialsScience">
-     <propertyAddressed xsi:type="mse:Optical_Properties_addressed">
+   <applicability xsi:type="rsm:MaterialsScience">
+     <propertyAddressed xsi:type="rsm:Optical_Properties_addressed">
        Optical
      </propertyAddressed>
    </applicability>
@@ -100,7 +88,7 @@
        <restriction> fee-required </restriction>
        <termsURL>http://www.nist.gov/open/license.cfm</termsURL>
      </policy>
-     <via xsi:type="rac:ViaMedia">
+     <via xsi:type="rsm:ViaMedia">
        <description>CDROM contains 5228 spectra in JCAMP-DX format</description>
        <accessURL>http://dx.doi.org/10.18434/T45K5N</accessURL>
        <details><type>Physical Object: Storage Media</type></details>
@@ -108,5 +96,5 @@
      </via>
    </access>
 
-</rsm:Resource>
+</Resource>
    
