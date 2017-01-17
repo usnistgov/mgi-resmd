@@ -41,13 +41,13 @@
        <affiliation> NIST </affiliation>
      </creator>
 
-     <contributor role="DataCurator" xsi:type="dcr:DciteContributor">
+     <contributor role="DataCurator" xsi:type="rsm:DciteContributor">
        <name pid="orcid:0000-0001-5929-0354"> Zachary Trautt </name>
      </contributor>
 
      <!-- Datacite date types:  Created, Accepted, Copyrighted,
           Available, Collected, Issued, Submitted, Updated, Valid -->
-     <date role="Created" xsi:type="dcr:DciteDate"> 2008-04-01 </date>
+     <date role="Created" xsi:type="rsm:DciteDate"> 2008-04-01 </date>
 
      <contact>
        <name>Zachary Trautt</name>
@@ -127,19 +127,19 @@
          Defects: Point defects
        </structuralFeature>
        
-       <propertyAddressed xsi:type="mse:Microstructural_Properties_addressed">
+       <propertyAddressed xsi:type="rsm:Microstructural_Properties_addressed">
          Microstructural
        </propertyAddressed>
 
-       <experimentalMethod xsi:type="mse:Charge_distribution_Experimental_Methods">
+       <experimentalMethod xsi:type="rsm:Charge_distribution_Experimental_Methods">
          Charge distribution
        </experimentalMethod>
 
-       <computationalMethod xsi:type="mse:Dislocation_Dynamics_Computational_method">
+       <computationalMethod xsi:type="rsm:Dislocation_Dynamics_Computational_method">
          Dislocation Dynamics
        </computationalMethod>
 
-       <synthesisProcessing xsi:type="mse:Annealing_Synthesis_and_Processing">
+       <synthesisProcessing xsi:type="rsm:Annealing_Synthesis_and_Processing">
          Annealing: normalizing
        </synthesisProcessing>
 

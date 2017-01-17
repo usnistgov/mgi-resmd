@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Resource xmlns="" xsi:type="rac:AccessibleResource"
+<Resource xmlns="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
+          xsi:type="rsm:AccessibleResource"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
-          xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
-          xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
-          xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
-          xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
-          xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/res-md.xsd
-                              http://schema.nist.gov/xml/resmd-datacite/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-datacite.xsd
-                              http://schema.nist.gov/xml/resmd-access/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/resmd-access.xsd
-                              http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
-                              https://raw.githubusercontent.com/usnistgov/mgi-resmd/master/schemas/xml/mat-sci_res-md.xsd"
-          status="active" localid="urn:nist.gov/nmrr/ipr">
+          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
+          status="active" localid="urn:nist.gov/nmrr/fipy">
 
    <identity>
      <title> FiPy: A Finite Volume PDE Solver Using Python </title>
@@ -39,7 +28,7 @@
        <name sur="Warren" given="James" middle="A.">James A. Warren</name>
        <affiliation> NIST </affiliation>
      </creator>
-     <date role="Created" xsi:type="dcr:DciteDate"> 2008-04-01 </date>
+     <date role="Created" xsi:type="rsm:DciteDate"> 2008-04-01 </date>
      <contact>
        <name>Jonathan Guyer</name>
        <emailAddress> jonathan.guyer@nist.gov </emailAddress>
@@ -81,7 +70,7 @@
    </content>
 
    <!-- This part contains Software-specific metadata -->
-   <role xsi:type="rac:Software">
+   <role xsi:type="rsm:Software">
      <type> Software </type>
 <!--     <supportedOS> Mac OS X </supportedOS>
      <supportedOS> Debian Linux </supportedOS>
@@ -92,14 +81,14 @@
    </role>
 
    <!-- This part contains Materials Science-specific metadata -->
-   <applicability xsi:type="ms:MaterialsScience">
-     <structuralFeature xsi:type="mse:Microstructure_Structural_Feature">
+   <applicability xsi:type="rsm:MaterialsScience">
+     <structuralFeature xsi:type="rsm:Microstructure_Structural_Feature">
        Microstructure: single crystal
      </structuralFeature>
-     <structuralFeature xsi:type="mse:Microstructure_Structural_Feature">
+     <structuralFeature xsi:type="rsm:Microstructure_Structural_Feature">
        Microstructure: polycrystalline
      </structuralFeature>
-     <propertyAddressed xsi:type="mse:Microstructural_Properties_addressed">
+     <propertyAddressed xsi:type="rsm:Microstructural_Properties_addressed">
        Microstructural
      </propertyAddressed>
    </applicability>     
@@ -110,12 +99,12 @@
        <restriction> public </restriction>
        <termsURL> http://www.ctcms.nist.gov/fipy/LICENSE.html </termsURL>
      </policy>
-     <via xsi:type="rac:ViaDownload">
+     <via xsi:type="rsm:ViaDownload">
        <accessURL use="dir" returns="text/html">
           http://www.ctcms.nist.gov/fipy/download/
        </accessURL>
      </via>
-     <via xsi:type="rac:ViaPortal" pid="">
+     <via xsi:type="rsm:ViaPortal" pid="">
        <title> FiPy Home page </title>
        <description> </description>
        <accessURL> http://www.ctcms.nist.gov/fipy/ </accessURL>

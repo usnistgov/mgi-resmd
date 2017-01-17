@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Resource xmlns="" xsi:type="rac:AccessibleResource"
+<Resource xmlns="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
+          xsi:type="rsm:AccessibleResource"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd"
-          xmlns:dcr="http://schema.nist.gov/xml/resmd-datacite/1.0wd" 
-          xmlns:rac="http://schema.nist.gov/xml/resmd-access/1.0wd" 
-          xmlns:ms="http://schema.nist.gov/xml/mat-sci_res-md/1.0wd" 
-          xmlns:mse="https://www.nist.gov/od/sch/mse-vocab/1.0wd" 
-          xsi:schemaLocation="http://schema.nist.gov/xml/res-md/1.0wd
-                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/res-md.xsd
-                              http://schema.nist.gov/xml/resmd-datacite/1.0wd
-                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-datacite.xsd
-                              http://schema.nist.gov/xml/resmd-access/1.0wd
-                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/resmd-access.xsd
-                              http://schema.nist.gov/xml/mat-sci_res-md/1.0wd
-                              https://raw.githubusercontent.com/RayPlante/mgi-resmd/resmdxml.9/schemas/xml/mat-sci_res-md.xsd"
+          xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
           status="active" localid="urn:nist.gov/nmrr/ipr">
 
    <identity>
@@ -37,10 +26,10 @@
          Hans van Der Graaf
        </name>
      </creator>
-     <contributor role="DataCurator" xsi:type="dcr:DciteContributor">
+     <contributor role="DataCurator" xsi:type="rsm:DciteContributor">
        <name pid="orcid:09834100891">Zachary Trautt</name>
      </contributor>
-     <date role="Created" xsi:type="dcr:DciteDate"> 2008-04-01 </date>
+     <date role="Created" xsi:type="rsm:DciteDate"> 2008-04-01 </date>
      <contact>
        <name>Zachary Trautt</name>
        <emailAddress> zachary.trautt@nist.gov </emailAddress>
@@ -85,18 +74,18 @@
      <type pid="http://purl.org/dc/dcmitype/Collection"> Collection: Repository </type>
 <!--     <type> Collection: Repository </type> -->
    </role>
-   <applicability xsi:type="ms:MaterialsScience">
-     <propertyAddressed xsi:type="mse:Microstructural_Properties_addressed">
+   <applicability xsi:type="rsm:MaterialsScience">
+     <propertyAddressed xsi:type="rsm:Microstructural_Properties_addressed">
        Microstructural
      </propertyAddressed>
    </applicability>
    <related>
-     <relationship xsi:type="dcr:DciteRelation" label="IsDocumentedBy"> is documented by </relationship>
+     <relationship xsi:type="rsm:DciteRelation" label="IsDocumentedBy"> is documented by </relationship>
      <resource>IPR Help Page</resource>
    </related>
    <access>
      <policy><restriction> public </restriction></policy>
-     <via xsi:type="rac:ViaPortal">
+     <via xsi:type="rsm:ViaPortal">
        <accessURL> http://www.ctcms.nist.gov/potentials/ </accessURL>
        <details> <type> InteractiveResource: Portal </type></details>
      </via>
