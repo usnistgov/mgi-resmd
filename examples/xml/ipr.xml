@@ -59,7 +59,7 @@
      </reference>
      <primaryAudience> research </primaryAudience>
    </content>
-   <role xsi:type="rsm:Repository">
+   <role xsi:type="rsm:DataCollection">
       <type> Collection: Repository </type>
    </role>
    <applicability xsi:type="rsm:MaterialsScience">

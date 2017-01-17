@@ -99,20 +99,15 @@
        <restriction> public </restriction>
        <termsURL> http://www.ctcms.nist.gov/fipy/LICENSE.html </termsURL>
      </policy>
-     <via xsi:type="rsm:ViaDownload">
+     <method xsi:type="rsm:DownloadMethod">
        <accessURL use="dir" returns="text/html">
           http://www.ctcms.nist.gov/fipy/download/
        </accessURL>
-     </via>
-     <via xsi:type="rsm:ViaPortal" pid="">
+     </method>
+     <method xsi:type="rsm:PortalMethod">
        <title> FiPy Home page </title>
        <description> </description>
        <accessURL> http://www.ctcms.nist.gov/fipy/ </accessURL>
-       <details>
-         <type pid="http://purl.org/dc/dcmitype/InteractiveResource">
-           InteractiveResource: Portal
-         </type>
-       </details>
-     </via>
+     </method>
    </access>
 </Resource>

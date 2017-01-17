@@ -32,7 +32,7 @@
    <xs:include schemaLocation="mse_vocab.xsd"/>
        
 
-   <xs:element name="Resource" type="rsm:Resource">
+   <xs:element name="Resource" type="rsm:AccessibleResource">
       <xs:annotation>
          <xs:documentation>
            a root element for a document describing a Resource,
@@ -114,16 +114,6 @@
              </xs:documentation>
              <xs:documentation>
                Domain specific metadata gets captured here.  
-             </xs:documentation>
-           </xs:annotation>
-         </xs:element>
-
-         <xs:element name="related" type="rsm:Related"
-                     minOccurs="0" maxOccurs="unbounded">
-           <xs:annotation>
-             <xs:documentation>
-               A reference to a related resource and the nature of the
-               relationship.
              </xs:documentation>
            </xs:annotation>
          </xs:element>
@@ -920,58 +910,9 @@
      </xs:annotation>
 
      <xs:sequence>
-        <xs:element name="type" type="rsm:RoleType">
-          <xs:annotation>
-             <xs:documentation>
-               a label that indicates the kind of resource it is.
-             </xs:documentation>
-             <xs:documentation>
-               This corresponds to the DC element, type.  Values may be drawn,
-               for example, from the DCMI Type Vocabulary.
-             </xs:documentation>
-             <xs:documentation>
-               This label may use any format or convention for these labels.  An
-               xsi:type on this element or on the parent element may be used to
-               imply/enforce a particular format.  
-             </xs:documentation>
-             <xs:documentation>
-               In the absense of xsi:type usage that restricts the labels that
-               can be used, the following format is recommended:
-               the value can be a colon-separated list of
-               of labels in order of most general to most specific
-               (i.e. each the last label represents a more specific term for the 
-               ones that precede it).  Applications may choose to display only 
-               the last label or the entire string, depending on the context.  
-             </xs:documentation>
-          </xs:annotation>
-        </xs:element>
-
      </xs:sequence>
    </xs:complexType>   
 
-   <xs:complexType name="RoleType">
-     <xs:simpleContent>
-       <xs:extension base="xs:token"> 
-
-         <xs:attribute name="pid" type="xs:anyURI">
-            <xs:annotation>
-              <xs:documentation>
-                An unambigous identifier that identifies a resource type having
-                a defined meaning, indicating that this resource is some variety
-                of the resource type given by that meaning.  
-              </xs:documentation>
-              <xs:documentation>
-                An example would a DCMI Type Vocabulary URI like
-                http://purl.org/dc/dcmitype/PhysicalObject.  The label may 
-                indicate that the type is some more precise variety (e.g. a
-                soil sample).
-              </xs:documentation>
-            </xs:annotation>
-         </xs:attribute>
-
-       </xs:extension>       
-     </xs:simpleContent>
-   </xs:complexType>
 
    <xs:complexType name="Applicability">
      <xs:annotation>
@@ -1050,7 +991,8 @@
        <xs:extension base="rsm:Resource">
          <xs:sequence>
 
-           <xs:element name="access" type="rsm:Access" minOccurs="0">
+           <xs:element name="access" type="rsm:Access" minOccurs="0"
+                       maxOccurs="unbounded">
              <xs:annotation>
                <xs:documentation>
                  Information describing how to access the resource and its 
@@ -1083,7 +1025,7 @@
          </xs:annotation>
        </xs:element>
 
-       <xs:element name="via" type="rsm:AccessVia"
+       <xs:element name="method" type="rsm:AccessMethod"
                    minOccurs="0" maxOccurs="unbounded">
          <xs:annotation>
            <xs:documentation>
@@ -1091,7 +1033,7 @@
              mechanism (other than simple download).
            </xs:documentation>
            <xs:documentation>
-             As the AccessVia type is abstract, all instances must include an
+             As the AccessMethod type is abstract, all instances must include an
              xsi:type attribute.
            </xs:documentation>
          </xs:annotation>
@@ -1100,7 +1042,7 @@
      </xs:sequence>
    </xs:complexType>
 
-   <xs:complexType name="AccessVia">
+   <xs:complexType name="AccessMethod">
      <xs:annotation>
        <xs:documentation>
          metadata describing how one can access a resource via some mechanism
@@ -1152,83 +1094,11 @@
           </xs:annotation>
        </xs:element>       
 
-       <xs:element name="details" type="rsm:ResourceRole"
-                   minOccurs="0" maxOccurs="1">
-         <xs:annotation>
-           <xs:documentation>
-             An identification of the type of access mechanism this is along
-             with, if appropriate, qualifications on the features and
-             constraints on that mechanism.
-           </xs:documentation>
-           <xs:documentation>
-             The child type element provides the identifying label for the
-             access mechanism.  Recognized types include,
-             'InteractiveResource: Portal', 'Software', and 'Service: API'.
-           </xs:documentation>
-         </xs:annotation>
-       </xs:element>
-
      </xs:sequence>
 
-     <xs:attribute name="pid" type="xs:anyURI">
-        <xs:annotation>
-          <xs:documentation>
-            An unambigous identifier for the access mechanism that resolves to
-            a more complete description.
-          </xs:documentation>
-          <xs:documentation>
-            This identifier should be provided if the access method (e.g. portal
-            or software) is separately registered and described.  When this PID
-            appears, any metadata provided in this item is for convenience of
-            display and access.  The metadata provided by resolving this PID
-            should be considered definitive.  
-          </xs:documentation>
-        </xs:annotation>
-     </xs:attribute>
-     
    </xs:complexType>
 
-   <xs:complexType name="DownloadDetailsType">
-     <xs:annotation>
-       <xs:documentation>
-         a Role whose type is forced to be 'Download'.
-       </xs:documentation>
-       <xs:documentation>
-         This is only intended for use within an AccessVia subclass.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:restriction base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
-                       fixed="Download"/>
-         </xs:sequence>
-       </xs:restriction>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="ViaDownloadRestrict" abstract="true">
-     <xs:annotation>
-       <xs:documentation>
-         abstract type for restricting type to download
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:restriction base="rsm:AccessVia">
-         <xs:sequence>
-           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
-           <xs:element name="description" type="xs:token" minOccurs="0"/>
-           <xs:element name="accessURL" type="rsm:AccessURL" minOccurs="1"/>
-           <xs:element name="details" type="rsm:DownloadDetailsType"
-                       minOccurs="0" maxOccurs="1"/>
-         </xs:sequence>
-       </xs:restriction>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="ViaDownload">
+   <xs:complexType name="DownloadMethod">
      <xs:annotation>
        <xs:documentation>
          metadata describing how one can access a resource via the web
@@ -1242,7 +1112,7 @@
      </xs:annotation>
 
      <xs:complexContent>
-       <xs:extension base="rsm:ViaDownloadRestrict">
+       <xs:extension base="rsm:AccessMethod">
          <xs:sequence>
            <xs:element name="format" type="xs:token"
                        minOccurs="0" maxOccurs="unbounded">
@@ -1428,58 +1298,7 @@
      </xs:simpleContent>
    </xs:complexType>
 
-   <xs:complexType name="SoftwareRoleTypeRestriction" abstract="true">
-     <xs:annotation>
-       <xs:documentation>
-         a Role whose type is forced to be 'Software'.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:restriction base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
-                       fixed="Software">
-             <xs:annotation>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/Software
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:restriction>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="Software">
-     <xs:annotation>
-       <xs:documentation>
-         metadata for describing software
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:SoftwareRoleTypeRestriction">
-         <xs:sequence>
-
-           <xs:element name="codeLanguage" type="xs:token"
-                       minOccurs="0" maxOccurs="unbounded">
-             <xs:annotation>
-               <xs:documentation>
-                 The name of the code language that the software is implemented
-                 in
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>
-
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-
-   </xs:complexType>
-
-   <xs:complexType name="ViaSoftware">
+   <xs:complexType name="SoftwareMethod">
      <xs:annotation>
        <xs:documentation>
          metadata describing how one can access a resource via locally
@@ -1496,63 +1315,16 @@
      </xs:annotation>
 
      <xs:complexContent>
-       <xs:restriction base="rsm:AccessVia">
+       <xs:extension base="rsm:AccessMethod">
          <xs:sequence>
-           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
-           <xs:element name="description" type="xs:token" minOccurs="0"/>
-           <xs:element name="accessURL" type="rsm:AccessURL" minOccurs="0"/>
            <xs:element name="details" type="rsm:Software"
-                       minOccurs="0" maxOccurs="1"/>
-         </xs:sequence>
-       </xs:restriction>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="MediaDetailsType">
-     <xs:annotation>
-       <xs:documentation>
-         a Role whose type is forced to be 'Media'.
-       </xs:documentation>
-       <xs:documentation>
-         This is only intended for use within an AccessVia subclass.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:restriction base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
-                       fixed="Physical Object: Storage Media">
-             <xs:annotation>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/PhysicalObject
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:restriction>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="ViaMediaRestriction" abstract="true">
-     <xs:annotation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:restriction base="rsm:AccessVia">
-         <xs:sequence>
-           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
-           <xs:element name="description" type="xs:token" minOccurs="0"/>
-           <xs:element name="accessURL" type="rsm:AccessURL" minOccurs="0"/>
-           <xs:element name="details" type="rsm:MediaDetailsType"
                        minOccurs="1" maxOccurs="1"/>
          </xs:sequence>
-       </xs:restriction>
+       </xs:extension>
      </xs:complexContent>
    </xs:complexType>
 
-   <xs:complexType name="ViaMedia">
+   <xs:complexType name="MediaMethod">
      <xs:annotation>
        <xs:documentation>
          A description of access to a resource via physical storage media
@@ -1564,10 +1336,10 @@
      </xs:annotation>
 
      <xs:complexContent>
-       <xs:extension base="rsm:ViaMediaRestriction">
+       <xs:extension base="rsm:AccessMethod">
          <xs:sequence>
 
-           <xs:element name="mediaType" type="xs:token"
+           <xs:element name="mediaType" type="rsm:MediaType"
                        minOccurs="1" maxOccurs="unbounded">
               <xs:annotation>
                  <xs:documentation>
@@ -1579,87 +1351,50 @@
              </xs:annotation>
            </xs:element>
             
-           <xs:element name="requestURL" type="xs:anyURI" minOccurs="0">
-              <xs:annotation>
-             </xs:annotation>
-           </xs:element>
-         
          </xs:sequence>
        </xs:extension>
      </xs:complexContent>
    </xs:complexType>
 
-   <xs:complexType name="ServiceAPIRoleTypeRestriction" abstract="true">
+   <xs:simpleType name="MediaType">
      <xs:annotation>
        <xs:documentation>
-         a Role whose type is forced to be 'Service: API'.
+         Controlled labels that indicate a type of media that data or software
+         is available.
        </xs:documentation>
      </xs:annotation>
 
-     <xs:complexContent>
-       <xs:restriction base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
-                       fixed="Service: API">
-             <xs:annotation>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/Service
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:restriction>
-     </xs:complexContent>
-   </xs:complexType>
+     <xs:restriction base="xs:token">
 
-   <xs:complexType name="ServiceAPI">
-     <xs:annotation>
-       <xs:documentation>
-         metadata for describing a web-accessible service whose operations
-         are accessed via URLs having a common URL base.
-       </xs:documentation>
-     </xs:annotation>
+       <xs:enumeration value="CDROM">
+         <xs:annotation>
+           <xs:documentation>
+             A web site that provides a suite of tool for interacting with 
+             a variety of data.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
 
-     <xs:complexContent>
-       <xs:extension base="rsm:ServiceAPIRoleTypeRestriction">
-         <xs:sequence>
+       <xs:enumeration value="DVDROM">
+         <xs:annotation>
+           <xs:documentation>
+             A DVD Disk formatted for data
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
 
-           <xs:element name="baseURL" type="xs:anyURI">
-              <xs:annotation>
-                 <xs:documentation>
-                  The base URL for accessing the service API; it is expected that
-                  additional URL components (paths or arguments) may be needed to
-                  access different functions of the API.
-                 </xs:documentation>
-              </xs:annotation>
-           </xs:element>       
+       <xs:enumeration value="USB drive">
+         <xs:annotation>
+           <xs:documentation>
+             A portable USB drive
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
 
-           <xs:element name="specificationURL" type="xs:anyURI">
-              <xs:annotation>
-                 <xs:documentation>
-                   a URL that will retrieve a structured description of the
-                   service interface (e.g. WSDL, ...).
-                 </xs:documentation>
-              </xs:annotation>
-           </xs:element>       
+     </xs:restriction>
+   </xs:simpleType>
 
-           <xs:element name="complianceID" type="xs:anyURI">
-              <xs:annotation>
-                 <xs:documentation>
-                   a URI for a service standard that this service is 
-                   compliant with.
-                 </xs:documentation>
-              </xs:annotation>
-           </xs:element>       
-   
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-
-   </xs:complexType>
-
-   <xs:complexType name="ViaServiceAPI">
+   <xs:complexType name="ServiceAPIMethod">
      <xs:annotation>
        <xs:documentation>
          metadata describing how one can access a resource via a web service
@@ -1676,61 +1411,16 @@
      </xs:annotation>
 
      <xs:complexContent>
-       <xs:restriction base="rsm:AccessVia">
+       <xs:extension base="rsm:AccessMethod">
          <xs:sequence>
-           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
-           <xs:element name="description" type="xs:token" minOccurs="0"/>
-           <xs:element name="accessURL" type="rsm:AccessURL" minOccurs="0"/>
            <xs:element name="details" type="rsm:ServiceAPI"
-                       minOccurs="0" maxOccurs="1"/>
-         </xs:sequence>
-       </xs:restriction>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="PortalRoleTypeRestriction" abstract="true">
-     <xs:annotation>
-       <xs:documentation>
-         a Role whose type is forced to be 'InteractiveResource: Portal'.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:restriction base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
-                       fixed="InteractiveResource: Portal">
-             <xs:annotation>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/Software
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:restriction>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="Portal">
-     <xs:annotation>
-       <xs:documentation>
-         metadata for describing a web portal, a web site that aggregrates and
-         provides interaction with data and browser-based tools.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:PortalRoleTypeRestriction">
-         <xs:sequence>
-
+                       minOccurs="1" maxOccurs="1"/>
          </xs:sequence>
        </xs:extension>
      </xs:complexContent>
-
    </xs:complexType>
 
-   <xs:complexType name="ViaPortal">
+   <xs:complexType name="PortalMethod">
      <xs:annotation>
        <xs:documentation>
          description of acces to a resource via a portal.
@@ -1739,22 +1429,17 @@
          The accessURL points to the landing page for the portal.
        </xs:documentation>
        <xs:documentation>
-         Use this AccessVia type when the resource is accessible via a portal
+         Use this AccessMethod type when the resource is accessible via a portal
          that is not specific to this resource.  In such a case the accessURL
          given here would not be the same as the resource's landingPage URL.  
        </xs:documentation>
      </xs:annotation>
 
      <xs:complexContent>
-       <xs:restriction base="rsm:AccessVia">
+       <xs:extension base="rsm:AccessMethod">
          <xs:sequence>
-           <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1"/>
-           <xs:element name="description" type="xs:token" minOccurs="0"/>
-           <xs:element name="accessURL" type="rsm:AccessURL" minOccurs="0"/>
-           <xs:element name="details" type="rsm:Portal"
-                       minOccurs="0" maxOccurs="1"/>
          </xs:sequence>
-       </xs:restriction>
+       </xs:extension>
      </xs:complexContent>
    </xs:complexType>
 
@@ -1831,55 +1516,6 @@
 
          </xs:sequence>
        </xs:extension>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="Repository">
-     <xs:annotation>
-       <xs:documentation>
-         a resource that aggregates and makes accessible many datasets together
-         as part of a collection.  
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:restriction base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
-                       fixed="Collection: Repository">
-             <xs:annotation>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/Collection
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:restriction>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="Database">
-     <xs:annotation>
-       <xs:documentation>
-         a searchable collection of tabular or property-oriented data
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:restriction base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:RoleType" minOccurs="1"
-                       fixed="Dataset: Database">
-             <xs:annotation>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/Dataset.  
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:restriction>
      </xs:complexContent>
    </xs:complexType>
 
@@ -2688,6 +2324,414 @@
            <xs:documentation>
              a relationship indicating that the subject resource is a source 
              upon which the target resource is based
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="Organization">
+     <xs:annotation>
+       <xs:documentation>
+         a searchable collection of tabular or property-oriented data
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:OrgRoleType" minOccurs="1"
+                       maxOccurs="1">
+             <xs:annotation>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Dataset.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="OrgRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a dataset.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Organization: Institution">
+         <xs:annotation>
+           <xs:documentation>
+             A long-lived organization that may engage in many projects
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Organization: Project">
+         <xs:annotation>
+           <xs:documentation>
+             An organization that focuses on a particular project, often with
+             a limited lifetime
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Organization">
+         <xs:annotation>
+           <xs:documentation>
+             A logical set of related data supporting a common scientific purpose
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="DataCollection">
+     <xs:annotation>
+       <xs:documentation>
+         a resource that aggregates and makes accessible many datasets together
+         as part of a collection.  
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:CollectionRoleType" minOccurs="1"
+                       maxOccurs="3">
+             <xs:annotation>
+               <xs:documentation>
+                 the sub-type of collection this resource qualifies as.
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="CollectionRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a data collection.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Collection">
+         <xs:annotation>
+           <xs:documentation>
+             An aggregation of data sets 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Collection: Repository">
+         <xs:annotation>
+           <xs:documentation>
+             An aggregation of data sets 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Collection: Project Archive">
+         <xs:annotation>
+           <xs:documentation>
+             An aggregation of data sets 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+       
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="Dataset">
+     <xs:annotation>
+       <xs:documentation>
+         a searchable collection of tabular or property-oriented data
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:DatasetRoleType" minOccurs="1"
+                       maxOccurs="2">
+             <xs:annotation>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Dataset.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="DatasetRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a dataset.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Dataset">
+         <xs:annotation>
+           <xs:documentation>
+             A logical set of related data supporting a common scientific purpose
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Dataset: Database">
+         <xs:annotation>
+           <xs:documentation>
+             A logical set of related data supporting a common scientific purpose
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="Database">
+     <xs:annotation>
+       <xs:documentation>
+         a searchable collection of tabular or property-oriented data
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:DatabaseRoleType" minOccurs="1"
+                       maxOccurs="1">
+             <xs:annotation>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Dataset.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="DatabaseRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a dataset.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Dataset: Database">
+         <xs:annotation>
+           <xs:documentation>
+             A logical set of related data supporting a common scientific purpose
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="ServiceAPI">
+     <xs:annotation>
+       <xs:documentation>
+         metadata for describing a web-accessible service whose operations
+         are accessed via URLs having a common URL base.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+
+           <xs:element name="type" type="rsm:ServiceRoleType">
+             <xs:annotation>
+                <xs:documentation>
+                  a label that indicates the kind of resource it is.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+           
+           <xs:element name="baseURL" type="xs:anyURI">
+              <xs:annotation>
+                 <xs:documentation>
+                  The base URL for accessing the service API; it is expected that
+                  additional URL components (paths or arguments) may be needed to
+                  access different functions of the API.
+                 </xs:documentation>
+              </xs:annotation>
+           </xs:element>       
+
+           <xs:element name="specificationURL" type="xs:anyURI">
+              <xs:annotation>
+                 <xs:documentation>
+                   a URL that will retrieve a structured description of the
+                   service interface (e.g. WSDL, ...).
+                 </xs:documentation>
+              </xs:annotation>
+           </xs:element>       
+
+           <xs:element name="complianceID" type="xs:anyURI">
+              <xs:annotation>
+                 <xs:documentation>
+                   a URI for a service standard that this service is 
+                   compliant with.
+                 </xs:documentation>
+              </xs:annotation>
+           </xs:element>       
+   
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+
+   </xs:complexType>
+
+   <xs:simpleType name="ServiceRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as software.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Service: API">
+         <xs:annotation>
+           <xs:documentation>
+             A label indicating that this record describes a web-based
+             service API.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="Software">
+     <xs:annotation>
+       <xs:documentation>
+         metadata for describing software
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+
+           <xs:element name="type" type="rsm:SoftwareRoleType">
+             <xs:annotation>
+                <xs:documentation>
+                  a label that indicates the kind of resource it is.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+           
+           <xs:element name="codeLanguage" type="xs:token"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:documentation>
+                 The name of the code language that the software is implemented
+                 in
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+
+   </xs:complexType>
+
+   <xs:simpleType name="SoftwareRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as software.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Software">
+         <xs:annotation>
+           <xs:documentation>
+             A label indicating that this resource is a software package
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="WebSite">
+     <xs:annotation>
+       <xs:documentation>
+         a searchable collection of tabular or property-oriented data
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:SiteRoleType" minOccurs="1"
+                       maxOccurs="2">
+             <xs:annotation>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Dataset.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="SiteRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a web site.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Web Site: InteractiveResource: Portal">
+         <xs:annotation>
+           <xs:documentation>
+             A web site that provides a suite of tool for interacting with 
+             a variety of data.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Web Site: Informational">
+         <xs:annotation>
+           <xs:documentation>
+             A web site that provides a suite of tool for interacting with 
+             a variety of data.
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>

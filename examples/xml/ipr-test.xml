@@ -70,25 +70,19 @@
      </reference>
      <primaryAudience> research </primaryAudience>
    </content>
-   <role>
-     <type pid="http://purl.org/dc/dcmitype/Collection"> Collection: Repository </type>
-<!--     <type> Collection: Repository </type> -->
+   <role xsi:type="rsm:DataCollection">
+      <type> Collection: Repository </type>
    </role>
    <applicability xsi:type="rsm:MaterialsScience">
      <propertyAddressed xsi:type="rsm:Microstructural_Properties_addressed">
        Microstructural
      </propertyAddressed>
    </applicability>
-   <related>
-     <relationship xsi:type="rsm:DciteRelation" label="IsDocumentedBy"> is documented by </relationship>
-     <resource>IPR Help Page</resource>
-   </related>
    <access>
      <policy><restriction> public </restriction></policy>
-     <via xsi:type="rsm:ViaPortal">
+     <method xsi:type="rsm:PortalMethod">
        <accessURL> http://www.ctcms.nist.gov/potentials/ </accessURL>
-       <details> <type> InteractiveResource: Portal </type></details>
-     </via>
+     </method>
    </access>
 
 </Resource>

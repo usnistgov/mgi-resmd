@@ -103,7 +103,7 @@
        additional metadata associated with them.  Software is an
        example that would have extended metadata.
      -->
-   <role xsi:type="rsm:Repository">
+   <role xsi:type="rsm:DataCollection">
       <type> Collection: Repository </type>
    </role>
 
@@ -161,31 +161,28 @@
      </policy>
 
      <!--
-         multiple <via> elements can describe different ways for accessing
+         multiple <method> elements can describe different ways for accessing
          a resource
        -->
-     <via xsi:type="rsm:ViaPortal">
+     <method xsi:type="rsm:PortalMethod">
        <title> The IPR Portal </title>
        <description> ... </description>
 
        <!-- if different from landing page -->
        <accessURL> https://www.ctcms.nist.gov/potentials/search </accessURL>
-
-       <details><type> InteractiveResource: Portal </type></details>
-     </via>       
+     </method>       
 
      <!-- downloadable file or directory of files -->
-     <via xsi:type="rsm:ViaDownload">
+     <method xsi:type="rsm:DownloadMethod">
        <title> The IPR database </title>
        <description> ... </description>
        <accessURL> https://www.ctcms.nist.gov/potentials/data.json </accessURL>
-       <details><type> Download </type></details>
        <format> text/json </format>
        <filesize> 1100 </filesize>
-     </via>       
+     </method>       
 
      <!-- service API (that may conform to some standard) -->
-     <via xsi:type="rsm:ViaServiceAPI">
+     <method xsi:type="rsm:ServiceAPIMethod">
        <title> The IPR search service </title>
        <description> ... </description>
        <details>
@@ -194,19 +191,17 @@
          <specificationURL> https://... </specificationURL>
          <complianceID> https://... </complianceID>
        </details>
-     </via>
+     </method>
 
      <!-- via media one can order -->
-     <via xsi:type="rsm:ViaMedia">
+     <method xsi:type="rsm:MediaMethod">
        <title> The IPR Database </title>
        <description> ... </description>
 
        <!-- if different from landing page -->
        <accessURL> https://www.ctcms.nist.gov/potentials/order </accessURL>
-
-       <details><type> Physical Object: Storage Media </type></details>
        <mediaType> CDROM </mediaType>
-     </via>       
+     </method>       
    </access>
 
 </Resource>

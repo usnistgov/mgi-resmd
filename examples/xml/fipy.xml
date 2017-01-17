@@ -100,10 +100,10 @@
        <restriction> public </restriction>
        <termsURL> http://www.ctcms.nist.gov/fipy/LICENSE.html </termsURL>
      </policy>
-     <via xsi:type="rsm:ViaDownload">
+     <method xsi:type="rsm:DownloadMethod">
        <accessURL use="dir" returns="text/html">
           http://www.ctcms.nist.gov/fipy/download/
        </accessURL>
-     </via>
+     </method>
    </access>
 </Resource>

@@ -88,12 +88,11 @@
        <restriction> fee-required </restriction>
        <termsURL>http://www.nist.gov/open/license.cfm</termsURL>
      </policy>
-     <via xsi:type="rsm:ViaMedia">
+     <method xsi:type="rsm:MediaMethod">
        <description>CDROM contains 5228 spectra in JCAMP-DX format</description>
        <accessURL>http://dx.doi.org/10.18434/T45K5N</accessURL>
-       <details><type>Physical Object: Storage Media</type></details>
        <mediaType>CDROM</mediaType>
-     </via>
+     </method>
    </access>
 
 </Resource>
