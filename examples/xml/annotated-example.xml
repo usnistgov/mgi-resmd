@@ -116,31 +116,31 @@
      -->
    <applicability xsi:type="rsm:MaterialsScience">
 
-       <materialType xsi:type="rsm:Ceramics_Material_type">
-         Ceramics: Perovskite
+       <materialType>
+         <Ceramics> Ceramics: Perovskite </Ceramics>
        </materialType>
 
-       <structuralFeature xsi:type="rsm:Composites_Structural_Feature">
-         Composites: nanocomposites
+       <structuralFeature>
+         <Composites> Composites: nanocomposites </Composites>
        </structuralFeature>
-       <structuralFeature xsi:type="rsm:Defects_Structural_Feature">
-         Defects: Point defects
+       <structuralFeature>
+         <Defects> Defects: Point defects </Defects>
        </structuralFeature>
        
-       <propertyAddressed xsi:type="rsm:Microstructural_Properties_addressed">
-         Microstructural
+       <propertyAddressed>
+         <Microstructural> Microstructural </Microstructural>
        </propertyAddressed>
 
-       <experimentalMethod xsi:type="rsm:Charge_distribution_Experimental_Methods">
-         Charge distribution
+       <experimentalMethod>
+         <Charge_distribution> Charge distribution </Charge_distribution>
        </experimentalMethod>
 
-       <computationalMethod xsi:type="rsm:Dislocation_Dynamics_Computational_method">
-         Dislocation Dynamics
+       <computationalMethod>
+         <Dislocation_Dynamics> Dislocation Dynamics </Dislocation_Dynamics>
        </computationalMethod>
 
-       <synthesisProcessing xsi:type="rsm:Annealing_Synthesis_and_Processing">
-         Annealing: normalizing
+       <synthesisProcessing>
+         <Annealing> Annealing: normalizing </Annealing>
        </synthesisProcessing>
 
    </applicability>

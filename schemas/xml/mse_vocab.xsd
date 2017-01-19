@@ -2,20 +2,34 @@
 <xs:schema targetNamespace="http://schema.nist.gov/xml/res-md/1.0wd-02-2017" 
            xmlns="http://www.w3.org/2001/XMLSchema" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-           xmlns:mse="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
+           xmlns:tv="http://schema.nist.gov/xml/tieredvocab/1.0wd" 
+           xmlns:rsm="http://schema.nist.gov/xml/res-md/1.0wd-02-2017"
            xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
            elementFormDefault="qualified" 
-           attributeFormDefault="unqualified" version="draft10">
+           attributeFormDefault="unqualified" version="10">
 
-   <xs:simpleType name="Material_type">
+   <xs:complexType name="Material_type">
      <xs:annotation>
        <xs:documentation>
          a property that captures Material type(s) vocabulary
        </xs:documentation>
      </xs:annotation>
-     <xs:restriction base="xs:token"/>
-   </xs:simpleType>
- 
+
+     <xs:choice>
+         <xs:element name="Biological" type="rsm:Biological_Material_type"/>
+         <xs:element name="Biomaterials" type="rsm:Biomaterials_Material_type"/>
+         <xs:element name="Ceramics" type="rsm:Ceramics_Material_type"/>
+         <xs:element name="Metals_and_alloys" type="rsm:Metals_and_alloys_Material_type"/>
+         <xs:element name="Metamaterial" type="rsm:Metamaterial_Material_type"/>
+         <xs:element name="Molecular_fluids" type="rsm:Molecular_fluids_Material_type"/>
+         <xs:element name="Organic_Carbon-containing" type="rsm:Organic_Carbon-containing_Material_type"/>
+         <xs:element name="Organometallic" type="rsm:Organometallic_Material_type"/>
+         <xs:element name="Oxides" type="rsm:Oxides_Material_type"/>
+         <xs:element name="Polymer" type="rsm:Polymer_Material_type"/>
+         <xs:element name="Semiconductor" type="rsm:Semiconductor_Material_type"/>
+     </xs:choice>
+   </xs:complexType>
+  
    <xs:simpleType name="Biological_Material_type">
      <xs:annotation>
        <xs:documentation>
@@ -23,7 +37,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Biological"/>
      </xs:restriction>
    </xs:simpleType>
@@ -35,7 +49,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Biomaterials"/>
      </xs:restriction>
    </xs:simpleType>
@@ -47,7 +61,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Ceramics"/>
        <xs:enumeration value="Ceramics: Perovskite"/>
      </xs:restriction>
@@ -60,7 +74,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Metals and alloys"/>
        <xs:enumeration value="Metals and alloys: Al-containing"/>
        <xs:enumeration value="Metals and alloys: Commercially pure metals"/>
@@ -80,7 +94,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Metamaterial"/>
      </xs:restriction>
    </xs:simpleType>
@@ -92,7 +106,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Molecular fluids"/>
      </xs:restriction>
    </xs:simpleType>
@@ -104,7 +118,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Organic (Carbon-containing)"/>
      </xs:restriction>
    </xs:simpleType>
@@ -116,7 +130,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Organometallic"/>
      </xs:restriction>
    </xs:simpleType>
@@ -128,7 +142,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Oxides"/>
      </xs:restriction>
    </xs:simpleType>
@@ -140,7 +154,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Polymer"/>
        <xs:enumeration value="Polymer: Copolymer"/>
        <xs:enumeration value="Polymer: Elastomer"/>
@@ -158,22 +172,33 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Material_type">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Semiconductor"/>
        <xs:enumeration value="Semiconductor: II-VI"/>
        <xs:enumeration value="Semiconductor: III-V"/>
      </xs:restriction>
    </xs:simpleType>
  
-   <xs:simpleType name="Structural_Feature">
+   <xs:complexType name="Structural_Feature">
      <xs:annotation>
        <xs:documentation>
          a property that captures Structural Feature(s) vocabulary
        </xs:documentation>
      </xs:annotation>
-     <xs:restriction base="xs:token"/>
-   </xs:simpleType>
- 
+
+     <xs:choice>
+         <xs:element name="Composites" type="rsm:Composites_Structural_Feature"/>
+         <xs:element name="Defects" type="rsm:Defects_Structural_Feature"/>
+         <xs:element name="Engineered_structures" type="rsm:Engineered_structures_Structural_Feature"/>
+         <xs:element name="Interfacial" type="rsm:Interfacial_Structural_Feature"/>
+         <xs:element name="Interphase" type="rsm:Interphase_Structural_Feature"/>
+         <xs:element name="Microstructure" type="rsm:Microstructure_Structural_Feature"/>
+         <xs:element name="Morphology" type="rsm:Morphology_Structural_Feature"/>
+         <xs:element name="Phase" type="rsm:Phase_Structural_Feature"/>
+         <xs:element name="Surfaces" type="rsm:Surfaces_Structural_Feature"/>
+     </xs:choice>
+   </xs:complexType>
+  
    <xs:simpleType name="Composites_Structural_Feature">
      <xs:annotation>
        <xs:documentation>
@@ -181,7 +206,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Structural_Feature">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Composites"/>
        <xs:enumeration value="Composites: fiber-reinforced"/>
        <xs:enumeration value="Composites: metal-matrix"/>
@@ -199,7 +224,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Structural_Feature">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Defects"/>
        <xs:enumeration value="Defects: Dislocations"/>
        <xs:enumeration value="Defects: Point defects"/>
@@ -214,7 +239,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Structural_Feature">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Engineered structures"/>
      </xs:restriction>
    </xs:simpleType>
@@ -226,7 +251,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Structural_Feature">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Interfacial"/>
      </xs:restriction>
    </xs:simpleType>
@@ -238,7 +263,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Structural_Feature">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Interphase"/>
      </xs:restriction>
    </xs:simpleType>
@@ -250,7 +275,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Structural_Feature">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Microstructure"/>
        <xs:enumeration value="Microstructure: compound"/>
        <xs:enumeration value="Microstructure: dendritic"/>
@@ -273,7 +298,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Structural_Feature">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Morphology"/>
        <xs:enumeration value="Morphology: 1D"/>
        <xs:enumeration value="Morphology: 2D"/>
@@ -298,7 +323,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Structural_Feature">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Phase"/>
        <xs:enumeration value="Phase: crystalline"/>
        <xs:enumeration value="Phase: gas"/>
@@ -313,20 +338,38 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Structural_Feature">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Surfaces"/>
      </xs:restriction>
    </xs:simpleType>
  
-   <xs:simpleType name="Properties_addressed">
+   <xs:complexType name="Properties_addressed">
      <xs:annotation>
        <xs:documentation>
          a property that captures Properties addressed vocabulary
        </xs:documentation>
      </xs:annotation>
-     <xs:restriction base="xs:token"/>
-   </xs:simpleType>
- 
+
+     <xs:choice>
+         <xs:element name="Chemical" type="rsm:Chemical_Properties_addressed"/>
+         <xs:element name="Corrosion" type="rsm:Corrosion_Properties_addressed"/>
+         <xs:element name="Crystallographic" type="rsm:Crystallographic_Properties_addressed"/>
+         <xs:element name="Electrical" type="rsm:Electrical_Properties_addressed"/>
+         <xs:element name="Kinetic" type="rsm:Kinetic_Properties_addressed"/>
+         <xs:element name="Magnetic" type="rsm:Magnetic_Properties_addressed"/>
+         <xs:element name="Mechanical" type="rsm:Mechanical_Properties_addressed"/>
+         <xs:element name="Microstructural" type="rsm:Microstructural_Properties_addressed"/>
+         <xs:element name="Optical" type="rsm:Optical_Properties_addressed"/>
+         <xs:element name="Rheological" type="rsm:Rheological_Properties_addressed"/>
+         <xs:element name="Structural" type="rsm:Structural_Properties_addressed"/>
+         <xs:element name="Thermodynamic" type="rsm:Thermodynamic_Properties_addressed"/>
+         <xs:element name="Toxicity_Safety" type="rsm:Toxicity_Safety_Properties_addressed"/>
+         <xs:element name="Transport" type="rsm:Transport_Properties_addressed"/>
+         <xs:element name="Vibrational_or_Electronic" type="rsm:Vibrational_or_Electronic_Properties_addressed"/>
+         <xs:element name="Viscoelastic_creep" type="rsm:Viscoelastic_creep_Properties_addressed"/>
+     </xs:choice>
+   </xs:complexType>
+  
    <xs:simpleType name="Chemical_Properties_addressed">
      <xs:annotation>
        <xs:documentation>
@@ -334,7 +377,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Chemical"/>
        <xs:enumeration value="Chemical: Composition"/>
        <xs:enumeration value="Chemical: Molecular weights"/>
@@ -348,7 +391,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Corrosion"/>
      </xs:restriction>
    </xs:simpleType>
@@ -360,7 +403,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Crystallographic"/>
        <xs:enumeration value="Crystallographic: Orientation maps"/>
      </xs:restriction>
@@ -373,7 +416,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Electrical"/>
        <xs:enumeration value="Electrical: Conductivity"/>
        <xs:enumeration value="Electrical: Dielectric constant"/>
@@ -395,7 +438,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Kinetic"/>
        <xs:enumeration value="Kinetic: Grain growth"/>
        <xs:enumeration value="Kinetic: Phase evolution"/>
@@ -410,7 +453,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Magnetic"/>
      </xs:restriction>
    </xs:simpleType>
@@ -422,7 +465,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Mechanical"/>
        <xs:enumeration value="Mechanical: acoustic emission"/>
        <xs:enumeration value="Mechanical: compression response"/>
@@ -446,7 +489,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Microstructural"/>
        <xs:enumeration value="Microstructural: clustering"/>
        <xs:enumeration value="Microstructural: crystallinity"/>
@@ -465,7 +508,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Optical"/>
      </xs:restriction>
    </xs:simpleType>
@@ -477,7 +520,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Rheological"/>
        <xs:enumeration value="Rheological: viscosity"/>
      </xs:restriction>
@@ -490,7 +533,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Structural"/>
      </xs:restriction>
    </xs:simpleType>
@@ -502,7 +545,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Thermodynamic"/>
        <xs:enumeration value="Thermodynamic: calorimetry profile"/>
        <xs:enumeration value="Thermodynamic: crystallization temperature"/>
@@ -530,7 +573,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Toxicity / Safety"/>
      </xs:restriction>
    </xs:simpleType>
@@ -542,7 +585,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Transport"/>
        <xs:enumeration value="Transport: diffusivity"/>
        <xs:enumeration value="Transport: tracer diffusivity"/>
@@ -556,7 +599,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Vibrational or Electronic"/>
        <xs:enumeration value="Vibrational or Electronic: band gap"/>
        <xs:enumeration value="Vibrational or Electronic: spin polarization"/>
@@ -570,20 +613,35 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Properties_addressed">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Viscoelastic / creep"/>
      </xs:restriction>
    </xs:simpleType>
  
-   <xs:simpleType name="Experimental_Methods">
+   <xs:complexType name="Experimental_Methods">
      <xs:annotation>
        <xs:documentation>
          a property that captures Experimental Methods vocabulary
        </xs:documentation>
      </xs:annotation>
-     <xs:restriction base="xs:token"/>
-   </xs:simpleType>
- 
+
+     <xs:choice>
+         <xs:element name="Charge_distribution" type="rsm:Charge_distribution_Experimental_Methods"/>
+         <xs:element name="Dilatometry" type="rsm:Dilatometry_Experimental_Methods"/>
+         <xs:element name="Electrochemical" type="rsm:Electrochemical_Experimental_Methods"/>
+         <xs:element name="Mechanical" type="rsm:Mechanical_Experimental_Methods"/>
+         <xs:element name="Microscopy" type="rsm:Microscopy_Experimental_Methods"/>
+         <xs:element name="Optical" type="rsm:Optical_Experimental_Methods"/>
+         <xs:element name="Profilometry" type="rsm:Profilometry_Experimental_Methods"/>
+         <xs:element name="Scattering_Diffraction" type="rsm:Scattering_Diffraction_Experimental_Methods"/>
+         <xs:element name="Spectrometry" type="rsm:Spectrometry_Experimental_Methods"/>
+         <xs:element name="Spectroscopy" type="rsm:Spectroscopy_Experimental_Methods"/>
+         <xs:element name="Thermochemical" type="rsm:Thermochemical_Experimental_Methods"/>
+         <xs:element name="Tomography" type="rsm:Tomography_Experimental_Methods"/>
+         <xs:element name="Ultrasonic" type="rsm:Ultrasonic_Experimental_Methods"/>
+     </xs:choice>
+   </xs:complexType>
+  
    <xs:simpleType name="Charge_distribution_Experimental_Methods">
      <xs:annotation>
        <xs:documentation>
@@ -591,7 +649,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Charge distribution"/>
        <xs:enumeration value="Charge distribution: pulsed electroacoustic method"/>
      </xs:restriction>
@@ -604,7 +662,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Dilatometry"/>
      </xs:restriction>
    </xs:simpleType>
@@ -616,7 +674,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Electrochemical"/>
        <xs:enumeration value="Electrochemical: Amperometry"/>
        <xs:enumeration value="Electrochemical: Voltammetry"/>
@@ -630,7 +688,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Mechanical"/>
        <xs:enumeration value="Mechanical: nanoindentation"/>
        <xs:enumeration value="Mechanical: Tensile tests"/>
@@ -644,7 +702,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Microscopy"/>
        <xs:enumeration value="Microscopy: Analytical Electron Microscopy"/>
        <xs:enumeration value="Microscopy: atomic force microscopy (AFM)"/>
@@ -670,7 +728,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Optical"/>
        <xs:enumeration value="Optical: Ellipsometry"/>
        <xs:enumeration value="Optical: Fractography"/>
@@ -684,7 +742,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Profilometry"/>
      </xs:restriction>
    </xs:simpleType>
@@ -696,7 +754,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Scattering / Diffraction"/>
        <xs:enumeration value="Scattering / Diffraction: Electron Backscatter Diffraction (SEM)"/>
        <xs:enumeration value="Scattering / Diffraction: Neutron [elastic]"/>
@@ -718,7 +776,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Spectrometry"/>
        <xs:enumeration value="Spectrometry: Alpha Spectrometry"/>
        <xs:enumeration value="Spectrometry: Energy Dispersive x-Ray Spectometry"/>
@@ -738,7 +796,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Spectroscopy"/>
        <xs:enumeration value="Spectroscopy: dielectric and impedance spectroscopy"/>
        <xs:enumeration value="Spectroscopy: dynamic mechanical analysis / spectroscopy"/>
@@ -762,7 +820,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Thermochemical"/>
        <xs:enumeration value="Thermochemical: Calorimetry / Microcalorimetry"/>
        <xs:enumeration value="Thermochemical: Differential Scanning Calorimetry (DSC)"/>
@@ -778,7 +836,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Tomography"/>
        <xs:enumeration value="Tomography: atom probe tomography"/>
        <xs:enumeration value="Tomography: X-ray tomography"/>
@@ -792,20 +850,34 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Experimental_Methods">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Ultrasonic"/>
      </xs:restriction>
    </xs:simpleType>
  
-   <xs:simpleType name="Computational_method">
+   <xs:complexType name="Computational_method">
      <xs:annotation>
        <xs:documentation>
          a property that captures Computational method(s) vocabulary
        </xs:documentation>
      </xs:annotation>
-     <xs:restriction base="xs:token"/>
-   </xs:simpleType>
- 
+
+     <xs:choice>
+         <xs:element name="Boundary_tracking_level_set" type="rsm:Boundary_tracking_level_set_Computational_method"/>
+         <xs:element name="Crystal_plasticity_calculation" type="rsm:Crystal_plasticity_calculation_Computational_method"/>
+         <xs:element name="Density_Functional_Theory_Electronic_Structure" type="rsm:Density_Functional_Theory_Electronic_Structure_Computational_method"/>
+         <xs:element name="Dislocation_Dynamics" type="rsm:Dislocation_Dynamics_Computational_method"/>
+         <xs:element name="Finite_Element_Analysis_Modeling" type="rsm:Finite_Element_Analysis_Modeling_Computational_method"/>
+         <xs:element name="Molecular_Dynamics" type="rsm:Molecular_Dynamics_Computational_method"/>
+         <xs:element name="Monte-Carlo_Methods" type="rsm:Monte-Carlo_Methods_Computational_method"/>
+         <xs:element name="Multiscale_Simulations" type="rsm:Multiscale_Simulations_Computational_method"/>
+         <xs:element name="Phase-field_Calculations" type="rsm:Phase-field_Calculations_Computational_method"/>
+         <xs:element name="Reverse_Monte_Carlo_RMC" type="rsm:Reverse_Monte_Carlo_RMC_Computational_method"/>
+         <xs:element name="Simulated_experiment" type="rsm:Simulated_experiment_Computational_method"/>
+         <xs:element name="Statistical_Mechanics" type="rsm:Statistical_Mechanics_Computational_method"/>
+     </xs:choice>
+   </xs:complexType>
+  
    <xs:simpleType name="Boundary_tracking_level_set_Computational_method">
      <xs:annotation>
        <xs:documentation>
@@ -813,7 +885,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Boundary tracking / level set"/>
      </xs:restriction>
    </xs:simpleType>
@@ -825,7 +897,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Crystal plasticity calculation"/>
      </xs:restriction>
    </xs:simpleType>
@@ -837,7 +909,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Density Functional Theory (Electronic Structure)"/>
      </xs:restriction>
    </xs:simpleType>
@@ -849,7 +921,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Dislocation Dynamics"/>
      </xs:restriction>
    </xs:simpleType>
@@ -861,7 +933,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Finite Element Analysis / Modeling"/>
      </xs:restriction>
    </xs:simpleType>
@@ -873,7 +945,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Molecular Dynamics"/>
      </xs:restriction>
    </xs:simpleType>
@@ -885,7 +957,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Monte-Carlo Methods"/>
      </xs:restriction>
    </xs:simpleType>
@@ -897,7 +969,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Multiscale Simulations"/>
      </xs:restriction>
    </xs:simpleType>
@@ -909,7 +981,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Phase-field Calculations"/>
      </xs:restriction>
    </xs:simpleType>
@@ -921,7 +993,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Reverse Monte Carlo (RMC)"/>
      </xs:restriction>
    </xs:simpleType>
@@ -933,7 +1005,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Simulated experiment"/>
      </xs:restriction>
    </xs:simpleType>
@@ -945,20 +1017,40 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Computational_method">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Statistical Mechanics"/>
      </xs:restriction>
    </xs:simpleType>
  
-   <xs:simpleType name="Synthesis_and_Processing">
+   <xs:complexType name="Synthesis_and_Processing">
      <xs:annotation>
        <xs:documentation>
          a property that captures Synthesis and Processing vocabulary
        </xs:documentation>
      </xs:annotation>
-     <xs:restriction base="xs:token"/>
-   </xs:simpleType>
- 
+
+     <xs:choice>
+         <xs:element name="Annealing" type="rsm:Annealing_Synthesis_and_Processing"/>
+         <xs:element name="Casting" type="rsm:Casting_Synthesis_and_Processing"/>
+         <xs:element name="Curing" type="rsm:Curing_Synthesis_and_Processing"/>
+         <xs:element name="Deposition_processing" type="rsm:Deposition_processing_Synthesis_and_Processing"/>
+         <xs:element name="Drying" type="rsm:Drying_Synthesis_and_Processing"/>
+         <xs:element name="Forming" type="rsm:Forming_Synthesis_and_Processing"/>
+         <xs:element name="Homogenization" type="rsm:Homogenization_Synthesis_and_Processing"/>
+         <xs:element name="Mechanical_surface_modification" type="rsm:Mechanical_surface_modification_Synthesis_and_Processing"/>
+         <xs:element name="Powder_processing" type="rsm:Powder_processing_Synthesis_and_Processing"/>
+         <xs:element name="Quenching" type="rsm:Quenching_Synthesis_and_Processing"/>
+         <xs:element name="Reactive" type="rsm:Reactive_Synthesis_and_Processing"/>
+         <xs:element name="Reductive_roasting" type="rsm:Reductive_roasting_Synthesis_and_Processing"/>
+         <xs:element name="Sectioning" type="rsm:Sectioning_Synthesis_and_Processing"/>
+         <xs:element name="Self-assembly" type="rsm:Self-assembly_Synthesis_and_Processing"/>
+         <xs:element name="Solidification" type="rsm:Solidification_Synthesis_and_Processing"/>
+         <xs:element name="Subtractive_processing" type="rsm:Subtractive_processing_Synthesis_and_Processing"/>
+         <xs:element name="Thermal_plasma_processing" type="rsm:Thermal_plasma_processing_Synthesis_and_Processing"/>
+         <xs:element name="Ultra-sonication" type="rsm:Ultra-sonication_Synthesis_and_Processing"/>
+     </xs:choice>
+   </xs:complexType>
+  
    <xs:simpleType name="Annealing_Synthesis_and_Processing">
      <xs:annotation>
        <xs:documentation>
@@ -966,7 +1058,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Annealing"/>
        <xs:enumeration value="Annealing: aging"/>
        <xs:enumeration value="Annealing: homogenization"/>
@@ -984,7 +1076,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Casting"/>
        <xs:enumeration value="Casting: centrifugal casting"/>
        <xs:enumeration value="Casting: continuous casting"/>
@@ -1003,7 +1095,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Curing"/>
      </xs:restriction>
    </xs:simpleType>
@@ -1015,7 +1107,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Deposition processing"/>
        <xs:enumeration value="Deposition processing: chemical vapor deposition"/>
        <xs:enumeration value="Deposition processing: electrodeposition"/>
@@ -1037,7 +1129,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Drying"/>
      </xs:restriction>
    </xs:simpleType>
@@ -1049,7 +1141,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Forming"/>
        <xs:enumeration value="Forming: cold rolling"/>
        <xs:enumeration value="Forming: drawing"/>
@@ -1069,7 +1161,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Homogenization"/>
        <xs:enumeration value="Homogenization: mechanical mixing"/>
        <xs:enumeration value="Homogenization: melt mixing"/>
@@ -1083,7 +1175,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Mechanical surface modification"/>
        <xs:enumeration value="Mechanical surface modification: polishing"/>
      </xs:restriction>
@@ -1096,7 +1188,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Powder processing"/>
        <xs:enumeration value="Powder processing: atomization"/>
        <xs:enumeration value="Powder processing: ball milling"/>
@@ -1113,7 +1205,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Quenching"/>
        <xs:enumeration value="Quenching: air cooled / quench"/>
        <xs:enumeration value="Quenching: brine quench"/>
@@ -1133,7 +1225,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Reactive"/>
        <xs:enumeration value="Reactive: in-situ polymerization"/>
        <xs:enumeration value="Reactive: solution processing"/>
@@ -1147,7 +1239,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Reductive roasting"/>
      </xs:restriction>
    </xs:simpleType>
@@ -1159,7 +1251,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Sectioning"/>
      </xs:restriction>
    </xs:simpleType>
@@ -1171,7 +1263,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Self-assembly"/>
      </xs:restriction>
    </xs:simpleType>
@@ -1183,7 +1275,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Solidification"/>
        <xs:enumeration value="Solidification: directional solidification"/>
        <xs:enumeration value="Solidification: rapid solidification"/>
@@ -1200,7 +1292,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Subtractive processing"/>
        <xs:enumeration value="Subtractive processing: dissolving / etching"/>
        <xs:enumeration value="Subtractive processing: focused ion beam (FIB)"/>
@@ -1214,7 +1306,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Thermal plasma processing"/>
      </xs:restriction>
    </xs:simpleType>
@@ -1226,7 +1318,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:Synthesis_and_Processing">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="Ultra-sonication"/>
      </xs:restriction>
    </xs:simpleType>

@@ -63,8 +63,8 @@
       <type> Collection: Repository </type>
    </role>
    <applicability xsi:type="rsm:MaterialsScience">
-     <propertyAddressed xsi:type="rsm:Microstructural_Properties_addressed">
-       Microstructural
+     <propertyAddressed>
+       <Microstructural> Microstructural </Microstructural>
      </propertyAddressed>
    </applicability>
    <access>

@@ -21,9 +21,9 @@ FORWARD = \
            xmlns="http://www.w3.org/2001/XMLSchema" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            xmlns:tv="http://schema.nist.gov/xml/tieredvocab/1.0wd" 
-           xmlns:mse="{tns}"
+           xmlns:rsm="{tns}"
            xmlns:am="http://schema.nist.gov/xml/mgi.schema.annot" 
-           elementFormDefault="unqualified" 
+           elementFormDefault="qualified" 
            attributeFormDefault="unqualified" version="{version}">
 """
 
@@ -42,7 +42,7 @@ L2ENUM = \
        </xs:documentation>
      </xs:annotation>
 
-     <xs:restriction base="mse:{propName}">
+     <xs:restriction base="xs:token">
        <xs:enumeration value="{value}"/>
      </xs:restriction>
    </xs:simpleType>
@@ -50,15 +50,18 @@ L2ENUM = \
 
 L0TYPE = \
 """
-   <xs:simpleType name="{name}">
+   <xs:complexType name="{name}">
      <xs:annotation>
        <xs:documentation>
          a property that captures {prop} vocabulary
        </xs:documentation>
      </xs:annotation>
-     <xs:restriction base="xs:token"/>
-   </xs:simpleType>
-"""
+
+     <xs:choice>
+         <xs:element name="{value}" type="rsm:{value}_{name}"/>
+     </xs:choice>
+   </xs:complexType>
+ """
 
 
 if not prog:
@@ -79,7 +82,7 @@ def define_opts(progname=None):
                         dest='camel',
                         help="use camel case for generated type names")
     parser.add_argument('-n', '--namespace', type=str, dest='ns', metavar='NS',
-                        default='https://www.nist.gov/od/sch/mse-vocab/1.0wd',
+                       default='http://schema.nist.gov/xml/res-md/1.0wd-02-2017',
                         help='set the schema namespace to NS')
     parser.add_argument('-t', '--run-test', type=str, dest='test',metavar='TEST',
                         default=None, help='run the test named TEST')
@@ -249,6 +252,20 @@ class Property(object):
                   "propType": self.name }
         tdata.update(data)
 
+        lines = format.splitlines()
+        choiceline = filter(lambda n: "{value}" in n[1], enumerate(lines))
+        if len(choiceline) > 0:
+            lineno = choiceline[0][0]
+            choiceline = choiceline[0][1]
+            lines.pop(lineno)
+
+            elines = []
+            for val in reversed(self.lev1.keys()):
+                edata = tdata.copy()
+                edata['value'] = self.to_name(val)
+                lines.insert(lineno, choiceline.format(**edata))
+            
+        format = "\n".join(lines)
         return format.format(**tdata)
 
     def write_schema(self, out):
