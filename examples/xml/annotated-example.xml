@@ -118,30 +118,30 @@
    <applicability xsi:type="rsm:MaterialsScience">
 
        <materialType>
-         <Ceramics> Ceramics: Perovskite </Ceramics>
+         <ceramics> ceramics: carbides </ceramics>
        </materialType>
 
        <structuralFeature>
-         <Composites> Composites: nanocomposites </Composites>
+         <composites> composites: nanocomposites </composites>
        </structuralFeature>
        <structuralFeature>
-         <Defects> Defects: Point defects </Defects>
+         <defects> defects: point defects </defects>
        </structuralFeature>
        
        <propertyAddressed>
-         <Microstructural> Microstructural </Microstructural>
+         <microstructural> microstructural </microstructural>
        </propertyAddressed>
 
        <experimentalMethod>
-         <Charge_distribution> Charge distribution </Charge_distribution>
+         <charge_distribution> charge distribution </charge_distribution>
        </experimentalMethod>
 
        <computationalMethod>
-         <Dislocation_Dynamics> Dislocation Dynamics </Dislocation_Dynamics>
+         <dislocation_dynamics> dislocation dynamics </dislocation_dynamics>
        </computationalMethod>
 
        <synthesisProcessing>
-         <Annealing> Annealing: normalizing </Annealing>
+         <annealing_and_homogenization> annealing and homogenization: normalizing </annealing_and_homogenization>
        </synthesisProcessing>
 
    </applicability>

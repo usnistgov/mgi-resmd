@@ -64,7 +64,7 @@
    </role>
    <applicability xsi:type="rsm:MaterialsScience">
      <propertyAddressed>
-       <Microstructural> Microstructural </Microstructural>
+       <microstructural> microstructural </microstructural>
      </propertyAddressed>
    </applicability>
    <access>

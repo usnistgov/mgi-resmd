@@ -84,13 +84,13 @@
    <!-- This part contains Materials Science-specific metadata -->
    <applicability xsi:type="rsm:MaterialsScience">
      <structuralFeature>
-       <Microstructure> Microstructure: single crystal </Microstructure>
+       <microstructures> microstructures: single crystal </microstructures>
      </structuralFeature>
      <structuralFeature>
-       <Microstructure> Microstructure: polycrystalline </Microstructure>
+       <microstructures> microstructures: polycrystalline </microstructures>
      </structuralFeature>
      <propertyAddressed>
-       <Microstructural>Microstructural</Microstructural>
+       <microstructural>microstructural</microstructural>
      </propertyAddressed>
    </applicability>     
 
