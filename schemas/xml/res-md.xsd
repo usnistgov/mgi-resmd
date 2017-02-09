@@ -2788,7 +2788,7 @@
              </xs:annotation>
            </xs:element>
            
-           <xs:element name="baseURL" type="xs:anyURI">
+           <xs:element name="baseURL" type="xs:anyURI" minOccurs="0">
               <xs:annotation>
                 <xs:appinfo>
                   <label>Base URL</label>
@@ -2801,7 +2801,7 @@
               </xs:annotation>
            </xs:element>       
 
-           <xs:element name="specificationURL" type="xs:anyURI">
+           <xs:element name="specificationURL" type="xs:anyURI" minOccurs="0">
               <xs:annotation>
                 <xs:appinfo>
                   <label>Specification URL</label>
@@ -2813,7 +2813,7 @@
               </xs:annotation>
            </xs:element>       
 
-           <xs:element name="complianceID" type="xs:anyURI">
+           <xs:element name="complianceID" type="xs:anyURI" minOccurs="0">
               <xs:annotation>
                 <xs:appinfo>
                   <label>Compliance ID</label>
