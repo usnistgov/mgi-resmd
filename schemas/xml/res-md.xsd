@@ -27,10 +27,8 @@
       </xs:documentation>
    </xs:annotation>
 
-<!-- <xs:include schemaLocation="file://localhost/mdcs/mse_vocab.xsd"/> -->
-     
-   <xs:include schemaLocation="mse_vocab.xsd"/>
-       
+   <xs:include schemaLocation="http://129.6.153.219/rest/types/get-dependency?id=589d94c86e95520522138e07"/>
+
 
    <xs:element name="Resource" type="rsm:AccessibleResource">
       <xs:annotation>
@@ -200,6 +198,7 @@
       </xs:attribute>
    </xs:complexType>
 
+   <!-- Organization -->
    <xs:complexType name="Identity">
      <xs:annotation>
        <xs:documentation>
@@ -1617,8 +1616,10 @@
      <xs:complexContent>
        <xs:extension base="rsm:Applicability">
          <xs:sequence>
-           <xs:element name="materialType" type="rsm:Material_types" 
-                       minOccurs="0" maxOccurs="unbounded">
+           <xs:element name="materialType" type="rsm:Material_types"
+                       minOccurs="0" maxOccurs="unbounded"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/fancy_tree_material_type">
              <xs:annotation>
                <xs:appinfo>
                  <label>Material Type</label>
@@ -1630,9 +1631,11 @@
              </xs:annotation>
            </xs:element>
 
-           <xs:element name="structuralFeature" 
-                       type="rsm:Structural_features" 
-                       minOccurs="0" maxOccurs="unbounded">
+           <xs:element name="structuralFeature"
+                       type="rsm:Structural_features"
+                       minOccurs="0" maxOccurs="unbounded"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/fancy_tree_structural_feature">
              <xs:annotation>
                <xs:appinfo>
                  <label>Structural Feature</label>
@@ -1644,8 +1647,10 @@
              </xs:annotation>
            </xs:element>
 
-           <xs:element name="propertyAddressed" type="rsm:Properties_addressed"
-                       minOccurs="0" maxOccurs="unbounded">
+           <xs:element name="propertyAddressed" type="rsm:Properties_addressed" 
+                       minOccurs="0" maxOccurs="unbounded"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/fancy_tree_property_addressed">
              <xs:annotation>
                <xs:appinfo>
                  <label>Property Addressed</label>
@@ -1656,11 +1661,13 @@
              </xs:annotation>
            </xs:element>
 
-           <xs:element name="experimentalMethod" type="rsm:Experimental_methods"
-                       minOccurs="0" maxOccurs="unbounded">
+           <xs:element name="experimentalMethod" type="rsm:Experimental_methods" 
+                       minOccurs="0" maxOccurs="unbounded"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/fancy_tree_experimental_method">
              <xs:annotation>
                <xs:appinfo>
-                 <label>Experimental Method</label>
+                 <label>Experimental Data Acquisition Methods</label>
                </xs:appinfo>
                <xs:documentation>
                   the experimental technique used to acquire the data
@@ -1669,11 +1676,13 @@
              </xs:annotation>
            </xs:element>
 
-           <xs:element name="computationalMethod" type="rsm:Computational_methods"
-                       minOccurs="0" maxOccurs="unbounded">
+           <xs:element name="computationalMethod" type="rsm:Computational_methods" 
+                       minOccurs="0" maxOccurs="unbounded"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/fancy_tree_computational_method">
              <xs:annotation>
                <xs:appinfo>
-                 <label>Computational Method</label>
+                 <label>Computational Data Acquisition Methods</label>
                </xs:appinfo>
                <xs:documentation>
                   the computational technique used to acquire the data
@@ -1682,9 +1691,11 @@
              </xs:annotation>
            </xs:element>
 
-           <xs:element name="synthesisProcessing"
-                       type="rsm:Synthesis_and_processing"
-                       minOccurs="0" maxOccurs="unbounded">
+           <xs:element name="synthesisProcessing" 
+                       type="rsm:Synthesis_and_processing" 
+                       minOccurs="0" maxOccurs="unbounded"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/fancy_tree_synthesis_processing">
              <xs:annotation>
                <xs:appinfo>
                  <label>Synthesis Processing</label>
@@ -1901,7 +1912,6 @@
               </xs:documentation>
             </xs:annotation>
           </xs:attribute>
-
        </xs:extension>
      </xs:complexContent>
 
@@ -2554,6 +2564,9 @@
            <xs:element name="type" type="rsm:OrgRoleType" minOccurs="1"
                        maxOccurs="1">
              <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
                <xs:documentation>
                  It is recommended that the pid attribute be set to
                  http://purl.org/dc/dcmitype/Dataset.  
@@ -2617,6 +2630,9 @@
            <xs:element name="type" type="rsm:CollectionRoleType" minOccurs="1"
                        maxOccurs="3">
              <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
                <xs:documentation>
                  the sub-type of collection this resource qualifies as.
                </xs:documentation>
@@ -2677,6 +2693,9 @@
            <xs:element name="type" type="rsm:DatasetRoleType" minOccurs="1"
                        maxOccurs="2">
              <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
                <xs:documentation>
                  It is recommended that the pid attribute be set to
                  http://purl.org/dc/dcmitype/Dataset.  
