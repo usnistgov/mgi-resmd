@@ -120,7 +120,7 @@
            </xs:annotation>
          </xs:element>
 
-         <xs:element name="applicability" type="rsm:Applicability"
+         <xs:element name="applicability" type="rsm:MaterialsScience"
                      minOccurs="0" maxOccurs="unbounded">
            <xs:annotation>
              <xs:appinfo>

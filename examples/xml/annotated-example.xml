@@ -115,7 +115,7 @@
    <!--
        The applicability element provides 
      -->
-   <applicability xsi:type="rsm:MaterialsScience">
+   <applicability>
 
        <materialType>
          <ceramics> ceramics: carbides </ceramics>
