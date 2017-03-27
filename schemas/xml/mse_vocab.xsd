@@ -15,7 +15,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:choice>
+     <xs:choice minOccurs="0">
          <xs:element name="experiments" type="rsm:experiments_Data_origin"/>
          <xs:element name="informatics_and_data_science" type="rsm:informatics_and_data_science_Data_origin"/>
          <xs:element name="simulations" type="rsm:simulations_Data_origin"/>
@@ -78,7 +78,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:choice>
+     <xs:choice minOccurs="0">
          <xs:element name="biological" type="rsm:biological_Material_types"/>
          <xs:element name="biomaterials" type="rsm:biomaterials_Material_types"/>
          <xs:element name="ceramics" type="rsm:ceramics_Material_types"/>
@@ -254,7 +254,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:choice>
+     <xs:choice minOccurs="0">
          <xs:element name="composites" type="rsm:composites_Structural_features"/>
          <xs:element name="defects" type="rsm:defects_Structural_features"/>
          <xs:element name="engineered_structures" type="rsm:engineered_structures_Structural_features"/>
@@ -451,7 +451,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:choice>
+     <xs:choice minOccurs="0">
          <xs:element name="chemical" type="rsm:chemical_Properties_addressed"/>
          <xs:element name="colligative" type="rsm:colligative_Properties_addressed"/>
          <xs:element name="corrosion" type="rsm:corrosion_Properties_addressed"/>
@@ -754,7 +754,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:choice>
+     <xs:choice minOccurs="0">
          <xs:element name="charge_distribution" type="rsm:charge_distribution_Characterization_methods"/>
          <xs:element name="chromatography" type="rsm:chromatography_Characterization_methods"/>
          <xs:element name="dilatometry" type="rsm:dilatometry_Characterization_methods"/>
@@ -1050,7 +1050,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:choice>
+     <xs:choice minOccurs="0">
          <xs:element name="boundary_tracking_or_level_set" type="rsm:boundary_tracking_or_level_set_Computational_methods"/>
          <xs:element name="CALPHAD" type="rsm:CALPHAD_Computational_methods"/>
          <xs:element name="cellular_automata" type="rsm:cellular_automata_Computational_methods"/>
@@ -1282,7 +1282,7 @@
        </xs:documentation>
      </xs:annotation>
 
-     <xs:choice>
+     <xs:choice minOccurs="0">
          <xs:element name="annealing_and_homogenization" type="rsm:annealing_and_homogenization_Synthesis_and_processing"/>
          <xs:element name="casting" type="rsm:casting_Synthesis_and_processing"/>
          <xs:element name="deposition_and_coating" type="rsm:deposition_and_coating_Synthesis_and_processing"/>

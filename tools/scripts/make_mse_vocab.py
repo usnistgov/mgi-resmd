@@ -57,7 +57,7 @@ L0TYPE = \
        </xs:documentation>
      </xs:annotation>
 
-     <xs:choice>
+     <xs:choice minOccurs="0">
          <xs:element name="{value}" type="rsm:{value}_{name}"/>
      </xs:choice>
    </xs:complexType>

@@ -74,6 +74,8 @@
       <type> Collection: Repository </type>
    </role>
    <applicability xsi:type="rsm:MaterialsScience">
+     <materialType>
+     </materialType>
      <structuralFeature>
        <microstructures> microstructures </microstructures>
      </structuralFeature>
