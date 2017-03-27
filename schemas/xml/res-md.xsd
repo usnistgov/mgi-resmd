@@ -977,39 +977,6 @@
    </xs:simpleType>
    
 
-   <xs:simpleType name="Audience">
-     <xs:annotation>
-       <xs:documentation>
-         Controlled vocabulary categorizing an intended audience.
-       </xs:documentation>
-     </xs:annotation>
-     
-     <xs:restriction base="xs:token">
-       <xs:enumeration value="research">
-         <xs:annotation>
-           <xs:documentation>
-             intended for academic and commercial researchers
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-       <xs:enumeration value="education">
-         <xs:annotation>
-           <xs:documentation>
-             intended for formal and informal educational settings
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-       <xs:enumeration value="public outreach">
-         <xs:annotation>
-           <xs:documentation>
-             intended for broad public consumption for purposes of news 
-             and awareness
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-     </xs:restriction>
-   </xs:simpleType>
-
    <xs:complexType name="ResourceRole">
      <xs:annotation>
        <xs:documentation>
@@ -1351,45 +1318,6 @@
      </xs:sequence>
    </xs:complexType>
 
-   <xs:simpleType name="Restriction">
-      <xs:restriction base="xs:token">
-         <xs:enumeration value="public">
-            <xs:annotation>
-               <xs:documentation>
-                  unrestricted, anonymous access is allowed without 
-                  authentication.
-               </xs:documentation>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="open-login">
-            <xs:annotation>
-               <xs:documentation>
-                  unrestricted access requires a login (or other 
-                  authentication mechanism).  
-               </xs:documentation>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="proprietary">
-            <xs:annotation>
-               <xs:documentation>
-                  requires authentication and users only have access 
-                  to datasets they have been given rights to.  Generally,
-                  there is no charge to use this resource.
-               </xs:documentation>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="fee-required">
-            <xs:annotation>
-               <xs:documentation>
-                  requires user to pay a one-time or subscription fee in 
-                  order to access the resource.  On-line resources typically
-                  will require authentication.
-               </xs:documentation>
-            </xs:annotation>
-         </xs:enumeration>
-      </xs:restriction>
-   </xs:simpleType>
-
    <xs:complexType name="AccessURL">
      <xs:simpleContent>
        <xs:extension base="xs:anyURI">
@@ -1520,44 +1448,6 @@
        </xs:extension>
      </xs:complexContent>
    </xs:complexType>
-
-   <xs:simpleType name="MediaType">
-     <xs:annotation>
-       <xs:documentation>
-         Controlled labels that indicate a type of media that data or software
-         is available.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:restriction base="xs:token">
-
-       <xs:enumeration value="CDROM">
-         <xs:annotation>
-           <xs:documentation>
-             A web site that provides a suite of tool for interacting with 
-             a variety of data.
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-       <xs:enumeration value="DVDROM">
-         <xs:annotation>
-           <xs:documentation>
-             A DVD Disk formatted for data
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-       <xs:enumeration value="USB drive">
-         <xs:annotation>
-           <xs:documentation>
-             A portable USB drive
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-     </xs:restriction>
-   </xs:simpleType>
 
    <xs:complexType name="ServiceAPIMethod">
      <xs:annotation>
@@ -3001,6 +2891,116 @@
            <xs:documentation>
              A web site that provides a suite of tool for interacting with 
              a variety of data.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="Audience">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled vocabulary categorizing an intended audience.
+       </xs:documentation>
+     </xs:annotation>
+     
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="research">
+         <xs:annotation>
+           <xs:documentation>
+             intended for academic and commercial researchers
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+       <xs:enumeration value="education">
+         <xs:annotation>
+           <xs:documentation>
+             intended for formal and informal educational settings
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+       <xs:enumeration value="public outreach">
+         <xs:annotation>
+           <xs:documentation>
+             intended for broad public consumption for purposes of news 
+             and awareness
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="Restriction">
+      <xs:restriction base="xs:token">
+         <xs:enumeration value="public">
+            <xs:annotation>
+               <xs:documentation>
+                  unrestricted, anonymous access is allowed without 
+                  authentication.
+               </xs:documentation>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="open-login">
+            <xs:annotation>
+               <xs:documentation>
+                  unrestricted access requires a login (or other 
+                  authentication mechanism).  
+               </xs:documentation>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="proprietary">
+            <xs:annotation>
+               <xs:documentation>
+                  requires authentication and users only have access 
+                  to datasets they have been given rights to.  Generally,
+                  there is no charge to use this resource.
+               </xs:documentation>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="fee-required">
+            <xs:annotation>
+               <xs:documentation>
+                  requires user to pay a one-time or subscription fee in 
+                  order to access the resource.  On-line resources typically
+                  will require authentication.
+               </xs:documentation>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="MediaType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of media that data or software
+         is available.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="CDROM">
+         <xs:annotation>
+           <xs:documentation>
+             A web site that provides a suite of tool for interacting with 
+             a variety of data.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="DVDROM">
+         <xs:annotation>
+           <xs:documentation>
+             A DVD Disk formatted for data
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="USB drive">
+         <xs:annotation>
+           <xs:documentation>
+             A portable USB drive
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>
