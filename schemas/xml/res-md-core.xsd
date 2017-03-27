@@ -200,7 +200,447 @@
       </xs:attribute>
    </xs:complexType>
 
-   <!-- Organization -->
+   <xs:complexType name="Organization">
+     <xs:annotation>
+       <xs:documentation>
+         a searchable collection of tabular or property-oriented data
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:OrgRoleType" minOccurs="1"
+                       maxOccurs="1">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Dataset.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="OrgRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a dataset.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Organization: Institution">
+         <xs:annotation>
+           <xs:documentation>
+             A long-lived organization that may engage in many projects
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Organization: Project">
+         <xs:annotation>
+           <xs:documentation>
+             An organization that focuses on a particular project, often with
+             a limited lifetime
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Organization">
+         <xs:annotation>
+           <xs:documentation>
+             A logical set of related data supporting a common scientific purpose
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="DataCollection">
+     <xs:annotation>
+       <xs:documentation>
+         a resource that aggregates and makes accessible many datasets together
+         as part of a collection.  
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:CollectionRoleType" minOccurs="1"
+                       maxOccurs="3">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 the sub-type of collection this resource qualifies as.
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="CollectionRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a data collection.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Collection">
+         <xs:annotation>
+           <xs:documentation>
+             An aggregation of data sets 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Collection: Repository">
+         <xs:annotation>
+           <xs:documentation>
+             An aggregation of data sets 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Collection: Project Archive">
+         <xs:annotation>
+           <xs:documentation>
+             An aggregation of data sets 
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+       
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="Dataset">
+     <xs:annotation>
+       <xs:documentation>
+         a searchable collection of tabular or property-oriented data
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:DatasetRoleType" minOccurs="1"
+                       maxOccurs="2">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Dataset.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="DatasetRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a dataset.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Dataset">
+         <xs:annotation>
+           <xs:documentation>
+             A logical set of related data supporting a common scientific purpose
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Dataset: Database">
+         <xs:annotation>
+           <xs:documentation>
+             A logical set of related data supporting a common scientific purpose
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="Database">
+     <xs:annotation>
+       <xs:documentation>
+         a searchable collection of tabular or property-oriented data
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:DatabaseRoleType" minOccurs="1"
+                       maxOccurs="1">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Dataset.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="DatabaseRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a dataset.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Dataset: Database">
+         <xs:annotation>
+           <xs:documentation>
+             A logical set of related data supporting a common scientific purpose
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="ServiceAPI">
+     <xs:annotation>
+       <xs:documentation>
+         metadata for describing a web-accessible service whose operations
+         are accessed via URLs having a common URL base.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+
+           <xs:element name="type" type="rsm:ServiceRoleType">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
+                <xs:documentation>
+                  a label that indicates the kind of resource it is.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+           
+           <xs:element name="baseURL" type="xs:anyURI" minOccurs="0">
+              <xs:annotation>
+                <xs:appinfo>
+                  <label>Base URL</label>
+                </xs:appinfo>
+                 <xs:documentation>
+                  The base URL for accessing the service API; it is expected that
+                  additional URL components (paths or arguments) may be needed to
+                  access different functions of the API.
+                 </xs:documentation>
+              </xs:annotation>
+           </xs:element>       
+
+           <xs:element name="specificationURL" type="xs:anyURI" minOccurs="0">
+              <xs:annotation>
+                <xs:appinfo>
+                  <label>Specification URL</label>
+                </xs:appinfo>
+                 <xs:documentation>
+                   a URL that will retrieve a structured description of the
+                   service interface (e.g. WSDL, ...).
+                 </xs:documentation>
+              </xs:annotation>
+           </xs:element>       
+
+           <xs:element name="complianceID" type="xs:anyURI" minOccurs="0">
+              <xs:annotation>
+                <xs:appinfo>
+                  <label>Compliance ID</label>
+                </xs:appinfo>
+                 <xs:documentation>
+                   a URI for a service standard that this service is 
+                   compliant with.
+                 </xs:documentation>
+              </xs:annotation>
+           </xs:element>       
+   
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+
+   </xs:complexType>
+
+   <xs:simpleType name="ServiceRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as software.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Service: API">
+         <xs:annotation>
+           <xs:documentation>
+             A label indicating that this record describes a web-based
+             service API.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="Software">
+     <xs:annotation>
+       <xs:documentation>
+         metadata for describing software
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+
+           <xs:element name="type" type="rsm:SoftwareRoleType">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
+                <xs:documentation>
+                  a label that indicates the kind of resource it is.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+           
+           <xs:element name="codeLanguage" type="xs:token"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Code Language</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 The name of the code language that the software is implemented
+                 in
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+
+   </xs:complexType>
+
+   <xs:simpleType name="SoftwareRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as software.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Software">
+         <xs:annotation>
+           <xs:documentation>
+             A label indicating that this resource is a software package
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="WebSite">
+     <xs:annotation>
+       <xs:documentation>
+         a searchable collection of tabular or property-oriented data
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:ResourceRole">
+         <xs:sequence>
+           <xs:element name="type" type="rsm:SiteRoleType" minOccurs="1"
+                       maxOccurs="2">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Type</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 It is recommended that the pid attribute be set to
+                 http://purl.org/dc/dcmitype/Dataset.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>             
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
+   <xs:simpleType name="SiteRoleType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that indicate a type of role this resource can
+         play as a web site.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Web Site: InteractiveResource: Portal">
+         <xs:annotation>
+           <xs:documentation>
+             A web site that provides a suite of tool for interacting with 
+             a variety of data.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Web Site: Informational">
+         <xs:annotation>
+           <xs:documentation>
+             A web site that provides a suite of tool for interacting with 
+             a variety of data.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
+   </xs:simpleType>
+
    <xs:complexType name="Identity">
      <xs:annotation>
        <xs:documentation>
@@ -2450,447 +2890,6 @@
            <xs:documentation>
              a relationship indicating that the subject resource is a source 
              upon which the target resource is based
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-     </xs:restriction>
-   </xs:simpleType>
-
-   <xs:complexType name="Organization">
-     <xs:annotation>
-       <xs:documentation>
-         a searchable collection of tabular or property-oriented data
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:OrgRoleType" minOccurs="1"
-                       maxOccurs="1">
-             <xs:annotation>
-               <xs:appinfo>
-                 <label>Type</label>
-               </xs:appinfo>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/Dataset.  
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:simpleType name="OrgRoleType">
-     <xs:annotation>
-       <xs:documentation>
-         Controlled labels that indicate a type of role this resource can
-         play as a dataset.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:restriction base="xs:token">
-
-       <xs:enumeration value="Organization: Institution">
-         <xs:annotation>
-           <xs:documentation>
-             A long-lived organization that may engage in many projects
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-       <xs:enumeration value="Organization: Project">
-         <xs:annotation>
-           <xs:documentation>
-             An organization that focuses on a particular project, often with
-             a limited lifetime
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-       <xs:enumeration value="Organization">
-         <xs:annotation>
-           <xs:documentation>
-             A logical set of related data supporting a common scientific purpose
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-     </xs:restriction>
-   </xs:simpleType>
-
-   <xs:complexType name="DataCollection">
-     <xs:annotation>
-       <xs:documentation>
-         a resource that aggregates and makes accessible many datasets together
-         as part of a collection.  
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:CollectionRoleType" minOccurs="1"
-                       maxOccurs="3">
-             <xs:annotation>
-               <xs:appinfo>
-                 <label>Type</label>
-               </xs:appinfo>
-               <xs:documentation>
-                 the sub-type of collection this resource qualifies as.
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:simpleType name="CollectionRoleType">
-     <xs:annotation>
-       <xs:documentation>
-         Controlled labels that indicate a type of role this resource can
-         play as a data collection.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:restriction base="xs:token">
-
-       <xs:enumeration value="Collection">
-         <xs:annotation>
-           <xs:documentation>
-             An aggregation of data sets 
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-       <xs:enumeration value="Collection: Repository">
-         <xs:annotation>
-           <xs:documentation>
-             An aggregation of data sets 
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-       <xs:enumeration value="Collection: Project Archive">
-         <xs:annotation>
-           <xs:documentation>
-             An aggregation of data sets 
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-       
-     </xs:restriction>
-   </xs:simpleType>
-
-   <xs:complexType name="Dataset">
-     <xs:annotation>
-       <xs:documentation>
-         a searchable collection of tabular or property-oriented data
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:DatasetRoleType" minOccurs="1"
-                       maxOccurs="2">
-             <xs:annotation>
-               <xs:appinfo>
-                 <label>Type</label>
-               </xs:appinfo>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/Dataset.  
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:simpleType name="DatasetRoleType">
-     <xs:annotation>
-       <xs:documentation>
-         Controlled labels that indicate a type of role this resource can
-         play as a dataset.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:restriction base="xs:token">
-
-       <xs:enumeration value="Dataset">
-         <xs:annotation>
-           <xs:documentation>
-             A logical set of related data supporting a common scientific purpose
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-       <xs:enumeration value="Dataset: Database">
-         <xs:annotation>
-           <xs:documentation>
-             A logical set of related data supporting a common scientific purpose
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-     </xs:restriction>
-   </xs:simpleType>
-
-   <xs:complexType name="Database">
-     <xs:annotation>
-       <xs:documentation>
-         a searchable collection of tabular or property-oriented data
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:DatabaseRoleType" minOccurs="1"
-                       maxOccurs="1">
-             <xs:annotation>
-               <xs:appinfo>
-                 <label>Type</label>
-               </xs:appinfo>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/Dataset.  
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:simpleType name="DatabaseRoleType">
-     <xs:annotation>
-       <xs:documentation>
-         Controlled labels that indicate a type of role this resource can
-         play as a dataset.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:restriction base="xs:token">
-
-       <xs:enumeration value="Dataset: Database">
-         <xs:annotation>
-           <xs:documentation>
-             A logical set of related data supporting a common scientific purpose
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-     </xs:restriction>
-   </xs:simpleType>
-
-   <xs:complexType name="ServiceAPI">
-     <xs:annotation>
-       <xs:documentation>
-         metadata for describing a web-accessible service whose operations
-         are accessed via URLs having a common URL base.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:ResourceRole">
-         <xs:sequence>
-
-           <xs:element name="type" type="rsm:ServiceRoleType">
-             <xs:annotation>
-               <xs:appinfo>
-                 <label>Type</label>
-               </xs:appinfo>
-                <xs:documentation>
-                  a label that indicates the kind of resource it is.
-                </xs:documentation>
-             </xs:annotation>
-           </xs:element>
-           
-           <xs:element name="baseURL" type="xs:anyURI" minOccurs="0">
-              <xs:annotation>
-                <xs:appinfo>
-                  <label>Base URL</label>
-                </xs:appinfo>
-                 <xs:documentation>
-                  The base URL for accessing the service API; it is expected that
-                  additional URL components (paths or arguments) may be needed to
-                  access different functions of the API.
-                 </xs:documentation>
-              </xs:annotation>
-           </xs:element>       
-
-           <xs:element name="specificationURL" type="xs:anyURI" minOccurs="0">
-              <xs:annotation>
-                <xs:appinfo>
-                  <label>Specification URL</label>
-                </xs:appinfo>
-                 <xs:documentation>
-                   a URL that will retrieve a structured description of the
-                   service interface (e.g. WSDL, ...).
-                 </xs:documentation>
-              </xs:annotation>
-           </xs:element>       
-
-           <xs:element name="complianceID" type="xs:anyURI" minOccurs="0">
-              <xs:annotation>
-                <xs:appinfo>
-                  <label>Compliance ID</label>
-                </xs:appinfo>
-                 <xs:documentation>
-                   a URI for a service standard that this service is 
-                   compliant with.
-                 </xs:documentation>
-              </xs:annotation>
-           </xs:element>       
-   
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-
-   </xs:complexType>
-
-   <xs:simpleType name="ServiceRoleType">
-     <xs:annotation>
-       <xs:documentation>
-         Controlled labels that indicate a type of role this resource can
-         play as software.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:restriction base="xs:token">
-
-       <xs:enumeration value="Service: API">
-         <xs:annotation>
-           <xs:documentation>
-             A label indicating that this record describes a web-based
-             service API.
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-     </xs:restriction>
-   </xs:simpleType>
-
-   <xs:complexType name="Software">
-     <xs:annotation>
-       <xs:documentation>
-         metadata for describing software
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:ResourceRole">
-         <xs:sequence>
-
-           <xs:element name="type" type="rsm:SoftwareRoleType">
-             <xs:annotation>
-               <xs:appinfo>
-                 <label>Type</label>
-               </xs:appinfo>
-                <xs:documentation>
-                  a label that indicates the kind of resource it is.
-                </xs:documentation>
-             </xs:annotation>
-           </xs:element>
-           
-           <xs:element name="codeLanguage" type="xs:token"
-                       minOccurs="0" maxOccurs="unbounded">
-             <xs:annotation>
-               <xs:appinfo>
-                 <label>Code Language</label>
-               </xs:appinfo>
-               <xs:documentation>
-                 The name of the code language that the software is implemented
-                 in
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>
-
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-
-   </xs:complexType>
-
-   <xs:simpleType name="SoftwareRoleType">
-     <xs:annotation>
-       <xs:documentation>
-         Controlled labels that indicate a type of role this resource can
-         play as software.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:restriction base="xs:token">
-
-       <xs:enumeration value="Software">
-         <xs:annotation>
-           <xs:documentation>
-             A label indicating that this resource is a software package
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-     </xs:restriction>
-   </xs:simpleType>
-
-   <xs:complexType name="WebSite">
-     <xs:annotation>
-       <xs:documentation>
-         a searchable collection of tabular or property-oriented data
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:ResourceRole">
-         <xs:sequence>
-           <xs:element name="type" type="rsm:SiteRoleType" minOccurs="1"
-                       maxOccurs="2">
-             <xs:annotation>
-               <xs:appinfo>
-                 <label>Type</label>
-               </xs:appinfo>
-               <xs:documentation>
-                 It is recommended that the pid attribute be set to
-                 http://purl.org/dc/dcmitype/Dataset.  
-               </xs:documentation>
-             </xs:annotation>
-           </xs:element>             
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-   </xs:complexType>
-
-   <xs:simpleType name="SiteRoleType">
-     <xs:annotation>
-       <xs:documentation>
-         Controlled labels that indicate a type of role this resource can
-         play as a web site.
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:restriction base="xs:token">
-
-       <xs:enumeration value="Web Site: InteractiveResource: Portal">
-         <xs:annotation>
-           <xs:documentation>
-             A web site that provides a suite of tool for interacting with 
-             a variety of data.
-           </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-
-       <xs:enumeration value="Web Site: Informational">
-         <xs:annotation>
-           <xs:documentation>
-             A web site that provides a suite of tool for interacting with 
-             a variety of data.
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>
