@@ -84,8 +84,15 @@ def define_opts(progname=None):
     parser.add_argument('-n', '--namespace', type=str, dest='ns', metavar='NS',
                        default='http://schema.nist.gov/xml/res-md/1.0wd-02-2017',
                         help='set the schema namespace to NS')
+    parser.add_argument('-s', '--start-row', type=int, dest='start',
+                        metavar='ROW#', default=0, 
+                        help='start reading vocabulary terms with row ROW#')
+    parser.add_argument('-e', '--end-row', type=int, dest='end',
+                        metavar='ROW#', default=0, 
+                        help='end reading vocabulary terms with row ROW#')
     parser.add_argument('-t', '--run-test', type=str, dest='test',metavar='TEST',
                         default=None, help='run the test named TEST')
+    
     return parser
 
 def get_vocab_data(filename):
@@ -283,6 +290,12 @@ def main(opts):
     props = OrderedDict()
     line = 1
     for cells in ws.iter_rows():
+        if opts.end and line >= opts.end:
+            break
+        if opts.start and line < opts.start:
+            line += 1
+            continue
+        
         if len(cells) > 2 and cells[1].value is not None:
             if cells[0].value is None:
                 raise VocabFormatError("Empty property name", cells, line)

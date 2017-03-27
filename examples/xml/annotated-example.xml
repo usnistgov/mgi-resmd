@@ -129,12 +129,12 @@
        </structuralFeature>
        
        <propertyAddressed>
-         <microstructural> microstructural </microstructural>
+         <structural> structural </structural>
        </propertyAddressed>
 
-       <experimentalMethod>
+       <characterizationMethod>
          <charge_distribution> charge distribution </charge_distribution>
-       </experimentalMethod>
+       </characterizationMethod>
 
        <computationalMethod>
          <dislocation_dynamics> dislocation dynamics </dislocation_dynamics>

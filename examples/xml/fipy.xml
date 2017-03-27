@@ -90,7 +90,7 @@
        <microstructures> microstructures: polycrystalline </microstructures>
      </structuralFeature>
      <propertyAddressed>
-       <microstructural>microstructural</microstructural>
+       <structural>structural</structural>
      </propertyAddressed>
    </applicability>     
 

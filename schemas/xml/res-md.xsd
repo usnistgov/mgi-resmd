@@ -27,8 +27,10 @@
       </xs:documentation>
    </xs:annotation>
 
+   <!--
    <xs:include schemaLocation="http://129.6.153.219/rest/types/get-dependency?id=589d94c86e95520522138e07"/>
-
+     -->
+   <xs:include schemaLocation="mse_vocab.xsd"/>
 
    <xs:element name="Resource" type="rsm:AccessibleResource">
       <xs:annotation>
@@ -1616,6 +1618,20 @@
      <xs:complexContent>
        <xs:extension base="rsm:Applicability">
          <xs:sequence>
+           <xs:element name="dataOrigin" type="rsm:Data_origin" 
+                       minOccurs="0" maxOccurs="4"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/fancy_tree_material_type">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Origin of Data</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 A category reflecting broadly how the data was produced.
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
            <xs:element name="materialType" type="rsm:Material_types"
                        minOccurs="0" maxOccurs="unbounded"
                        xmlns:ns0="http://mdcs.ns"
@@ -1661,13 +1677,13 @@
              </xs:annotation>
            </xs:element>
 
-           <xs:element name="experimentalMethod" type="rsm:Experimental_methods" 
+           <xs:element name="characterizationMethod" type="rsm:Characterization_methods" 
                        minOccurs="0" maxOccurs="unbounded"
                        xmlns:ns0="http://mdcs.ns"
                        ns0:_mod_mdcs_="/registry/fancy_tree_experimental_method">
              <xs:annotation>
                <xs:appinfo>
-                 <label>Experimental Data Acquisition Methods</label>
+                 <label>Experimental Characterization Methods</label>
                </xs:appinfo>
                <xs:documentation>
                   the experimental technique used to acquire the data

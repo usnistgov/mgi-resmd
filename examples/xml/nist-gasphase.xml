@@ -78,8 +78,8 @@
    </role>
 
    <applicability xsi:type="rsm:MaterialsScience">
-     <propertyAddressed xsi:type="rsm:Optical_Properties_addressed">
-       Optical
+     <propertyAddressed>
+       <optical>optical</optical>
      </propertyAddressed>
    </applicability>
 
