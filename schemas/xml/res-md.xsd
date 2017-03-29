@@ -124,7 +124,7 @@
                      minOccurs="0" maxOccurs="unbounded">
            <xs:annotation>
              <xs:appinfo>
-               <label>Applicability</label>
+               <label>Applicability to Material Science</label>
              </xs:appinfo>
              <xs:documentation>
                Information describing the resource's applicability to a 
@@ -503,7 +503,7 @@
      <xs:annotation>
        <xs:documentation>
          Controlled labels that indicate a type of role this resource can
-         play as software.
+         play as a service.
        </xs:documentation>
      </xs:annotation>
 
@@ -547,7 +547,7 @@
                        minOccurs="0" maxOccurs="unbounded">
              <xs:annotation>
                <xs:appinfo>
-                 <label>Code Language</label>
+                 <label>Code Language Used</label>
                </xs:appinfo>
                <xs:documentation>
                  The name of the code language that the software is implemented
@@ -556,10 +556,233 @@
              </xs:annotation>
            </xs:element>
 
+           <xs:element name="supportedSystem" type="rsm:OpSystem"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Supported Operating System (OS)</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 A supported operating system that the software
+                 can be installed on
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="licenseName" type="xs:token"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Name of license applied to the software</label>
+                 <placeholder>e.g. GNUv2, BSD, etc.; see also Terms URL under "Access"</placeholder>
+               </xs:appinfo>
+               <xs:documentation>
+                 The common name for the license
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="feature" type="xs:token"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Highlighted feature</label>
+                 <tooltip>Provide a brief description of a key feature of the software</tooltip>
+                 <placeholder>e.g., based on the X algorithm</placeholder>
+               </xs:appinfo>
+               <xs:documentation>
+                 A short phrase or sentence describing an important feature
+                 of the software
+               </xs:documentation>
+               <xs:documentation>
+                 Several occurances could be displayed as a bulleted list.
+               </xs:documentation>               
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="documentation" type="rsm:SWDocLink"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Link to Documentation</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 A web link to the software's documentation.
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="validationInfo" type="rsm:Link"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Link to Validation Information</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 A web link to the information about how the software is or
+                 was validated
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="exportControlStatement" type="rsm:Link"
+                       minOccurs="0" maxOccurs="unbounded">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Link to an export control statement</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 A web link to a statement of any export control rules that 
+                 apply to this software.  
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="inputsOutputs" type="xs:token"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/description"
+                       minOccurs="0" maxOccurs="1">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Briefly describe software's inputs and outputs</label>
+                 <placeholder>Describe the input data the software operates on and the output data it produces...</placeholder>
+               </xs:appinfo>
+               <xs:documentation>
+                 A description of the data inputs and outputs for the software.
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="useNotes" type="xs:token"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/description"
+                       minOccurs="0" maxOccurs="1">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Provide any notes, caveats requirements, or recommendations for installing and using this software</label>
+               </xs:appinfo>
+               <xs:documentation>
+                 Micellaneous notes regarding the installation or use of this
+                 software
+               </xs:documentation>
+               <xs:documentation>
+                 This can include platform requirements or qualifications that
+                 might be useful while browsing during discovery.
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
          </xs:sequence>
        </xs:extension>
      </xs:complexContent>
 
+   </xs:complexType>
+
+   <xs:complexType name="Link">
+     <xs:annotation>
+       <xs:documentation>
+         A URL and description of the URL's target.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:sequence>
+       <xs:element name="url">
+         <xs:annotation>
+           <xs:appinfo>
+             <label>Link URL</label>
+           </xs:appinfo>
+           <xs:documentation>
+             The link's URL
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>
+
+       <xs:element name="caption" minOccurs="0">
+         <xs:annotation>
+           <xs:appinfo>
+             <label>Link description</label>
+             <placeholder>Enter a Brief title or label indicating what the URL points to</placeholder>
+           </xs:appinfo>
+           <xs:documentation>
+             A brief label that describes what document is pointed to by the
+             link.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>         
+     </xs:sequence>
+     
+   </xs:complexType>
+
+   <xs:complexType name="SWDocLink">
+     <xs:annotation>
+       <xs:documentation>
+         A URL and description of the URL's target.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:sequence>
+       <xs:element name="url">
+         <xs:annotation>
+           <xs:appinfo>
+             <label>Documentation URL</label>
+           </xs:appinfo>
+           <xs:documentation>
+             The link's URL
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>
+
+       <xs:element name="caption" minOccurs="0">
+         <xs:annotation>
+           <xs:appinfo>
+             <label>Type of documentation</label>
+             <placeholder>e.g. manual, API, tutorial, etc.</placeholder>
+           </xs:appinfo>
+           <xs:documentation>
+             A brief label that describes what document is pointed to by the
+             link.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>         
+     </xs:sequence>
+     
+   </xs:complexType>
+
+   <xs:complexType name="OpSystem">
+     <xs:annotation>
+       <xs:documentation>
+         An named and possibly versioned operating system
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:sequence>
+
+       <xs:element name="osName" type="xs:token">
+         <xs:annotation>
+           <xs:appinfo>
+             <label>OS Name</label>
+             <placeholder>e.g. Windows, Mac, Linux, Ubuntu, Solaris, etc.</placeholder>
+           </xs:appinfo>
+           <xs:documentation>
+             The common name for the operating system
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>         
+
+       <xs:element name="osVersion" type="xs:token"
+                   minOccurs="0" maxOccurs="unbounded">
+         <xs:annotation>
+           <xs:appinfo>
+             <label>OS Version</label>
+             <placeholder>e.g. Vista, X, 8+, 14.01, etc.; add more with + as needed.</placeholder>
+           </xs:appinfo>
+           <xs:documentation>
+             A particular version of the named operating system
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>         
+     </xs:sequence>
+     
    </xs:complexType>
 
    <xs:simpleType name="SoftwareRoleType">
@@ -1336,8 +1559,8 @@
        <xs:element name="landingPage" type="xs:anyURI">
           <xs:annotation>
             <xs:appinfo>
-              <label>Landing Page</label>
-              <placeholder>Enter a landing page</placeholder>
+              <label>Home/Landing Page</label>
+              <placeholder>Enter a web site URL</placeholder>
               <tooltip>URL pointing to the definitive, human-readable document or web
                 page that serves as the primary description of or entry to
                 this resource.</tooltip>
@@ -1707,7 +1930,7 @@
                    minOccurs="1" maxOccurs="4">
          <xs:annotation>
            <xs:appinfo>
-             <label>Restriction</label>
+             <label>Access restriction</label>
            </xs:appinfo>
            <xs:appinfo>
              <am:dcterm>accessRights</am:dcterm>
@@ -1724,7 +1947,8 @@
        <xs:element name="rights" type="xs:token" minOccurs="0" maxOccurs="1">
          <xs:annotation>
            <xs:appinfo>
-             <label>Rights</label>
+             <label>Rights and Restrictions Info</label>
+             <placeholder>Briefly explain any specific restrictions on use</placeholder>
            </xs:appinfo>
            <xs:appinfo>
              <am:dcterm>Rights</am:dcterm>
@@ -1743,7 +1967,7 @@
        <xs:element name="termsURL" type="xs:anyURI" minOccurs="0" maxOccurs="1">
          <xs:annotation>
            <xs:appinfo>
-             <label>Terms URL</label>
+             <label>License or Terms-of-use URL</label>
            </xs:appinfo>
            <xs:appinfo>
              <am:dcterm>Rights</am:dcterm>
@@ -1755,6 +1979,70 @@
          </xs:annotation>
        </xs:element>
 
+       <xs:element name="copyright" type="rsm:Copyright"
+                   minOccurs="0" maxOccurs="1">
+         <xs:annotation>
+           <xs:appinfo>
+             <label>Copyright</label>
+           </xs:appinfo>
+           <xs:documentation>
+             A structured copyright statement
+           </xs:documentation>
+         </xs:annotation>
+       </xs:element>
+
+     </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="Copyright">
+     <xs:annotation>
+       <xs:documentation>
+         a structured statement of a copyright
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:sequence>
+        <xs:element name="crholder" type="xs:token"
+                    minOccurs="1" maxOccurs="1">
+          <xs:annotation>
+            <xs:appinfo>
+              <label>Copyright Holder</label>
+              <placeholder>Enter name of person or organization who holds the copyright</placeholder>
+              <tooltip>name of person or organization who holds the copyright</tooltip>
+            </xs:appinfo>
+            <xs:documentation>
+              Copyright holder's name
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+
+        <xs:element name="cryear" type="xs:token"
+                    minOccurs="0" maxOccurs="unbounded">
+          <xs:annotation>
+            <xs:appinfo>
+              <label>Year</label>
+              <placeholder>Enter year or year range, e.g. 1998-2004</placeholder>
+              <tooltip>click + to add an additional year</tooltip>
+            </xs:appinfo>
+            <xs:documentation>
+              Year copyright was applied
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+
+        <xs:element name="crref" type="xs:anyURI"
+                    minOccurs="0" maxOccurs="1">
+          <xs:annotation>
+            <xs:appinfo>
+              <label>URL to copyright statement or information on holder</label>
+              <placeholder>http...</placeholder>
+            </xs:appinfo>
+            <xs:documentation>
+              a URL pointing to a human-readable document that provides more information about the held copyright or the copyright holder.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+       
      </xs:sequence>
    </xs:complexType>
 
@@ -1828,32 +2116,6 @@
      </xs:simpleContent>
    </xs:complexType>
 
-   <xs:complexType name="SoftwareMethod">
-     <xs:annotation>
-       <xs:documentation>
-         metadata describing how one can access a resource via locally
-         installable software.
-       </xs:documentation>
-       <xs:documentation>
-         The accessURL points to the home page for the software from which it
-         can be downloaded.  
-       </xs:documentation>
-       <xs:documentation>
-         The details element provides additional information about supported
-         platforms, licensing, etc. 
-       </xs:documentation>
-     </xs:annotation>
-
-     <xs:complexContent>
-       <xs:extension base="rsm:AccessMethod">
-         <xs:sequence>
-           <xs:element name="details" type="rsm:Software"
-                       minOccurs="1" maxOccurs="1"/>
-         </xs:sequence>
-       </xs:extension>
-     </xs:complexContent>
-   </xs:complexType>
-
    <xs:complexType name="MediaMethod">
      <xs:annotation>
        <xs:documentation>
@@ -1889,6 +2151,29 @@
      </xs:complexContent>
    </xs:complexType>
 
+   <xs:complexType name="PortalMethod">
+     <xs:annotation>
+       <xs:documentation>
+         description of acces to a resource via a portal.
+       </xs:documentation>
+       <xs:documentation>
+         The accessURL points to the landing page for the portal.
+       </xs:documentation>
+       <xs:documentation>
+         Use this AccessMethod type when the resource is accessible via a portal
+         that is not specific to this resource.  In such a case the accessURL
+         given here would not be the same as the resource's landingPage URL.  
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:complexContent>
+       <xs:extension base="rsm:AccessMethod">
+         <xs:sequence>
+         </xs:sequence>
+       </xs:extension>
+     </xs:complexContent>
+   </xs:complexType>
+
    <xs:complexType name="ServiceAPIMethod">
      <xs:annotation>
        <xs:documentation>
@@ -1915,24 +2200,27 @@
      </xs:complexContent>
    </xs:complexType>
 
-   <xs:complexType name="PortalMethod">
+   <xs:complexType name="SoftwareMethod">
      <xs:annotation>
        <xs:documentation>
-         description of acces to a resource via a portal.
+         metadata describing how one can access a resource via locally
+         installable software.
        </xs:documentation>
        <xs:documentation>
-         The accessURL points to the landing page for the portal.
+         The accessURL points to the home page for the software from which it
+         can be downloaded.  
        </xs:documentation>
        <xs:documentation>
-         Use this AccessMethod type when the resource is accessible via a portal
-         that is not specific to this resource.  In such a case the accessURL
-         given here would not be the same as the resource's landingPage URL.  
+         The details element provides additional information about supported
+         platforms, licensing, etc. 
        </xs:documentation>
      </xs:annotation>
 
      <xs:complexContent>
        <xs:extension base="rsm:AccessMethod">
          <xs:sequence>
+           <xs:element name="details" type="rsm:Software"
+                       minOccurs="1" maxOccurs="1"/>
          </xs:sequence>
        </xs:extension>
      </xs:complexContent>
@@ -2033,6 +2321,20 @@
                <xs:documentation>
                   the computational technique used to acquire the data
                   within this resource 
+               </xs:documentation>
+             </xs:annotation>
+           </xs:element>
+
+           <xs:element name="computeScale" type="rsm:Compute_scales" 
+                       minOccurs="0" maxOccurs="unbounded"
+                       xmlns:ns0="http://mdcs.ns"
+                       ns0:_mod_mdcs_="/registry/fancy_tree_computational_method">
+             <xs:annotation>
+               <xs:appinfo>
+                 <label>Physical scale modeled by computation</label>
+               </xs:appinfo>
+               <xs:documentation>
+                  the physical scale that is represented by a computation
                </xs:documentation>
              </xs:annotation>
            </xs:element>
@@ -3208,7 +3510,7 @@
        <xs:enumeration value="dislocation dynamics"/>
      </xs:restriction>
    </xs:simpleType>
-  
+
    <xs:simpleType name="finite_element_analysis_Computational_methods">
      <xs:annotation>
        <xs:documentation>
@@ -3568,7 +3870,111 @@
  
 <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   -  end mse_vocab.xsd inlined
-  -->
+-->
+
+   <xs:complexType name="Compute_scales">
+     <xs:annotation>
+       <xs:documentation>
+         a property that captures Compute scales vocabulary
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:choice minOccurs="0">
+         <xs:element name="electronic" type="rsm:electronic_Compute_scales"/>
+         <xs:element name="nanoscale" type="rsm:nanoscale_Compute_scales"/>
+         <xs:element name="microscale" type="rsm:microscale_Compute_scales"/>
+         <xs:element name="mesoscale" type="rsm:mesoscale_Compute_scales"/>
+         <xs:element name="macroscale" type="rsm:macroscale_Compute_scales"/>
+         <xs:element name="structural" type="rsm:structural_Compute_scales"/>
+         <xs:element name="multiscale" type="rsm:multiscale_Compute_scales"/>
+     </xs:choice>
+   </xs:complexType>
+  
+   <xs:simpleType name="electronic_Compute_scales">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for electronic vocabulary terms describing compute scales
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="electronic"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="nanoscale_Compute_scales">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for nanoscale vocabulary terms describing compute scales
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="atomic scale (nanoscale)"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="microscale_Compute_scales">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for microscale vocabulary terms describing compute scales
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="microscale"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="mesoscale_Compute_scales">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for mesoscale vocabulary terms describing compute scales
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="mesoscale"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="macroscale_Compute_scales">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for macroscale vocabulary terms describing compute scales
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="macroscale"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="structural_Compute_scales">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for structural vocabulary terms describing compute scales
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="structural"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+   <xs:simpleType name="multiscale_Compute_scales">
+     <xs:annotation>
+       <xs:documentation>
+         Allowed values for multiscale vocabulary terms describing compute scales
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+       <xs:enumeration value="multiscale"/>
+     </xs:restriction>
+   </xs:simpleType>
+ 
+
 
    <xs:complexType name="DciteDate">
      <xs:annotation>
