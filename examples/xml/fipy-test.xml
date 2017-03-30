@@ -17,15 +17,15 @@
      </publisher>
      <publicationYear> 2009 </publicationYear>
      <creator>
-       <name sur="Guyer" given="Jonathan" middle="E.">Jonathan E. Guyer</name>
+       <name>Jonathan E. Guyer</name>
        <affiliation> NIST </affiliation>
      </creator>
      <creator>
-       <name sur="Dan" given="J." middle="E.">Dan Wheeler</name>
+       <name>Dan Wheeler</name>
        <affiliation> NIST </affiliation>
      </creator>
      <creator>
-       <name sur="Warren" given="James" middle="A.">James A. Warren</name>
+       <name>James A. Warren</name>
        <affiliation> NIST </affiliation>
      </creator>
      <date role="Created" xsi:type="rsm:DciteDate"> 2008-04-01 </date>
@@ -100,7 +100,7 @@
        <termsURL> http://www.ctcms.nist.gov/fipy/LICENSE.html </termsURL>
      </policy>
      <method xsi:type="rsm:DownloadMethod">
-       <accessURL use="dir" returns="text/html">
+       <accessURL returns="text/html">
           http://www.ctcms.nist.gov/fipy/download/
        </accessURL>
      </method>
