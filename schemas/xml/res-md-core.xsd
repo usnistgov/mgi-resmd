@@ -2068,7 +2068,7 @@
          <xs:attribute name="returns" type="xs:token">
            <xs:annotation>
              <xs:appinfo>
-               <label>What is returned by this URL?</label>
+               <label>What is returned by this URL? </label>
                <tooltip>A MIME type is prefered (like "text/html" or "application/x-zip")</tooltip>
                <placeholder>e.g. text/html, application/x-zip, application/x-tar</placeholder>
              </xs:appinfo>
@@ -2211,7 +2211,7 @@
            <xs:element name="dataOrigin" type="rsm:Data_origin" 
                        minOccurs="0" maxOccurs="4"
                        xmlns:ns0="http://mdcs.ns"
-                       ns0:_mod_mdcs_="/registry/fancy_tree_material_type">
+                       ns0:_mod_mdcs_="/registry/fancy_tree_data_origin">
              <xs:annotation>
                <xs:appinfo>
                  <label>Origin of Data</label>
@@ -2270,7 +2270,7 @@
            <xs:element name="characterizationMethod" type="rsm:Characterization_methods" 
                        minOccurs="0" maxOccurs="unbounded"
                        xmlns:ns0="http://mdcs.ns"
-                       ns0:_mod_mdcs_="/registry/fancy_tree_experimental_method">
+                       ns0:_mod_mdcs_="/registry/fancy_tree_characterization_method">
              <xs:annotation>
                <xs:appinfo>
                  <label>Experimental Characterization Methods</label>
@@ -2300,7 +2300,7 @@
            <xs:element name="computeScale" type="rsm:Compute_scales" 
                        minOccurs="0" maxOccurs="unbounded"
                        xmlns:ns0="http://mdcs.ns"
-                       ns0:_mod_mdcs_="/registry/fancy_tree_computational_method">
+                       ns0:_mod_mdcs_="/registry/fancy_tree_compute_scale">
              <xs:annotation>
                <xs:appinfo>
                  <label>Physical scale modeled by computation</label>

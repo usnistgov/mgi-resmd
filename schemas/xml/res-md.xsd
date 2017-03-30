@@ -2268,7 +2268,7 @@
            <xs:element name="characterizationMethod" type="rsm:Characterization_methods" 
                        minOccurs="0" maxOccurs="unbounded"
                        xmlns:ns0="http://mdcs.ns"
-                       ns0:_mod_mdcs_="/registry/fancy_tree_experimental_method">
+                       ns0:_mod_mdcs_="/registry/fancy_tree_characterization_method">
              <xs:annotation>
                <xs:appinfo>
                  <label>Experimental Characterization Methods</label>
@@ -2298,7 +2298,7 @@
            <xs:element name="computeScale" type="rsm:Compute_scales" 
                        minOccurs="0" maxOccurs="unbounded"
                        xmlns:ns0="http://mdcs.ns"
-                       ns0:_mod_mdcs_="/registry/fancy_tree_compute_scales">
+                       ns0:_mod_mdcs_="/registry/fancy_tree_compute_scale">
              <xs:annotation>
                <xs:appinfo>
                  <label>Physical scale modeled by computation</label>
