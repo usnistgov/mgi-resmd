@@ -469,6 +469,18 @@
               </xs:annotation>
            </xs:element>       
 
+           <xs:element name="documentationURL" type="xs:anyURI" minOccurs="0">
+              <xs:annotation>
+                <xs:appinfo>
+                  <label>URL where the API is documented</label>
+                </xs:appinfo>
+                 <xs:documentation>
+                   a URL that points to a human-readable document that
+                   specifically describes how to use the API.
+                 </xs:documentation>
+              </xs:annotation>
+           </xs:element>       
+
            <xs:element name="specificationURL" type="xs:anyURI" minOccurs="0">
               <xs:annotation>
                 <xs:appinfo>
@@ -1054,7 +1066,7 @@
      </xs:annotation>
 
      <xs:sequence>
-       <xs:element name="publisher" type="rsm:NamePID">
+       <xs:element name="publisher" type="xs:token">
           <xs:annotation>
              <xs:appinfo>
                <label>Publisher</label>
@@ -1277,7 +1289,7 @@
      </xs:annotation>
 
      <xs:sequence>
-       <xs:element name="name" type="rsm:PersonName">
+       <xs:element name="name" type="rsm:NamePID">
           <xs:annotation>
             <xs:appinfo>
               <label>Name</label>
@@ -1292,7 +1304,7 @@
           </xs:annotation>
        </xs:element>
 
-       <xs:element name="affiliation" type="rsm:NamePID" minOccurs="0">
+       <xs:element name="affiliation" type="xs:token" minOccurs="0">
           <xs:annotation>
             <xs:appinfo>
               <label>Affiliation</label>
@@ -1853,6 +1865,7 @@
           <xs:annotation>
             <xs:appinfo>
               <label>Access URL</label>
+              <placeholder>http://...</placeholder>
             </xs:appinfo>
              <xs:documentation>
                The URL that through which user can access the resource via
@@ -2049,56 +2062,13 @@
    <xs:complexType name="AccessURL">
      <xs:simpleContent>
        <xs:extension base="xs:anyURI">
-         <xs:attribute name="use">
-           <xs:annotation>
-             <xs:appinfo>
-               <label>Use</label>
-             </xs:appinfo>
-             <xs:documentation>
-               A flag indicating whether this should be interpreted as a base
-               URL, a full URL, or a URL to a directory that will produce a 
-               listing of files.
-             </xs:documentation>
-             <xs:documentation>
-               The default value assumed when one is not given depends on the 
-               context.  
-             </xs:documentation>
-           </xs:annotation>
-           <xs:simpleType>
-             <xs:restriction base="xs:NMTOKEN">
-               <xs:enumeration value="full">
-                 <xs:annotation>
-                   <xs:documentation>
-                     Assume a full URL--that is, one that can be invoked 
-                     directly without alteration.  This usually returns a 
-                     single document or file.  
-                   </xs:documentation>
-                 </xs:annotation>
-               </xs:enumeration>
-               <xs:enumeration value="base">
-                 <xs:annotation>
-                   <xs:documentation>
-                     Assume a base URL--that is, one requiring an extra portion
-                     to be appended before being invoked.  
-                   </xs:documentation>
-                 </xs:annotation>
-               </xs:enumeration>
-               <xs:enumeration value="dir">
-                 <xs:annotation>
-                   <xs:documentation>
-                     Assume URL points to a directory that will return a listing
-                     of files.  
-                   </xs:documentation>
-                 </xs:annotation>
-               </xs:enumeration>
-             </xs:restriction>
-           </xs:simpleType>
-         </xs:attribute>
 
          <xs:attribute name="returns" type="xs:token">
            <xs:annotation>
              <xs:appinfo>
-               <label>Returns</label>
+               <label>What is returned by this URL? </label>
+               <tooltip>A MIME type is prefered (like "text/html" or "application/x-zip")</tooltip>
+               <placeholder>e.g. text/html, application/x-zip, application/x-tar</placeholder>
              </xs:appinfo>
              <xs:documentation>
                a MIME type indicating what is (typically) returned when
@@ -2239,7 +2209,7 @@
            <xs:element name="dataOrigin" type="rsm:Data_origin" 
                        minOccurs="0" maxOccurs="4"
                        xmlns:ns0="http://mdcs.ns"
-                       ns0:_mod_mdcs_="/registry/fancy_tree_material_type">
+                       ns0:_mod_mdcs_="/registry/fancy_tree_data_origin">
              <xs:annotation>
                <xs:appinfo>
                  <label>Origin of Data</label>
@@ -2328,7 +2298,7 @@
            <xs:element name="computeScale" type="rsm:Compute_scales" 
                        minOccurs="0" maxOccurs="unbounded"
                        xmlns:ns0="http://mdcs.ns"
-                       ns0:_mod_mdcs_="/registry/fancy_tree_computational_method">
+                       ns0:_mod_mdcs_="/registry/fancy_tree_compute_scales">
              <xs:annotation>
                <xs:appinfo>
                  <label>Physical scale modeled by computation</label>
