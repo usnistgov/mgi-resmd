@@ -291,6 +291,14 @@
       <CALPHAD>CALPHAD</CALPHAD>
    </xsl:template>
 
+   <xsl:template match="rm:publisher">
+      <xsl:param name="sp"/>
+      <xsl:param name="step"/>
+
+      <xsl:value-of select="$sp"/>
+      <publisher><xsl:value-of select="."/></publisher>
+   </xsl:template>
+
    <xsl:template match="rm:Resource">
       <xsl:param name="sp"/>
       <xsl:param name="step"/>
